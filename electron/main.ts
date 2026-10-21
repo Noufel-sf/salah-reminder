@@ -98,7 +98,7 @@ function createWindow() {
     maximizable: true,
     fullscreenable: true,
     frame: false, // Custom frameless title bar
-    backgroundColor: '#f6f9f6',
+    backgroundColor: '#101915',
     show: false,
     icon: iconData?.filePath || iconData?.image,
     webPreferences: {

@@ -8,7 +8,9 @@ import {
   Square, 
   RotateCcw, 
   Check, 
-  Sparkles 
+  Sparkles,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { AppSettings, CalculationMethodKey, SoundOption } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
@@ -299,6 +301,42 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 onChange={(e) => setFormData({ ...formData, adhanVolume: parseFloat(e.target.value) })}
                 className="w-full accent-emerald-700 cursor-pointer"
               />
+            </div>
+          </div>
+
+          {/* Theme / Appearance */}
+          <div className="pt-4 border-t border-slate-100">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
+              <Sun size={16} className="text-emerald-700" />
+              <span>مظهر التطبيق (الوضع النهاري / الليلي)</span>
+            </h3>
+
+            <div className="grid grid-cols-2 gap-3 max-w-md">
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, theme: 'light' })}
+                className={`py-2.5 px-4 rounded-none border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer font-readex ${
+                  formData.theme !== 'dark'
+                    ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <Sun size={14} />
+                <span>الوضع النهاري (فاتح)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, theme: 'dark' })}
+                className={`py-2.5 px-4 rounded-none border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer font-readex ${
+                  formData.theme === 'dark'
+                    ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <Moon size={14} />
+                <span>الوضع الليلي (داكن)</span>
+              </button>
             </div>
           </div>
 

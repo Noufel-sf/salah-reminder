@@ -35,6 +35,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     const theme = settings.theme || 'light';
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [settings.theme]);
 
   const handleSaveSettings = (newSettings: AppSettings) => {
