@@ -18,6 +18,7 @@ interface PrayerDashboardViewProps {
   onOpenQiblaTab: () => void;
   onOpenSettingsTab: () => void;
   onOpenTasbihTab?: () => void;
+  onOpenDuasTab?: () => void;
 }
 
 export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
@@ -28,7 +29,8 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onToggleNotification,
   onOpenQiblaTab,
   onOpenSettingsTab,
-  onOpenTasbihTab
+  onOpenTasbihTab,
+  onOpenDuasTab
 }) => {
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
 
@@ -40,10 +42,10 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
         currentPrayer={currentPrayer}
       />
 
-      {/* 2. Key Worship & Prayer Statistics */}
+      {/* 2. Key Worship & Prayer Statistics (Real Adhkar stats) */}
       <DashboardStats
-        prayers={prayers}
         onOpenTasbih={onOpenTasbihTab}
+        onOpenDuas={onOpenDuasTab}
       />
 
       {/* 3. Responsive 2-Column Grid */}

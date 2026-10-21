@@ -181,6 +181,7 @@ export const App: React.FC = () => {
               onOpenQiblaTab={() => setCurrentTab('qibla')}
               onOpenSettingsTab={() => setCurrentTab('settings')}
               onOpenTasbihTab={() => setCurrentTab('tasbih')}
+              onOpenDuasTab={() => setCurrentTab('duas')}
             />
           )}
 
