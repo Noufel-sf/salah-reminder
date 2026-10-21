@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Header } from './components/Header';
-import { NextPrayerCard } from './components/NextPrayerCard';
-import { PrayerList } from './components/PrayerList';
-import { SettingsModal } from './components/SettingsModal';
-import { QiblaModal } from './components/QiblaModal';
+import { DesktopSidebar, NavTab } from './components/DesktopSidebar';
+import { DesktopTopBar } from './components/DesktopTopBar';
+import { PrayerDashboardView } from './components/views/PrayerDashboardView';
+import { QiblaView } from './components/views/QiblaView';
+import { TasbihView } from './components/views/TasbihView';
+import { DuasView } from './components/views/DuasView';
+import { CalendarView } from './components/views/CalendarView';
+import { SettingsView } from './components/views/SettingsView';
+
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes } from './utils/prayerTimes';
 import { audioService } from './utils/audio';
@@ -11,6 +15,8 @@ import { audioService } from './utils/audio';
 const STORAGE_KEY = 'noor_prayer_settings';
 
 export const App: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState<NavTab>('prayers');
+
   // Load saved settings or fallback to default
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
@@ -25,10 +31,6 @@ export const App: React.FC = () => {
   });
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isQiblaOpen, setIsQiblaOpen] = useState(false);
-
-  // Track the last alerted prayer to avoid duplicate notifications
   const lastAlertedPrayerRef = useRef<string>('');
 
   // Save settings when changed
@@ -76,7 +78,7 @@ export const App: React.FC = () => {
     const todayStr = now.toDateString();
 
     prayerData.prayers.forEach((prayer) => {
-      if (prayer.id === 'Sunrise') return; // typically no prayer alert for sunrise
+      if (prayer.id === 'Sunrise') return;
       if (!settings.enabledPrayers[prayer.id]) return;
 
       const prayerTime = new Date(prayer.time);
@@ -99,8 +101,7 @@ export const App: React.FC = () => {
             );
           } else if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(`Time for ${prayer.name} (${prayer.arabicName})`, {
-              body: `It is now time for ${prayer.name} prayer in ${settings.city}.`,
-              icon: '/icon.png'
+              body: `It is now time for ${prayer.name} prayer in ${settings.city}.`
             });
           }
         }
@@ -108,60 +109,77 @@ export const App: React.FC = () => {
     });
   }, [currentTime, prayerData, settings]);
 
-  return (
-    <div className="relative min-h-screen bg-[#070b13] text-slate-100 flex flex-col font-sans select-none pb-6">
-      {/* Dynamic Background Atmosphere */}
-      <div className="app-atmosphere">
-        <div className="atmosphere-orb-1" />
-        <div className="atmosphere-orb-2" />
-        <div className="atmosphere-orb-3" />
-      </div>
+  const getTabTitle = () => {
+    switch (currentTab) {
+      case 'prayers':
+        return 'Assalamu Alaikum';
+      case 'qibla':
+        return 'Qibla Direction & Alignment';
+      case 'tasbih':
+        return 'Digital Tasbih & Dhikr';
+      case 'duas':
+        return 'Duas & Hadith Collection';
+      case 'calendar':
+        return 'Hijri Islamic Calendar';
+      case 'settings':
+        return 'Preferences & Settings';
+    }
+  };
 
-      {/* Titlebar & Header */}
-      <Header
+  return (
+    <div className="flex h-screen w-screen bg-[#f4f7f4] text-[#142820] overflow-hidden select-none font-sans">
+      {/* Left Full-Height Desktop Sidebar */}
+      <DesktopSidebar
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
         settings={settings}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenQibla={() => setIsQiblaOpen(true)}
+        onOpenSettingsLocation={() => setCurrentTab('settings')}
         onToggleMute={handleToggleMute}
       />
 
-      {/* Main Content Area */}
-      <main className="relative z-10 flex-1 px-4 pt-3 max-w-lg mx-auto w-full">
-        {/* Next Prayer Hero */}
-        <NextPrayerCard
-          nextPrayer={prayerData.nextPrayer}
-          currentPrayer={prayerData.currentPrayer}
-        />
+      {/* Main Desktop Workspace Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Window Bar */}
+        <DesktopTopBar title={getTabTitle()} />
 
-        {/* 6 Waqt Prayer Schedule List */}
-        <PrayerList
-          prayers={prayerData.prayers}
-          onToggleNotification={handleToggleNotification}
-        />
+        {/* Scrollable View Content */}
+        <main className="flex-1 overflow-y-auto">
+          {currentTab === 'prayers' && (
+            <PrayerDashboardView
+              prayers={prayerData.prayers}
+              nextPrayer={prayerData.nextPrayer}
+              currentPrayer={prayerData.currentPrayer}
+              settings={settings}
+              onToggleNotification={handleToggleNotification}
+              onOpenQiblaTab={() => setCurrentTab('qibla')}
+              onOpenSettingsTab={() => setCurrentTab('settings')}
+            />
+          )}
 
-        {/* Footer info */}
-        <footer className="mt-5 text-center text-[10px] text-slate-500">
-          <p>Method: {settings.calculationMethod} • {settings.madhab === 'hanafi' ? 'Hanafi' : 'Standard'}</p>
-          <p className="mt-0.5 text-slate-600">Noor Prayer Reminder Desktop</p>
-        </footer>
-      </main>
+          {currentTab === 'qibla' && (
+            <QiblaView settings={settings} />
+          )}
 
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onSave={handleSaveSettings}
-      />
+          {currentTab === 'tasbih' && (
+            <TasbihView />
+          )}
 
-      {/* Qibla Direction Compass Modal */}
-      <QiblaModal
-        isOpen={isQiblaOpen}
-        onClose={() => setIsQiblaOpen(false)}
-        latitude={settings.latitude}
-        longitude={settings.longitude}
-        cityName={settings.city}
-      />
+          {currentTab === 'duas' && (
+            <DuasView />
+          )}
+
+          {currentTab === 'calendar' && (
+            <CalendarView />
+          )}
+
+          {currentTab === 'settings' && (
+            <SettingsView
+              settings={settings}
+              onSave={handleSaveSettings}
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 };

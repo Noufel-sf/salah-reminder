@@ -1,19 +1,17 @@
 import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, Notification } from 'electron';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Disable hardware acceleration issues on some Windows setups if needed
-// app.disableHardwareAcceleration();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-
 function createTray() {
-  // Create a sleek simple tray icon using nativeImage canvas or SVG fallback
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
     </svg>
   `;
@@ -21,7 +19,7 @@ function createTray() {
   const trayIcon = nativeImage.createFromBuffer(iconBuffer).resize({ width: 16, height: 16 });
 
   tray = new Tray(trayIcon);
-  tray.setToolTip('Noor - Prayer Reminder');
+  tray.setToolTip('Noor - Salah Reminder');
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -59,16 +57,15 @@ function createTray() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 440,
-    height: 720,
-    minWidth: 400,
-    minHeight: 650,
-    maxWidth: 520,
-    maxHeight: 850,
+    width: 1200,
+    height: 800,
+    minWidth: 960,
+    minHeight: 640,
     resizable: true,
+    maximizable: true,
+    fullscreenable: true,
     frame: false, // Custom frameless title bar
-    transparent: false,
-    backgroundColor: '#0a0f18',
+    backgroundColor: '#f6f9f6',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -77,7 +74,6 @@ function createWindow() {
     }
   });
 
-  // In development, load from Vite dev server URL
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {

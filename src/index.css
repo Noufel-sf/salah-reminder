@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #070b13;
-  --bg-card: rgba(15, 23, 42, 0.72);
-  --bg-card-hover: rgba(22, 34, 60, 0.85);
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(16, 185, 129, 0.4);
+  /* Sage Green & Forest Islamic Design Palette matching reference */
+  --bg-app: #f4f7f4;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f9fbf9;
+  
+  --emerald-dark: #114232;
+  --emerald-main: #1f5945;
+  --emerald-primary: #2d6a4f;
+  --emerald-medium: #40916c;
+  --emerald-light: #52b788;
+  --emerald-tint: #eaf4ee;
+  --emerald-mint: #d8f3dc;
 
-  --emerald-primary: #10b981;
-  --emerald-light: #34d399;
-  --emerald-dark: #065f46;
-  --emerald-glow: rgba(16, 185, 129, 0.25);
+  --border-card: #e4eee6;
+  --border-subtle: #edf3ee;
 
-  --amber-gold: #f59e0b;
-  --amber-light: #fcd34d;
-  --amber-glow: rgba(245, 158, 11, 0.2);
-
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
+  --text-title: #142820;
+  --text-body: #3c5248;
+  --text-muted: #74897f;
+  --text-light: #9db2a8;
 
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-arabic: 'Amiri', serif;
@@ -29,13 +31,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  user-select: none;
 }
 
 body {
   font-family: var(--font-sans);
-  background: var(--bg-primary);
-  color: var(--text-main);
+  background-color: var(--bg-app);
+  color: var(--text-body);
   overflow-x: hidden;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -43,20 +44,21 @@ body {
 
 /* Custom Desktop Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: #cbd8cf;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: #a9bea1;
 }
 
-/* Frameless Titlebar Windows Drag Region */
+/* Frameless Window Drag Region */
 .titlebar-drag {
   -webkit-app-region: drag;
 }
@@ -64,114 +66,51 @@ body {
   -webkit-app-region: no-drag;
 }
 
-/* Background Atmosphere */
-.app-atmosphere {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+/* Card & Surface Tokens */
+.sage-card {
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(22, 66, 48, 0.04), 0 2px 6px -1px rgba(22, 66, 48, 0.02);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sage-card:hover {
+  box-shadow: 0 8px 30px -4px rgba(22, 66, 48, 0.08);
+}
+
+.active-prayer-row {
+  background-color: #f0f7f2 !important;
+  border-color: #b7ddc4 !important;
+}
+
+.next-prayer-row {
+  background: linear-gradient(135deg, #eef8f1 0%, #ffffff 100%) !important;
+  border-color: #52b788 !important;
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.08);
+}
+
+.arabic-calligraphy {
+  font-family: var(--font-arabic);
+}
+
+/* Mosque Silhouette Graphic Gradient */
+.mosque-banner {
+  background: linear-gradient(135deg, #164e3c 0%, #205c47 50%, #2d6a4f 100%);
+  position: relative;
   overflow: hidden;
 }
-.atmosphere-orb-1 {
-  position: absolute;
-  top: -100px;
-  right: -80px;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0) 70%);
-  border-radius: 50%;
-  filter: blur(40px);
-}
-.atmosphere-orb-2 {
-  position: absolute;
-  top: 300px;
-  left: -120px;
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle, rgba(14, 116, 144, 0.14) 0%, rgba(14, 116, 144, 0) 70%);
-  border-radius: 50%;
-  filter: blur(50px);
-}
-.atmosphere-orb-3 {
-  position: absolute;
-  bottom: -60px;
-  right: -50px;
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0) 70%);
-  border-radius: 50%;
-  filter: blur(45px);
-}
 
-/* Glass Card */
-.glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Pulsing Badge & Rings */
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4), inset 0 0 10px rgba(16, 185, 129, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(16, 185, 129, 0.7), inset 0 0 15px rgba(16, 185, 129, 0.35);
-  }
-}
-
-.active-prayer-card {
-  border: 1px solid rgba(16, 185, 129, 0.5) !important;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.18);
-}
-
-.next-prayer-card {
-  border: 1px solid rgba(245, 158, 11, 0.5) !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
-  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
-}
-
-/* Shimmer animation */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.shimmer-bar::after {
+.mosque-banner::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  animation: shimmer 2.5s infinite;
-}
-
-/* Modal overlay */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(4, 7, 13, 0.82);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  animation: fadeIn 0.2s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.arabic-text {
-  font-family: var(--font-arabic);
+  width: 45%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 300' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.12' d='M250 50 C230 110 200 130 190 200 L310 200 C300 130 270 110 250 50 Z M120 120 C110 150 90 170 85 200 L155 200 C150 170 130 150 120 120 Z M380 120 C370 150 350 170 345 200 L415 200 C410 170 390 150 380 120 Z M40 60 L60 60 L60 200 L40 200 Z M440 60 L460 60 L460 200 L440 200 Z'/%3E%3Crect x='0' y='200' width='500' height='100' fill='%23ffffff' fill-opacity='0.12'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: contain;
+  pointer-events: none;
 }
