@@ -12,6 +12,7 @@ import {
   Sliders
 } from 'lucide-react';
 import { PrayerItem, PrayerName, CalculationMethodKey } from '../../types/prayer';
+import { CALCULATION_METHOD_LABELS_AR } from '../../utils/prayerTimes';
 
 interface PrayerScheduleTableProps {
   prayers: PrayerItem[];
@@ -45,30 +46,32 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
     }
   };
 
+  const methodNameArabic = CALCULATION_METHOD_LABELS_AR[calculationMethod] || calculationMethod;
+
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
       {/* Table Section Header */}
       <div className="flex items-center justify-between pb-4 mb-2 border-b border-slate-100">
-        <div>
-          <h3 className="text-base font-bold tracking-tight text-slate-900">
-            Today's Prayers
+        <div className="text-right">
+          <h3 className="text-base font-bold tracking-tight text-slate-900 font-readex">
+            صلوات اليوم
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Calculated via {calculationMethod}
+          <p className="text-xs text-slate-500 mt-0.5 font-readex">
+            حسب طريقة: {methodNameArabic}
           </p>
         </div>
 
         <button
           onClick={onOpenSettingsTab}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-200 transition-colors cursor-pointer"
-          title="Configure calculation method and juristic school"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-200 transition-colors cursor-pointer font-readex"
+          title="تغيير طريقة الحساب والمذهب الفقهي"
         >
           <Sliders size={12} strokeWidth={2} />
-          <span>Change Method</span>
+          <span>تعديل الطريقة</span>
         </button>
       </div>
 
-      {/* Unified prayer rows with subtle row dividers */}
+      {/* Unified prayer rows */}
       <div className="divide-y divide-slate-100">
         {prayers.map((prayer) => {
           const isNext = prayer.isNext;
@@ -84,7 +87,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                   : 'hover:bg-slate-50/80 border border-transparent'
               }`}
             >
-              {/* Left Column: Icon + Prayer Name + Arabic */}
+              {/* Right Column in RTL: Icon + Prayer Name + Arabic */}
               <div className="flex items-center gap-3.5 min-w-0">
                 <div 
                   className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
@@ -102,7 +105,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
 
                 <div className="flex items-center gap-2.5 truncate">
                   <span 
-                    className={`text-sm tracking-tight ${
+                    className={`text-sm tracking-tight font-readex ${
                       isNext 
                         ? 'font-bold text-emerald-950' 
                         : isPassed 
@@ -114,7 +117,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                   </span>
 
                   <span 
-                    className={`arabic-text text-xs ${
+                    className={`font-amiri text-xs ${
                       isNext ? 'text-emerald-800 font-bold' : 'text-slate-400'
                     }`}
                   >
@@ -122,42 +125,42 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                   </span>
 
                   {isSunrise && (
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
-                      Shurooq
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-readex">
+                      شروق
                     </span>
                   )}
 
                   {isNext && (
-                    <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-700 text-white">
-                      Next
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-700 text-white font-readex">
+                      الصلاة القادمة
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Right Column: Status Tag, Time, Notification Toggle */}
+              {/* Left Column in RTL: Status Tag, Time, Notification Toggle */}
               <div className="flex items-center gap-4 shrink-0">
                 {/* Status indicator */}
-                <div className="text-right hidden sm:block">
+                <div className="text-left hidden sm:block font-readex">
                   {isPassed ? (
                     <span className="inline-flex items-center gap-1 text-xs text-slate-400">
                       <Check size={12} strokeWidth={2.5} className="text-emerald-600" />
-                      Completed
+                      مضت
                     </span>
                   ) : isNext ? (
                     <span className="text-xs font-semibold text-emerald-800">
-                      Upcoming
+                      القادمة
                     </span>
                   ) : (
                     <span className="text-xs font-normal text-slate-400">
-                      Upcoming
+                      متبقية
                     </span>
                   )}
                 </div>
 
                 {/* Scheduled time */}
                 <span 
-                  className={`font-mono text-sm tracking-tight w-20 text-right ${
+                  className={`font-mono text-sm tracking-tight w-24 text-left ${
                     isNext ? 'font-bold text-base text-emerald-950' : isPassed ? 'font-normal text-slate-400' : 'font-semibold text-slate-900'
                   }`}
                 >
@@ -173,8 +176,8 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                         ? 'bg-emerald-100/70 border-emerald-300 text-emerald-800'
                         : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
                     }`}
-                    title={prayer.notificationEnabled ? `Mute ${prayer.name} reminder` : `Enable ${prayer.name} reminder`}
-                    aria-label={prayer.notificationEnabled ? `Mute ${prayer.name} reminder` : `Enable ${prayer.name} reminder`}
+                    title={prayer.notificationEnabled ? `تعطيل تنبيه ${prayer.name}` : `تفعيل تنبيه ${prayer.name}`}
+                    aria-label={prayer.notificationEnabled ? `تعطيل تنبيه ${prayer.name}` : `تفعيل تنبيه ${prayer.name}`}
                   >
                     {prayer.notificationEnabled ? (
                       <Bell size={13} strokeWidth={2.2} />

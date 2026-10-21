@@ -2,8 +2,8 @@ import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from 'adhan';
 import { AppSettings, CalculationMethodKey, PrayerItem, PrayerName } from '../types/prayer';
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  city: 'Algiers',
-  country: 'Algeria',
+  city: 'الجزائر',
+  country: 'الجزائر',
   latitude: 36.7538,
   longitude: 3.0588,
   calculationMethod: 'MuslimWorldLeague',
@@ -23,13 +23,27 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'light'
 };
 
+export const CALCULATION_METHOD_LABELS_AR: Record<CalculationMethodKey, string> = {
+  MuslimWorldLeague: 'رابطة العالم الإسلامي',
+  Egyptian: 'الهيئة المصرية العامة للمساحة',
+  Karachi: 'جامعة العلوم الإسلامية بكراتشي',
+  UmmAlQura: 'جامعة أم القرى - مكة المكرمة',
+  Dubai: 'دائرة الشؤون الإسلامية بدبي',
+  Qatar: 'وزارة الأوقاف القطرية',
+  Kuwait: 'وزارة الأوقاف الكويتية',
+  MoonsightingCommittee: 'لجنة رؤية الهلال العالمية',
+  Singapore: 'المجلس الإسلامي بسنغافورة',
+  NorthAmerica: 'الجمعية الإسلامية لأمريكا الشمالية',
+  Other: 'طريقة مخصصة'
+};
+
 const PRAYER_METADATA: Record<PrayerName, { name: string; arabicName: string }> = {
-  Fajr: { name: 'Fajr', arabicName: 'الفجر' },
-  Sunrise: { name: 'Sunrise', arabicName: 'الشروق' },
-  Dhuhr: { name: 'Dhuhr', arabicName: 'الظهر' },
-  Asr: { name: 'Asr', arabicName: 'العصر' },
-  Maghrib: { name: 'Maghrib', arabicName: 'المغرب' },
-  Isha: { name: 'Isha', arabicName: 'العشاء' }
+  Fajr: { name: 'الفجر', arabicName: 'صلاة الفجر' },
+  Sunrise: { name: 'الشروق', arabicName: 'شروق الشمس' },
+  Dhuhr: { name: 'الظهر', arabicName: 'صلاة الظهر' },
+  Asr: { name: 'العصر', arabicName: 'صلاة العصر' },
+  Maghrib: { name: 'المغرب', arabicName: 'صلاة المغرب' },
+  Isha: { name: 'العشاء', arabicName: 'صلاة العشاء' }
 };
 
 export function getCalculationMethodParams(methodKey: CalculationMethodKey) {
@@ -144,32 +158,39 @@ export function calculatePrayerTimes(settings: AppSettings, date: Date = new Dat
 }
 
 export function formatTime(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  }).format(date);
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const period = hours >= 12 ? 'م' : 'ص';
+  const displayHours = (hours % 12 || 12).toString().padStart(2, '0');
+  return `${displayHours}:${minutes} ${period}`;
 }
 
 export function getHijriDate(date: Date = new Date()): { formatted: string; arabic: string } {
   try {
-    const formatterEnglish = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
     const formatterArabic = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
-
+    const formatted = formatterArabic.format(date);
     return {
-      formatted: formatterEnglish.format(date),
-      arabic: formatterArabic.format(date)
+      formatted,
+      arabic: formatted
     };
   } catch {
-    return { formatted: '1446 Hijri', arabic: '١٤٤٦ هـ' };
+    return { formatted: '١٤٤٦ هـ', arabic: '١٤٤٦ هـ' };
+  }
+}
+
+export function getGregorianDateArabic(date: Date = new Date()): string {
+  try {
+    return new Intl.DateTimeFormat('ar-EG', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    }).format(date);
+  } catch {
+    return date.toLocaleDateString('ar-EG');
   }
 }
 

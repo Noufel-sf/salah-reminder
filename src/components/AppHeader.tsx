@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Minus, Square, Copy, X, Calendar, MapPin } from 'lucide-react';
-import { getHijriDate } from '../utils/prayerTimes';
+import { getHijriDate, getGregorianDateArabic } from '../utils/prayerTimes';
 
 interface AppHeaderProps {
   title: string;
@@ -26,11 +26,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   }, []);
 
   const hijri = getHijriDate(currentTime);
-  const gregorianStr = currentTime.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric'
-  });
+  const gregorianStr = getGregorianDateArabic(currentTime);
 
   const handleMinimize = () => {
     window.electronAPI?.minimize();
@@ -47,9 +43,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <header className="titlebar-drag h-16 px-8 bg-white border-b border-slate-200/90 flex items-center justify-between shrink-0 select-none">
-      {/* Left: View Title & Subtitle */}
-      <div className="leading-tight">
-        <h2 className="text-xl font-bold tracking-tight text-slate-900">
+      {/* Right in RTL: View Title & Subtitle */}
+      <div className="leading-tight text-right">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 font-readex">
           {title}
         </h2>
         <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
@@ -58,47 +54,47 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <button
             onClick={onOpenLocationSettings}
             className="titlebar-no-drag inline-flex items-center gap-1 font-semibold text-emerald-800 hover:underline cursor-pointer"
-            title="Change City & Coordinates"
+            title="تغيير المدينة والإحداثيات"
           >
             <MapPin size={11} strokeWidth={2.2} />
-            <span>{cityName}, {countryName}</span>
+            <span>{cityName}، {countryName}</span>
           </button>
         </div>
       </div>
 
-      {/* Right: Date Badge & Window Controls */}
+      {/* Left in RTL: Date Badge & Window Controls */}
       <div className="titlebar-no-drag flex items-center gap-3">
         {/* Date pill */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
           <Calendar size={13} strokeWidth={2} className="text-emerald-700" />
-          <span className="font-medium">{gregorianStr}</span>
+          <span className="font-medium text-slate-700">{gregorianStr}</span>
           <span className="text-slate-300">|</span>
-          <span className="font-semibold text-emerald-900">{hijri.formatted}</span>
+          <span className="font-bold text-emerald-900 font-amiri text-sm">{hijri.arabic}</span>
         </div>
 
         {/* Window controls */}
-        <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+        <div className="flex items-center gap-1 pr-2 border-r border-slate-200">
           <button
             onClick={handleMinimize}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Minimize"
-            aria-label="Minimize window"
+            title="تصغير النافذة"
+            aria-label="تصغير النافذة"
           >
             <Minus size={14} strokeWidth={2} />
           </button>
           <button
             onClick={handleMaximize}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-            title={isMaximized ? 'Restore' : 'Maximize'}
-            aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
+            title={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
+            aria-label={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
           >
             {isMaximized ? <Copy size={12} strokeWidth={2} /> : <Square size={12} strokeWidth={2} />}
           </button>
           <button
             onClick={handleClose}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-            title="Close to tray"
-            aria-label="Close to tray"
+            title="إغلاق إلى شريط المهام"
+            aria-label="إغلاق إلى شريط المهام"
           >
             <X size={14} strokeWidth={2} />
           </button>

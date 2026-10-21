@@ -96,12 +96,12 @@ export const App: React.FC = () => {
 
           if (window.electronAPI) {
             window.electronAPI.showNotification(
-              `Hayya 'ala-s-Salah - ${prayer.name} (${prayer.arabicName})`,
-              `It is now time for ${prayer.name} prayer in ${settings.city}.`
+              `حيّ على الصلاة - ${prayer.name}`,
+              `حان الآن وقت ${prayer.name} في مدينة ${settings.city}.`
             );
           } else if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(`Time for ${prayer.name} (${prayer.arabicName})`, {
-              body: `It is now time for ${prayer.name} prayer in ${settings.city}.`
+            new Notification(`حان الآن وقت ${prayer.name}`, {
+              body: `حان موعد صلاة ${prayer.name} في مدينة ${settings.city}.`
             });
           }
         }
@@ -113,33 +113,33 @@ export const App: React.FC = () => {
     switch (currentTab) {
       case 'prayers':
         return {
-          title: 'Prayer Schedule',
-          subtitle: 'Your daily prayer times, at a glance.'
+          title: 'مواقيت الصلاة',
+          subtitle: 'أوقات الصلوات اليومية بدقة مع التنبيهات'
         };
       case 'qibla':
         return {
-          title: 'Qibla Direction',
-          subtitle: 'Precise compass alignment relative to the Holy Kaaba in Mecca'
+          title: 'اتجاه القبلة',
+          subtitle: 'تحديد دقيق لاتجاه الكعبة المشرفة بمكة المكرمة'
         };
       case 'tasbih':
         return {
-          title: 'Digital Tasbih',
-          subtitle: 'Count your daily dhikr and keep your tongue moist with remembrance'
+          title: 'المسبحة الإلكترونية',
+          subtitle: 'عدّ الأذكار اليومية واجعل لسانك رطباً بذكر الله'
         };
       case 'duas':
         return {
-          title: 'Quran & Hadith',
-          subtitle: 'Authentic prophetic morning, evening, and daily supplications'
+          title: 'الأذكار والحديث',
+          subtitle: 'أذكار الصباح والمساء والأدعية النبوية المأثورة'
         };
       case 'calendar':
         return {
-          title: 'Islamic Calendar',
-          subtitle: 'Track Hijri lunar dates, blessed nights, and upcoming Islamic milestones'
+          title: 'التقويم الهجري',
+          subtitle: 'متابعة التاريخ القمري والمناسبات والأيام المباركة'
         };
       case 'settings':
         return {
-          title: 'Settings & Preferences',
-          subtitle: 'Configure calculation methods, location coordinates, and audio alerts'
+          title: 'الإعدادات والتفضيلات',
+          subtitle: 'ضبط الموقع وطريقة الحساب وأصوات الأذان والتنبيهات'
         };
     }
   };
@@ -147,7 +147,7 @@ export const App: React.FC = () => {
   const headerInfo = getTabHeader();
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden select-none bg-[#f8faf8] text-slate-900 font-sans">
+    <div className="flex h-screen w-screen overflow-hidden select-none bg-[#f8faf8] text-slate-900 font-readex">
       {/* Left Application Sidebar */}
       <AppSidebar
         currentTab={currentTab}

@@ -9,10 +9,11 @@ export const TasbihCard: React.FC = () => {
   const [isConfirmingReset, setIsConfirmingReset] = useState<boolean>(false);
 
   const phrases = [
-    { arabic: 'سُبْحَانَ اللَّهِ', english: 'SubhanAllah', meaning: 'Glory be to Allah' },
-    { arabic: 'الْحَمْدُ لِلَّهِ', english: 'Alhamdulillah', meaning: 'Praise be to Allah' },
-    { arabic: 'اللَّهُ أَكْبَرُ', english: 'Allahu Akbar', meaning: 'Allah is the Greatest' },
-    { arabic: 'أَسْتَغْفِرُ اللَّهَ', english: 'Astaghfirullah', meaning: 'I seek forgiveness' }
+    { arabic: 'سُبْحَانَ اللَّهِ', title: 'التسبيح', meaning: 'تنزيه الله عن كل نقص' },
+    { arabic: 'الْحَمْدُ لِلَّهِ', title: 'التحميد', meaning: 'الشكر والثناء على نعم الله' },
+    { arabic: 'اللَّهُ أَكْبَرُ', title: 'التكبير', meaning: 'الله أعظم من كل شيء' },
+    { arabic: 'أَسْتَغْفِرُ اللَّهَ', title: 'الاستغفار', meaning: 'طلب المغفرة والصفح' },
+    { arabic: 'لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّهِ', title: 'الحوقلة', meaning: 'التوكل والاستعانة بالله' }
   ];
 
   const handleTap = () => {
@@ -40,26 +41,26 @@ export const TasbihCard: React.FC = () => {
   const progress = Math.min(100, Math.round((count / target) * 100));
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm text-right">
       {/* Header with Dhikr selector & Reset */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
-        <span className="text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5 text-slate-400">
-          <Sparkles size={12} strokeWidth={2.2} className="text-emerald-700" />
-          Digital Tasbih
+        <span className="text-[11px] font-bold flex items-center gap-1.5 text-slate-500 font-readex">
+          <Sparkles size={13} strokeWidth={2.2} className="text-emerald-700" />
+          المسبحة الإلكترونية
         </span>
 
         <button
           onClick={handleResetClick}
-          className={`text-[11px] font-medium inline-flex items-center gap-1 px-2 py-0.5 rounded transition-colors cursor-pointer ${
+          className={`text-[11px] font-medium inline-flex items-center gap-1 px-2.5 py-0.5 rounded transition-colors cursor-pointer font-readex ${
             isConfirmingReset
               ? 'bg-rose-50 text-rose-600 font-bold'
               : 'text-slate-400 hover:text-slate-600'
           }`}
-          title={isConfirmingReset ? 'Click again to confirm reset' : 'Reset count'}
-          aria-label="Reset count"
+          title={isConfirmingReset ? 'انقر مرة أخرى لتأكيد التصفير' : 'إعادة ضبط العداد'}
+          aria-label="إعادة ضبط العداد"
         >
           <RotateCcw size={11} strokeWidth={2} />
-          <span>{isConfirmingReset ? 'Confirm?' : 'Reset'}</span>
+          <span>{isConfirmingReset ? 'تأكيد؟' : 'إعادة ضبط'}</span>
         </button>
       </div>
 
@@ -67,15 +68,15 @@ export const TasbihCard: React.FC = () => {
       <div className="text-center">
         <button
           onClick={() => setActivePhraseIndex((activePhraseIndex + 1) % phrases.length)}
-          className="text-xs font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors"
-          title="Click to switch dhikr phrase"
+          className="text-xs font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors font-readex"
+          title="انقر لتغيير صيغة الذكر"
         >
-          <span>{phrases[activePhraseIndex].english}</span>
+          <span>{phrases[activePhraseIndex].title}</span>
           <span className="text-slate-300">•</span>
           <span className="text-slate-500">{phrases[activePhraseIndex].meaning}</span>
         </button>
 
-        <p className="arabic-text text-xl font-bold my-1 text-slate-800">
+        <p className="font-amiri text-2xl font-bold my-1 text-slate-900 leading-relaxed">
           {phrases[activePhraseIndex].arabic}
         </p>
 
@@ -84,26 +85,26 @@ export const TasbihCard: React.FC = () => {
           <button
             onClick={handleTap}
             className="w-20 h-20 rounded-full flex flex-col items-center justify-center text-white bg-emerald-800 hover:bg-emerald-900 shadow-md active:scale-95 transition-all cursor-pointer"
-            aria-label={`Current count is ${count} of ${target}. Tap to count.`}
+            aria-label={`العدد الحالي هو ${count} من ${target}. اضغط للعد.`}
           >
             <span className="font-mono text-2xl font-bold tracking-tight">{count}</span>
-            <span className="text-[9px] uppercase font-bold tracking-widest text-emerald-200">Tap</span>
+            <span className="text-[10px] font-bold tracking-wide text-emerald-200 font-readex">تسبيح</span>
           </button>
         </div>
 
         {/* Progress & Target Switcher */}
-        <div className="flex items-center justify-between text-[11px] mt-2 text-slate-500">
+        <div className="flex items-center justify-between text-[11px] mt-2 text-slate-500 font-readex">
           <div className="flex items-center gap-1.5">
-            <span>Target:</span>
+            <span>الهدف:</span>
             <button
               onClick={() => { setTarget(target === 33 ? 100 : 33); setCount(0); }}
-              className="font-bold underline cursor-pointer text-emerald-800 hover:text-emerald-950"
-              title="Click to switch target between 33 and 100"
+              className="font-bold underline cursor-pointer text-emerald-800 hover:text-emerald-950 font-mono"
+              title="انقر للتبديل بين ٣٣ و ١٠٠"
             >
               {target}
             </button>
           </div>
-          <span>{progress}% complete</span>
+          <span>مكتمل {progress}%</span>
         </div>
 
         <div className="h-1.5 w-full rounded-full overflow-hidden mt-1.5 bg-slate-100">

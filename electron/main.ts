@@ -19,11 +19,11 @@ function createTray() {
   const trayIcon = nativeImage.createFromBuffer(iconBuffer).resize({ width: 16, height: 16 });
 
   tray = new Tray(trayIcon);
-  tray.setToolTip('Noor - Salah Reminder');
+  tray.setToolTip('رمضان برو - منبّه الصلاة والأذكار');
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Open Noor Reminder',
+      label: 'فتح تطبيق رمضان برو',
       click: () => {
         if (mainWindow) {
           mainWindow.show();
@@ -33,7 +33,7 @@ function createTray() {
     },
     { type: 'separator' },
     {
-      label: 'Quit',
+      label: 'إغلاق التطبيق نهائياً',
       click: () => {
         isQuitting = true;
         app.quit();

@@ -19,16 +19,16 @@ interface SettingsViewProps {
 }
 
 const CITY_PRESETS = [
-  { city: 'Algiers', country: 'Algeria', lat: 36.7538, lng: 3.0588, method: 'MuslimWorldLeague' },
-  { city: 'Mecca', country: 'Saudi Arabia', lat: 21.4225, lng: 39.8262, method: 'UmmAlQura' },
-  { city: 'Medina', country: 'Saudi Arabia', lat: 24.5247, lng: 39.5692, method: 'UmmAlQura' },
-  { city: 'Cairo', country: 'Egypt', lat: 30.0444, lng: 31.2357, method: 'Egyptian' },
-  { city: 'Istanbul', country: 'Turkey', lat: 41.0082, lng: 28.9784, method: 'MuslimWorldLeague' },
-  { city: 'Dubai', country: 'UAE', lat: 25.2048, lng: 55.2708, method: 'Dubai' },
-  { city: 'London', country: 'United Kingdom', lat: 51.5074, lng: -0.1278, method: 'MuslimWorldLeague' },
-  { city: 'Paris', country: 'France', lat: 48.8566, lng: 2.3522, method: 'MuslimWorldLeague' },
-  { city: 'New York', country: 'USA', lat: 40.7128, lng: -74.006, method: 'NorthAmerica' },
-  { city: 'Lahore', country: 'Pakistan', lat: 31.5204, lng: 74.3587, method: 'Karachi' }
+  { city: 'الجزائر', country: 'الجزائر', lat: 36.7538, lng: 3.0588, method: 'MuslimWorldLeague' },
+  { city: 'مكة المكرمة', country: 'السعودية', lat: 21.4225, lng: 39.8262, method: 'UmmAlQura' },
+  { city: 'المدينة المنورة', country: 'السعودية', lat: 24.5247, lng: 39.5692, method: 'UmmAlQura' },
+  { city: 'القاهرة', country: 'مصر', lat: 30.0444, lng: 31.2357, method: 'Egyptian' },
+  { city: 'إسطنبول', country: 'تركيا', lat: 41.0082, lng: 28.9784, method: 'MuslimWorldLeague' },
+  { city: 'دبي', country: 'الإمارات', lat: 25.2048, lng: 55.2708, method: 'Dubai' },
+  { city: 'الرباط', country: 'المغرب', lat: 34.0209, lng: -6.8416, method: 'MuslimWorldLeague' },
+  { city: 'تونس', country: 'تونس', lat: 36.8065, lng: 10.1815, method: 'MuslimWorldLeague' },
+  { city: 'الدوحة', country: 'قطر', lat: 25.2854, lng: 51.5310, method: 'Qatar' },
+  { city: 'الكويت', country: 'الكويت', lat: 29.3759, lng: 47.9774, method: 'Kuwait' }
 ];
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) => {
@@ -63,7 +63,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
         }));
       }
     } catch {
-      alert('Could not auto-detect location. Please use manual coordinates or presets.');
+      alert('تعذر التحديد التلقائي للموقع. يرجى إدخال الإحداثيات يدوياً أو اختيار مدينة من القائمة.');
     } finally {
       setIsDetecting(false);
     }
@@ -88,25 +88,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-6">
-      <div className="sage-card p-8">
-        <div className="flex items-center justify-between pb-4 border-b border-[#edf3ee] mb-6">
+    <div className="p-8 max-w-4xl mx-auto space-y-6 text-right font-readex">
+      <div className="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-sm">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#164e3c] text-[#52b788] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
               <SettingsIcon size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-[#114232]">Application Settings</h2>
-              <p className="text-xs text-[#74897f]">Configure prayer calculations, audio, and system preferences</p>
+              <h2 className="text-xl font-bold text-slate-900 font-readex">إعدادات التطبيق</h2>
+              <p className="text-xs text-slate-500 font-readex">تهيئة مواقيت الصلاة، الصوت، وتفضيلات النظام</p>
             </div>
           </div>
 
           <button
             onClick={handleSaveAll}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-[#164e3c] hover:bg-[#205c47] text-white font-bold text-xs shadow-md shadow-[#164e3c]/20 transition-all cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-sm transition-all cursor-pointer font-readex"
           >
-            {isSaved ? <Check size={14} className="text-[#52b788]" /> : <Sparkles size={14} />}
-            <span>{isSaved ? 'Settings Saved!' : 'Save Changes'}</span>
+            {isSaved ? <Check size={14} className="text-emerald-300" /> : <Sparkles size={14} />}
+            <span>{isSaved ? 'تم الحفظ بنجاح!' : 'حفظ التغييرات'}</span>
           </button>
         </div>
 
@@ -114,17 +114,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           {/* Location & Coordinates */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-[#114232] flex items-center gap-2">
-                <MapPin size={16} className="text-[#2d6a4f]" />
-                Location & Coordinates
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <MapPin size={16} className="text-emerald-700" />
+                <span>الموقع الجغرافي والإحداثيات</span>
               </h3>
               <button
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
-                className="text-xs font-semibold text-[#2d6a4f] hover:text-[#114232] flex items-center gap-1.5 bg-[#f0f7f2] px-3 py-1.5 rounded-xl border border-[#d8e6dc]"
+                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 cursor-pointer font-readex"
               >
                 <RotateCcw size={12} className={isDetecting ? 'animate-spin' : ''} />
-                <span>{isDetecting ? 'Detecting via IP...' : 'Auto-Detect Location'}</span>
+                <span>{isDetecting ? 'جاري التحديد عبر IP...' : 'تحديد الموقع تلقائياً'}</span>
               </button>
             </div>
 
@@ -134,10 +134,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 <button
                   key={p.city}
                   onClick={() => handlePreset(p)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer font-readex ${
                     formData.city === p.city
-                      ? 'bg-[#164e3c] text-white shadow-sm'
-                      : 'bg-[#fafbfa] border border-[#edf3ee] text-[#486356] hover:bg-[#f0f7f2]'
+                      ? 'bg-emerald-800 text-white shadow-xs font-bold'
+                      : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {p.city}
@@ -147,98 +147,98 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">City</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">المدينة</label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full mt-1 bg-[#fafbfa] border border-[#d8e6dc] rounded-xl px-3 py-2 text-xs font-semibold text-[#114232] focus:outline-none focus:border-[#2d6a4f]"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">Country</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">الدولة</label>
                 <input
                   type="text"
                   value={formData.country}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full mt-1 bg-[#fafbfa] border border-[#d8e6dc] rounded-xl px-3 py-2 text-xs font-semibold text-[#114232] focus:outline-none focus:border-[#2d6a4f]"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">Latitude</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">خط العرض (Latitude)</label>
                 <input
                   type="number"
                   step="any"
                   value={formData.latitude}
                   onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-[#fafbfa] border border-[#d8e6dc] rounded-xl px-3 py-2 text-xs font-mono font-semibold text-[#114232] focus:outline-none focus:border-[#2d6a4f]"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">Longitude</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">خط الطول (Longitude)</label>
                 <input
                   type="number"
                   step="any"
                   value={formData.longitude}
                   onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-[#fafbfa] border border-[#d8e6dc] rounded-xl px-3 py-2 text-xs font-mono font-semibold text-[#114232] focus:outline-none focus:border-[#2d6a4f]"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
             </div>
           </div>
 
           {/* Calculation Method */}
-          <div className="pt-4 border-t border-[#edf3ee]">
-            <h3 className="font-bold text-sm text-[#114232] flex items-center gap-2 mb-3">
-              <Compass size={16} className="text-[#2d6a4f]" />
-              Calculation Method & Juristic School
+          <div className="pt-4 border-t border-slate-100">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
+              <Compass size={16} className="text-emerald-700" />
+              <span>طريقة الحساب والمذهب الفقهي</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">Calculation Method</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">طريقة حساب المواقيت</label>
                 <select
                   value={formData.calculationMethod}
                   onChange={(e) => setFormData({ ...formData, calculationMethod: e.target.value as CalculationMethodKey })}
-                  className="w-full mt-1 bg-[#fafbfa] border border-[#d8e6dc] rounded-xl px-3 py-2 text-xs font-semibold text-[#114232] focus:outline-none focus:border-[#2d6a4f]"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 >
-                  <option value="MuslimWorldLeague">Muslim World League (MWL)</option>
-                  <option value="Egyptian">Egyptian General Authority of Survey</option>
-                  <option value="Karachi">University of Islamic Sciences, Karachi</option>
-                  <option value="UmmAlQura">Umm al-Qura University, Makkah</option>
-                  <option value="Dubai">Dubai & UAE General Authority</option>
-                  <option value="Qatar">Qatar</option>
-                  <option value="Kuwait">Kuwait</option>
-                  <option value="MoonsightingCommittee">Moonsighting Committee Worldwide</option>
-                  <option value="Singapore">Singapore (MUIS)</option>
-                  <option value="NorthAmerica">ISNA (North America)</option>
+                  <option value="MuslimWorldLeague">رابطة العالم الإسلامي</option>
+                  <option value="Egyptian">الهيئة المصرية العامة للمساحة</option>
+                  <option value="Karachi">جامعة العلوم الإسلامية بكراتشي</option>
+                  <option value="UmmAlQura">جامعة أم القرى - مكة المكرمة</option>
+                  <option value="Dubai">دائرة الشؤون الإسلامية بدبي</option>
+                  <option value="Qatar">وزارة الأوقاف والشؤون الإسلامية - قطر</option>
+                  <option value="Kuwait">وزارة الأوقاف والشؤون الإسلامية - الكويت</option>
+                  <option value="MoonsightingCommittee">لجنة رؤية الهلال العالمية</option>
+                  <option value="Singapore">المجلس الإسلامي بسنغافورة (MUIS)</option>
+                  <option value="NorthAmerica">الجمعية الإسلامية لأمريكا الشمالية (ISNA)</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-[#74897f]">Asr Juristic Method</label>
+                <label className="text-xs font-semibold text-slate-600 font-readex">مذهب حساب صلاة العصر</label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, madhab: 'shafi' })}
-                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all ${
+                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'shafi'
-                        ? 'bg-[#164e3c] border-[#164e3c] text-white'
-                        : 'bg-[#fafbfa] border-[#d8e6dc] text-[#486356] hover:bg-[#f0f7f2]'
+                        ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
+                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    Standard (Shafi'i, Maliki)
+                    الجمهور (الشافعي، المالكي، الحنبلي)
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, madhab: 'hanafi' })}
-                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all ${
+                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'hanafi'
-                        ? 'bg-[#164e3c] border-[#164e3c] text-white'
-                        : 'bg-[#fafbfa] border-[#d8e6dc] text-[#486356] hover:bg-[#f0f7f2]'
+                        ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
+                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    Hanafi
+                    المذهب الحنفي
                   </button>
                 </div>
               </div>
@@ -246,38 +246,38 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Sound & Audio */}
-          <div className="pt-4 border-t border-[#edf3ee]">
+          <div className="pt-4 border-t border-slate-100">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-[#114232] flex items-center gap-2">
-                <Volume2 size={16} className="text-[#2d6a4f]" />
-                Prayer Call & Sound Settings
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <Volume2 size={16} className="text-emerald-700" />
+                <span>أصوات الأذان والتنبيهات</span>
               </h3>
               <button
                 type="button"
                 onClick={handleTestSound}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#eaf4ee] text-[#2d6a4f] text-xs font-semibold hover:bg-[#d8f3dc] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
               >
                 {isPlayingAudio ? <Square size={12} /> : <Play size={12} />}
-                <span>{isPlayingAudio ? 'Stop Sound' : 'Test Sound'}</span>
+                <span>{isPlayingAudio ? 'إيقاف الصوت' : 'تجربة الصوت'}</span>
               </button>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
               {[
-                { id: 'takbeer', label: 'Takbeer Call' },
-                { id: 'soft_chime', label: 'Peaceful Chime' },
-                { id: 'full_adhan', label: 'Full Adhan' },
-                { id: 'beep', label: 'Subtle Beep' },
-                { id: 'silent', label: 'Silent Mode' }
+                { id: 'takbeer', label: 'تكبيرات الأذان' },
+                { id: 'soft_chime', label: 'رنين هادئ' },
+                { id: 'full_adhan', label: 'الأذان كاملاً' },
+                { id: 'beep', label: 'نغمة تنبيه بسيطة' },
+                { id: 'silent', label: 'وضع الصامت' }
               ].map((s) => (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => setFormData({ ...formData, soundOption: s.id as SoundOption })}
-                  className={`p-3 rounded-xl border text-xs font-semibold transition-all ${
+                  className={`p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer font-readex ${
                     formData.soundOption === s.id
-                      ? 'bg-[#164e3c] border-[#164e3c] text-white shadow-sm'
-                      : 'bg-[#fafbfa] border-[#d8e6dc] text-[#486356] hover:bg-[#f0f7f2]'
+                      ? 'bg-emerald-800 border-emerald-800 text-white shadow-xs font-bold'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {s.label}
@@ -286,9 +286,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold text-[#74897f] mb-1.5">
-                <span>Alert Volume</span>
-                <span>{Math.round(formData.adhanVolume * 100)}%</span>
+              <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1.5 font-readex">
+                <span>مستوى صوت الأذان</span>
+                <span className="font-mono">{Math.round(formData.adhanVolume * 100)}%</span>
               </div>
               <input
                 type="range"
@@ -297,16 +297,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 step="0.05"
                 value={formData.adhanVolume}
                 onChange={(e) => setFormData({ ...formData, adhanVolume: parseFloat(e.target.value) })}
-                className="w-full accent-[#2d6a4f]"
+                className="w-full accent-emerald-700 cursor-pointer"
               />
             </div>
           </div>
 
           {/* Autostart */}
-          <div className="pt-4 border-t border-[#edf3ee] flex items-center justify-between">
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-sm text-[#114232]">Launch at Windows Startup</h4>
-              <p className="text-xs text-[#74897f]">Start Noor quietly in the system tray when your computer boots</p>
+              <h4 className="font-bold text-sm text-slate-900 font-readex">التشغيل التلقائي مع إقلاع النظام</h4>
+              <p className="text-xs text-slate-500 font-readex">بدء تشغيل التطبيق في شريط المهام بهدوء عند إقلاع جهاز الكمبيوتر</p>
             </div>
             <input
               type="checkbox"
@@ -316,7 +316,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 setFormData({ ...formData, autoStart: checked });
                 window.electronAPI?.setStartup(checked);
               }}
-              className="w-5 h-5 accent-[#2d6a4f] rounded-lg cursor-pointer"
+              className="w-5 h-5 accent-emerald-700 rounded-lg cursor-pointer"
             />
           </div>
         </div>
