@@ -8,8 +8,7 @@ import {
   Settings, 
   Volume2, 
   VolumeX, 
-  MapPin, 
-  Moon
+  MapPin
 } from 'lucide-react';
 import { AppSettings } from '../types/prayer';
 
@@ -81,12 +80,12 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       {/* Top Branding */}
       <div className="p-4 overflow-y-auto">
         <div className="titlebar-drag px-2 py-3 mb-4 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#e8f5ee] flex items-center justify-center text-[#24634c] border border-[#d2ecde]">
-            <Moon size={18} className="fill-[#24634c]/20" />
+          <div className="w-8 h-8 rounded-none bg-[#004217] flex items-center justify-center border border-emerald-900/30 overflow-hidden shadow-xs">
+            <img src="/logo.png" alt="شعار التطبيق" className="w-full h-full object-cover" />
           </div>
-          <div className="leading-tight">
-            <h1 className="font-extrabold text-sm text-[#123d2e] tracking-tight">Ramadhan Pro</h1>
-            <p className="text-[10px] text-[#48a07f] font-semibold">Salah Reminder</p>
+          <div className="leading-tight text-right">
+            <h1 className="font-extrabold text-sm text-[#123d2e] tracking-tight font-readex">رمضان برو</h1>
+            <p className="text-[10px] text-[#48a07f] font-semibold font-readex">الصلاة والعبادة اليومية</p>
           </div>
         </div>
 

@@ -69,8 +69,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <div className="flex flex-col flex-1 overflow-y-auto px-4 py-5">
         {/* Brand Header */}
         <div className="titlebar-drag px-2 mb-6 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-none flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
-            <Moon size={18} strokeWidth={2.2} className="fill-emerald-800/20" />
+          <div className="w-10 h-10 rounded-none flex items-center justify-center shrink-0 bg-[#004217] border border-emerald-900/30 overflow-hidden shadow-xs">
+            <img src="/logo.png" alt="شعار التطبيق" className="w-full h-full object-cover" />
           </div>
           <div className="leading-tight text-right">
             <h1 className="font-extrabold text-sm tracking-tight text-slate-900">

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, Notification } from 'electron';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,14 +10,44 @@ let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 
+function getAppIcon(): { image: Electron.NativeImage; filePath: string } | null {
+  const possiblePaths = [
+    path.join(__dirname, '../public/icon.png'),
+    path.join(__dirname, '../dist/icon.png'),
+    path.join(process.cwd(), 'public/icon.png'),
+    path.join(process.cwd(), 'dist/icon.png'),
+    path.join(__dirname, 'icon.png')
+  ];
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const img = nativeImage.createFromPath(p);
+        if (!img.isEmpty()) {
+          return { image: img, filePath: p };
+        }
+      } catch {
+        // continue
+      }
+    }
+  }
+  return null;
+}
+
 function createTray() {
-  const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-    </svg>
-  `;
-  const iconBuffer = Buffer.from(iconSvg);
-  const trayIcon = nativeImage.createFromBuffer(iconBuffer).resize({ width: 16, height: 16 });
+  const iconData = getAppIcon();
+  let trayIcon: Electron.NativeImage;
+
+  if (iconData) {
+    trayIcon = iconData.image.resize({ width: 16, height: 16 });
+  } else {
+    const iconSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+      </svg>
+    `;
+    trayIcon = nativeImage.createFromBuffer(Buffer.from(iconSvg)).resize({ width: 16, height: 16 });
+  }
 
   tray = new Tray(trayIcon);
   tray.setToolTip('رمضان برو - منبّه الصلاة والأذكار');
@@ -56,6 +87,8 @@ function createTray() {
 }
 
 function createWindow() {
+  const iconData = getAppIcon();
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -67,6 +100,7 @@ function createWindow() {
     frame: false, // Custom frameless title bar
     backgroundColor: '#f6f9f6',
     show: false,
+    icon: iconData?.filePath || iconData?.image,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -113,9 +147,11 @@ ipcMain.on('window-close', () => {
 // Native Notification IPC handler
 ipcMain.on('show-notification', (_, { title, body }: { title: string; body: string }) => {
   if (Notification.isSupported()) {
+    const iconData = getAppIcon();
     const notification = new Notification({
       title: title || 'Prayer Time',
       body: body || 'It is time for prayer',
+      icon: iconData?.filePath,
       silent: false
     });
     notification.on('click', () => {
