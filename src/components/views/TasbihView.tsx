@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RotateCcw, Volume2, VolumeX, Sparkles, Award } from 'lucide-react';
 import { audioService } from '../../utils/audio';
+import { DHIKR_ITEMS, incrementDhikr, getTodayDhikr, getAllTimeDhikrTotals } from '../../utils/worshipStats';
 
 export const TasbihView: React.FC = () => {
   const [count, setCount] = useState<number>(0);
   const [target, setTarget] = useState<number>(33);
   const [activePhraseIndex, setActivePhraseIndex] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [totalCompleted, setTotalCompleted] = useState<number>(0);
+  const [todayRecord, setTodayRecord] = useState(getTodayDhikr());
+  const [allTimeTotals, setAllTimeTotals] = useState(getAllTimeDhikrTotals());
 
-  const phrases = [
-    { arabic: 'سُبْحَانَ اللَّهِ', title: 'التسبيح', meaning: 'تنزيه الله تعالى عن كل نقص وعيب' },
-    { arabic: 'الْحَمْدُ لِلَّهِ', title: 'التحميد', meaning: 'الثناء الكامل والشكر لله على نعمه' },
-    { arabic: 'اللَّهُ أَكْبَرُ', title: 'التكبير', meaning: 'الله أعظم وأجل من كل ما سواه' },
-    { arabic: 'أَسْتَغْفِرُ اللَّهَ', title: 'الاستغفار', meaning: 'طلب المغفرة والستر والتوبة' },
-    { arabic: 'لا إِلَهَ إِلا اللَّهُ', title: 'التهليل', meaning: 'لا معبود بحق إلا الله وحده' },
-    { arabic: 'لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّهِ', title: 'الحوقلة', meaning: 'كنز من كنوز الجنة والتوكل التام' }
-  ];
+  useEffect(() => {
+    const handleUpdate = () => {
+      setTodayRecord(getTodayDhikr());
+      setAllTimeTotals(getAllTimeDhikrTotals());
+    };
+    window.addEventListener('worship-stats-updated', handleUpdate);
+    return () => window.removeEventListener('worship-stats-updated', handleUpdate);
+  }, []);
+
+  const currentDhikr = DHIKR_ITEMS[activePhraseIndex] || DHIKR_ITEMS[0];
 
   const handleTap = () => {
     const nextCount = count + 1;
@@ -24,9 +28,11 @@ export const TasbihView: React.FC = () => {
       audioService.playBeep(0.2);
     }
 
+    // Record real dhikr statistic
+    incrementDhikr(currentDhikr.key);
+
     if (nextCount >= target) {
       setCount(0);
-      setTotalCompleted(totalCompleted + 1);
       audioService.playChime(0.5);
     } else {
       setCount(nextCount);
@@ -68,20 +74,23 @@ export const TasbihView: React.FC = () => {
 
         {/* Phrase Selector Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-2 justify-center mb-6">
-          {phrases.map((phrase, idx) => (
+          {DHIKR_ITEMS.map((item, idx) => (
             <button
-              key={idx}
+              key={item.key}
               onClick={() => {
                 setActivePhraseIndex(idx);
                 setCount(0);
               }}
-              className={`px-3.5 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer font-readex flex items-center gap-1.5 ${
                 activePhraseIndex === idx
                   ? 'bg-emerald-800 text-white shadow-xs font-bold'
                   : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              {phrase.title}
+              <span>{item.title}</span>
+              <span className={`text-[10px] px-1 font-mono ${activePhraseIndex === idx ? 'bg-emerald-900 text-emerald-100' : 'bg-slate-200/60 text-slate-500'}`}>
+                {todayRecord[item.key]}
+              </span>
             </button>
           ))}
         </div>
@@ -89,13 +98,13 @@ export const TasbihView: React.FC = () => {
         {/* Current Dhikr Display */}
         <div className="py-2">
           <p className="font-amiri text-4xl font-bold text-slate-900 mb-2 leading-relaxed">
-            {phrases[activePhraseIndex].arabic}
+            {currentDhikr.arabic}
           </p>
           <p className="text-sm font-semibold text-emerald-800 font-readex">
-            {phrases[activePhraseIndex].title}
+            {currentDhikr.title}
           </p>
           <p className="text-xs text-slate-500 font-readex mt-0.5">
-            {phrases[activePhraseIndex].meaning}
+            {currentDhikr.meaning}
           </p>
         </div>
 
@@ -144,10 +153,28 @@ export const TasbihView: React.FC = () => {
               </button>
             ))}
           </div>
+        </div>
 
-          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-emerald-800 font-semibold font-readex">
-            <Award size={16} className="text-emerald-700" />
-            <span>مجموع الدورات المكتملة: {totalCompleted}</span>
+        {/* Real Dhikr Statistics Summary */}
+        <div className="mt-8 pt-6 border-t border-slate-100 text-right">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5 font-readex">
+              <Award size={15} className="text-emerald-700" />
+              سجل الأذكار اليومي المحفوظ
+            </span>
+            <span className="text-xs font-semibold text-slate-500 font-readex">
+              مجموع اليوم: <span className="font-bold font-mono text-emerald-800">{todayRecord.total}</span> | الكلي: <span className="font-bold font-mono text-slate-800">{allTimeTotals.total}</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {DHIKR_ITEMS.map((item) => (
+              <div key={item.key} className="p-3 bg-slate-50 border border-slate-200 text-right">
+                <span className="text-[11px] font-semibold text-slate-500 block truncate">{item.title}</span>
+                <span className="font-mono text-lg font-bold text-slate-900 block mt-0.5">{todayRecord[item.key]}</span>
+                <span className="text-[10px] text-slate-400 block">إجمالي كلي: {allTimeTotals[item.key]}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

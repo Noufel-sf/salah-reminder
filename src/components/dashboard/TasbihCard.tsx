@@ -1,32 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, RotateCcw } from 'lucide-react';
 import { audioService } from '../../utils/audio';
+import { DHIKR_ITEMS, incrementDhikr, getTodayDhikr } from '../../utils/worshipStats';
 
 export const TasbihCard: React.FC = () => {
   const [count, setCount] = useState<number>(0);
   const [target, setTarget] = useState<number>(33);
   const [activePhraseIndex, setActivePhraseIndex] = useState<number>(0);
   const [isConfirmingReset, setIsConfirmingReset] = useState<boolean>(false);
+  const [todayRecord, setTodayRecord] = useState(getTodayDhikr());
 
-  const phrases = [
-    { arabic: 'سُبْحَانَ اللَّهِ', title: 'التسبيح', meaning: 'تنزيه الله عن كل نقص' },
-    { arabic: 'الْحَمْدُ لِلَّهِ', title: 'التحميد', meaning: 'الشكر والثناء على نعم الله' },
-    { arabic: 'اللَّهُ أَكْبَرُ', title: 'التكبير', meaning: 'الله أعظم من كل شيء' },
-    { arabic: 'أَسْتَغْفِرُ اللَّهَ', title: 'الاستغفار', meaning: 'طلب المغفرة والصفح' },
-    { arabic: 'لا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّهِ', title: 'الحوقلة', meaning: 'التوكل والاستعانة بالله' }
-  ];
+  useEffect(() => {
+    const handleUpdate = () => {
+      setTodayRecord(getTodayDhikr());
+    };
+    window.addEventListener('worship-stats-updated', handleUpdate);
+    return () => window.removeEventListener('worship-stats-updated', handleUpdate);
+  }, []);
+
+  const currentDhikr = DHIKR_ITEMS[activePhraseIndex] || DHIKR_ITEMS[0];
 
   const handleTap = () => {
     const nextCount = count + 1;
     audioService.playBeep(0.15);
 
-    try {
-      const cur = parseInt(localStorage.getItem('noor_daily_dhikr_count') || '100', 10);
-      localStorage.setItem('noor_daily_dhikr_count', (cur + 1).toString());
-      window.dispatchEvent(new Event('dhikr-updated'));
-    } catch {
-      // ignore
-    }
+    // Save real statistics for this specific dhikr phrase
+    incrementDhikr(currentDhikr.key);
 
     if (nextCount >= target) {
       setCount(0);
@@ -75,17 +74,20 @@ export const TasbihCard: React.FC = () => {
       {/* Selected Dhikr info */}
       <div className="text-center">
         <button
-          onClick={() => setActivePhraseIndex((activePhraseIndex + 1) % phrases.length)}
+          onClick={() => setActivePhraseIndex((activePhraseIndex + 1) % DHIKR_ITEMS.length)}
           className="text-xs font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1 cursor-pointer transition-colors font-readex"
           title="انقر لتغيير صيغة الذكر"
         >
-          <span>{phrases[activePhraseIndex].title}</span>
+          <span>{currentDhikr.title}</span>
           <span className="text-slate-300">•</span>
-          <span className="text-slate-500">{phrases[activePhraseIndex].meaning}</span>
+          <span className="text-slate-500">{currentDhikr.meaning}</span>
+          <span className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.2 border border-emerald-200 font-mono">
+            اليوم: {todayRecord[currentDhikr.key]}
+          </span>
         </button>
 
         <p className="font-amiri text-2xl font-bold my-1 text-slate-900 leading-relaxed">
-          {phrases[activePhraseIndex].arabic}
+          {currentDhikr.arabic}
         </p>
 
         {/* Tap Increment Control */}

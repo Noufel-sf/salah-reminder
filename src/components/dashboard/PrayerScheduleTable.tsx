@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sunrise, 
   Sun, 
@@ -9,10 +9,12 @@ import {
   Bell, 
   BellOff, 
   Sparkles,
-  Sliders
+  Sliders,
+  CheckCircle2
 } from 'lucide-react';
 import { PrayerItem, PrayerName, CalculationMethodKey } from '../../types/prayer';
 import { CALCULATION_METHOD_LABELS_AR } from '../../utils/prayerTimes';
+import { getTodayPrayers, togglePrayerCompleted, DailyPrayerRecord } from '../../utils/worshipStats';
 
 interface PrayerScheduleTableProps {
   prayers: PrayerItem[];
@@ -27,6 +29,15 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
   onToggleNotification,
   onOpenSettingsTab
 }) => {
+  const [prayerRecord, setPrayerRecord] = useState<DailyPrayerRecord>(getTodayPrayers());
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setPrayerRecord(getTodayPrayers());
+    };
+    window.addEventListener('worship-stats-updated', handleUpdate);
+    return () => window.removeEventListener('worship-stats-updated', handleUpdate);
+  }, []);
   const getPrayerIcon = (id: PrayerName) => {
     switch (id) {
       case 'Fajr':
@@ -166,6 +177,22 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                 >
                   {prayer.timeString}
                 </span>
+
+                {/* Prayer Completion Toggle */}
+                {!isSunrise && (
+                  <button
+                    onClick={() => togglePrayerCompleted(prayer.id as keyof DailyPrayerRecord['prayers'])}
+                    className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-none border transition-all cursor-pointer font-readex ${
+                      prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']]
+                        ? 'bg-emerald-700 border-emerald-700 text-white font-bold'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                    title={prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']] ? 'انقر لإلغاء التحديد' : 'تحديد كصلاة مؤداة اليوم'}
+                  >
+                    <CheckCircle2 size={13} strokeWidth={prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']] ? 2.5 : 1.8} />
+                    <span>{prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']] ? 'صلّيتها' : 'لم أصلّ'}</span>
+                  </button>
+                )}
 
                 {/* Notification Bell Toggle */}
                 {!isSunrise ? (
