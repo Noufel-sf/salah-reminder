@@ -41,6 +41,7 @@ export interface AppSettings {
   autoStart: boolean;
   remindMinutesBefore: number; // e.g. 0 or 15 mins before
   enabledPrayers: Record<PrayerName, boolean>;
+  theme?: 'light' | 'dark' | 'system';
 }
 
 declare global {

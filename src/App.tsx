@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { DesktopSidebar, NavTab } from './components/DesktopSidebar';
-import { DesktopTopBar } from './components/DesktopTopBar';
+import { AppSidebar, NavTab } from './components/AppSidebar';
+import { AppHeader } from './components/AppHeader';
 import { PrayerDashboardView } from './components/views/PrayerDashboardView';
 import { QiblaView } from './components/views/QiblaView';
 import { TasbihView } from './components/views/TasbihView';
@@ -33,10 +33,22 @@ export const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const lastAlertedPrayerRef = useRef<string>('');
 
+  // Apply theme to document element
+  useEffect(() => {
+    const theme = settings.theme || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [settings.theme]);
+
   // Save settings when changed
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
+  };
+
+  // Toggle light/dark theme
+  const handleToggleTheme = () => {
+    const nextTheme = settings.theme === 'dark' ? 'light' : 'dark';
+    handleSaveSettings({ ...settings, theme: nextTheme });
   };
 
   // Toggle individual prayer notification
@@ -110,8 +122,8 @@ export const App: React.FC = () => {
     switch (currentTab) {
       case 'prayers':
         return {
-          title: 'Sholat & Timetable',
-          subtitle: 'Monitor daily waqt prayer times with accurate offline calculation'
+          title: 'Prayer Schedule',
+          subtitle: 'Your daily prayer times, at a glance.'
         };
       case 'qibla':
         return {
@@ -125,7 +137,7 @@ export const App: React.FC = () => {
         };
       case 'duas':
         return {
-          title: 'Doa & Hadith',
+          title: 'Quran & Hadith',
           subtitle: 'Authentic prophetic morning, evening, and daily supplications'
         };
       case 'calendar':
@@ -144,23 +156,39 @@ export const App: React.FC = () => {
   const headerInfo = getTabHeader();
 
   return (
-    <div className="flex h-screen w-screen bg-[#f6f8f6] text-[#132b21] overflow-hidden select-none font-sans">
-      {/* Left Sidebar */}
-      <DesktopSidebar
+    <div 
+      className="flex h-screen w-screen overflow-hidden select-none font-sans transition-colors"
+      style={{
+        backgroundColor: 'var(--color-bg)',
+        color: 'var(--color-text-primary)'
+      }}
+    >
+      {/* Left Application Sidebar */}
+      <AppSidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         settings={settings}
         onOpenSettingsLocation={() => setCurrentTab('settings')}
         onToggleMute={handleToggleMute}
+        onToggleTheme={handleToggleTheme}
       />
 
-      {/* Main Workspace Area */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-        {/* Top Window Bar */}
-        <DesktopTopBar title={headerInfo.title} subtitle={headerInfo.subtitle} />
+        {/* Top Header */}
+        <AppHeader 
+          title={headerInfo.title} 
+          subtitle={headerInfo.subtitle}
+          cityName={settings.city}
+          countryName={settings.country}
+          onOpenLocationSettings={() => setCurrentTab('settings')}
+        />
 
-        {/* Scrollable View Content */}
-        <main className="flex-1 overflow-y-auto bg-[#f6f8f6]">
+        {/* Scrollable View Container */}
+        <main 
+          className="flex-1 overflow-y-auto transition-colors"
+          style={{ backgroundColor: 'var(--color-bg)' }}
+        >
           {currentTab === 'prayers' && (
             <PrayerDashboardView
               prayers={prayerData.prayers}

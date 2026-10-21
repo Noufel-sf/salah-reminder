@@ -19,7 +19,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
     Asr: true,
     Maghrib: true,
     Isha: true
-  }
+  },
+  theme: 'light'
 };
 
 const PRAYER_METADATA: Record<PrayerName, { name: string; arabicName: string }> = {

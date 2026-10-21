@@ -1,30 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  /* Ramadhan Pro & Sage Islamic Modern Design Tokens */
-  --bg-app: #f6f8f6;
-  --bg-sidebar: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-subtle: #f9fbf9;
-  
-  --emerald-dark: #123d2e;
-  --emerald-main: #184e3b;
-  --emerald-primary: #24634c;
-  --emerald-medium: #347d62;
-  --emerald-light: #48a07f;
-  --emerald-mint: #e8f5ee;
-  --emerald-soft: #d2ecde;
+  /* Ramadhan Pro & Noor Precision Design System */
+  --color-primary: #155C45;
+  --color-primary-deep: #103D30;
+  --color-primary-light: #237A5E;
+  --color-primary-highlight: #E8F3EC;
+  --color-gold: #C6A15B;
+  --color-gold-soft: #F9F5EC;
 
-  --border-light: #e5ede7;
-  --border-subtle: #edf3ee;
+  --color-bg: #F5F7F3;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #FAFBF9;
+  --color-surface-muted: #F0F4F1;
 
-  --text-dark: #132b21;
-  --text-body: #3c5248;
-  --text-muted: #71887e;
-  --text-dim: #98aba2;
+  --color-text-primary: #18352C;
+  --color-text-secondary: #718078;
+  --color-text-tertiary: #9AA7A0;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-arabic: 'Amiri', serif;
+  --color-border: #E4EAE5;
+  --color-border-subtle: #EEF3EF;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-arabic: 'Noto Sans Arabic', system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 61, 48, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 61, 48, 0.05);
+  --shadow-lg: 0 8px 24px rgba(16, 61, 48, 0.07);
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+  --color-primary: #2FA07A;
+  --color-primary-deep: #103D30;
+  --color-primary-light: #44B892;
+  --color-primary-highlight: #1A362B;
+  --color-gold: #D6B475;
+  --color-gold-soft: #24221A;
+
+  --color-bg: #0D1713;
+  --color-surface: #13221B;
+  --color-surface-subtle: #182B23;
+  --color-surface-muted: #1D342A;
+
+  --color-text-primary: #E9F1EC;
+  --color-text-secondary: #8DA096;
+  --color-text-tertiary: #677A71;
+
+  --color-border: #213B2F;
+  --color-border-subtle: #1C3329;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -35,32 +69,17 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-app);
-  color: var(--text-body);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
   overflow: hidden;
   height: 100vh;
   width: 100vw;
   user-select: none;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Desktop Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #c8d8ce;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #a4beac;
-}
-
-/* Frameless Window Drag Region */
+/* Native Drag Region */
 .titlebar-drag {
   -webkit-app-region: drag;
 }
@@ -68,43 +87,76 @@ body {
   -webkit-app-region: no-drag;
 }
 
-/* High-end Clean Card Tokens */
-.ramadhan-card,
-.sage-card {
-  background: #ffffff;
-  border: 1px solid var(--border-light);
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(18, 61, 46, 0.03), 0 6px 18px rgba(18, 61, 46, 0.02);
-  transition: all 0.2s ease;
-}
-
-.ramadhan-card:hover,
-.sage-card:hover {
-  box-shadow: 0 3px 8px rgba(18, 61, 46, 0.05), 0 10px 24px rgba(18, 61, 46, 0.03);
-}
-
-.arabic-calligraphy {
+/* Arabic Typography Utility */
+.arabic-text {
   font-family: var(--font-arabic);
+  direction: rtl;
+  text-align: right;
+  line-height: 1.8;
 }
 
-/* Panoramic Mosque Banner with subtle Islamic geometric / arch pattern */
-.hero-banner {
-  background: linear-gradient(135deg, #133e2c 0%, #1a533c 45%, #24684c 100%);
+/* Custom Minimal Desktop Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Clean Surface Card */
+.pro-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pro-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Next Prayer Hero Card */
+.hero-card {
+  background-color: var(--color-primary-deep);
+  background-image: linear-gradient(135deg, #103D30 0%, #155C45 60%, #1A6C52 100%);
+  border-radius: var(--radius-xl);
+  color: #FFFFFF;
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  box-shadow: 0 8px 24px -4px rgba(16, 61, 48, 0.25);
 }
 
-.hero-banner::after {
+/* Discreet Geometric Accent watermark (subtle, non-distracting) */
+.hero-card::after {
   content: '';
   position: absolute;
-  right: -10px;
-  bottom: 0;
-  width: 38%;
-  height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 240' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' fill-opacity='0.10' d='M200 30 C180 80 160 100 150 160 L250 160 C240 100 220 80 200 30 Z M90 90 C80 120 65 135 60 160 L120 160 C115 135 100 120 90 90 Z M310 90 C300 120 285 135 280 160 L340 160 C335 135 320 120 310 90 Z M30 50 L45 50 L45 160 L30 160 Z M355 50 L370 50 L370 160 L355 160 Z'/%3E%3Crect x='0' y='160' width='400' height='80' fill='%23ffffff' fill-opacity='0.10'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right bottom;
-  background-size: contain;
+  right: -20px;
+  top: -20px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
   pointer-events: none;
+}
+
+/* Interactive Controls & Accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Clean Transition Classes */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
