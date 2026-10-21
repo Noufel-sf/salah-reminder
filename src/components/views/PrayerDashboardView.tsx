@@ -2,6 +2,7 @@ import React from 'react';
 import { PrayerItem, PrayerName, AppSettings } from '../../types/prayer';
 import { calculateQibla } from '../../utils/prayerTimes';
 import { NextPrayerHero } from '../dashboard/NextPrayerHero';
+import { DashboardStats } from '../dashboard/DashboardStats';
 import { PrayerScheduleTable } from '../dashboard/PrayerScheduleTable';
 import { DailyEncouragement } from '../dashboard/DailyEncouragement';
 import { DailyVerseCard } from '../dashboard/DailyVerseCard';
@@ -16,6 +17,7 @@ interface PrayerDashboardViewProps {
   onToggleNotification: (prayerId: PrayerName) => void;
   onOpenQiblaTab: () => void;
   onOpenSettingsTab: () => void;
+  onOpenTasbihTab?: () => void;
 }
 
 export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
@@ -25,7 +27,8 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   settings,
   onToggleNotification,
   onOpenQiblaTab,
-  onOpenSettingsTab
+  onOpenSettingsTab,
+  onOpenTasbihTab
 }) => {
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
 
@@ -37,7 +40,13 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
         currentPrayer={currentPrayer}
       />
 
-      {/* 2. Responsive 2-Column Grid */}
+      {/* 2. Key Worship & Prayer Statistics */}
+      <DashboardStats
+        prayers={prayers}
+        onOpenTasbih={onOpenTasbihTab}
+      />
+
+      {/* 3. Responsive 2-Column Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Main Schedule Column (xl:col-span-8) */}
         <div className="xl:col-span-8 space-y-6">

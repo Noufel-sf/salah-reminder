@@ -20,6 +20,14 @@ export const TasbihCard: React.FC = () => {
     const nextCount = count + 1;
     audioService.playBeep(0.15);
 
+    try {
+      const cur = parseInt(localStorage.getItem('noor_daily_dhikr_count') || '100', 10);
+      localStorage.setItem('noor_daily_dhikr_count', (cur + 1).toString());
+      window.dispatchEvent(new Event('dhikr-updated'));
+    } catch {
+      // ignore
+    }
+
     if (nextCount >= target) {
       setCount(0);
       audioService.playChime(0.4);

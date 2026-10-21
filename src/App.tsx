@@ -180,6 +180,7 @@ export const App: React.FC = () => {
               onToggleNotification={handleToggleNotification}
               onOpenQiblaTab={() => setCurrentTab('qibla')}
               onOpenSettingsTab={() => setCurrentTab('settings')}
+              onOpenTasbihTab={() => setCurrentTab('tasbih')}
             />
           )}
 
