@@ -1,105 +1,113 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  BookOpen, 
-  Sun, 
-  Moon, 
-  Heart, 
-  Bed, 
+  Search, 
   Sparkles, 
-  ShieldCheck, 
   Copy, 
-  Check 
+  Check, 
+  Star, 
+  RotateCcw,
+  CheckCircle2
 } from 'lucide-react';
-
-interface DuaItem {
-  id: string;
-  category: 'morning' | 'evening' | 'sleep' | 'parents' | 'hardship';
-  categoryLabel: string;
-  title: string;
-  subtitle: string;
-  arabic: string;
-  explanation: string;
-  reference: string;
-  icon: React.ReactNode;
-  bgTint: string;
-}
-
-const DUAS_DATA: DuaItem[] = [
-  {
-    id: '1',
-    category: 'morning',
-    categoryLabel: 'أذكار الصباح',
-    title: 'دعاء الصباح واستفتاح اليوم',
-    subtitle: 'لحفظ اليوم والبركة فيه',
-    arabic: 'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
-    explanation: 'تجديد للتوحيد وتسليم الأمر كله لله مع إشراقة كل صباح.',
-    reference: 'صحيح مسلم (٢٧٢٣)',
-    icon: <Sun size={18} className="text-amber-600" />,
-    bgTint: 'bg-amber-50 border-amber-200'
-  },
-  {
-    id: '2',
-    category: 'evening',
-    categoryLabel: 'أذكار المساء',
-    title: 'دعاء حلول المساء',
-    subtitle: 'للسكينة والأمان وحفظ الأهل',
-    arabic: 'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ',
-    explanation: 'استشعار لعظمة الله وحفظه بعد انقضاء النهار ودخول الليل.',
-    reference: 'صحيح مسلم',
-    icon: <Moon size={18} className="text-indigo-600" />,
-    bgTint: 'bg-indigo-50 border-indigo-200'
-  },
-  {
-    id: '3',
-    category: 'sleep',
-    categoryLabel: 'أذكار النوم',
-    title: 'دعاء قبل النوم',
-    subtitle: 'لراحة البال وحفظ النفس في المنام',
-    arabic: 'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ',
-    explanation: 'تفويض النفس والروح إلى بارئها عند النوم.',
-    reference: 'صحيح البخاري (٦٣٢٠)',
-    icon: <Bed size={18} className="text-blue-600" />,
-    bgTint: 'bg-blue-50 border-blue-200'
-  },
-  {
-    id: '4',
-    category: 'parents',
-    categoryLabel: 'بر الوالدين',
-    title: 'دعاء للوالدين بالرحمة والمغفرة',
-    subtitle: 'أعظم البر وأوفى الوفاء للأبوين',
-    arabic: 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا',
-    explanation: 'دعاء قرآني جامع لطلب الرحمة الواسعة للوالدين جزاء إحسانهما.',
-    reference: 'سورة الإسراء - الآية ٢٤',
-    icon: <Heart size={18} className="text-rose-600" />,
-    bgTint: 'bg-rose-50 border-rose-200'
-  },
-  {
-    id: '5',
-    category: 'hardship',
-    categoryLabel: 'تفريج الكروب',
-    title: 'دعاء الكرب والشدائد',
-    subtitle: 'لتفريج الهموم وجلب الطمأنينة واليسر',
-    arabic: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ، نِعْمَ الْمَوْلَىٰ وَنِعْمَ النَّصِيرُ',
-    explanation: 'التوكل المطلق على الله، وهو سلاح المؤمن في دفع كل كرب وهم.',
-    reference: 'سورة آل عمران - الآية ١٧٣',
-    icon: <ShieldCheck size={18} className="text-emerald-700" />,
-    bgTint: 'bg-emerald-50 border-emerald-200'
-  }
-];
+import { 
+  fetchAllAdhkar, 
+  AdhkarCategory, 
+  AdhkarItem,
+  getFavoriteAdhkarIds,
+  toggleFavoriteAdhkar
+} from '../../utils/adhkarService';
+import { audioService } from '../../utils/audio';
 
 export const DuasView: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [categories, setCategories] = useState<AdhkarCategory[]>([]);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string>('أذكار الصباح والمساء');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(getFavoriteAdhkarIds());
+  const [itemProgress, setItemProgress] = useState<Record<string, number>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const filtered = selectedCategory === 'all'
-    ? DUAS_DATA
-    : DUAS_DATA.filter((d) => d.category === selectedCategory);
+  // Quick preset tabs
+  const PRIMARY_TABS = [
+    'أذكار الصباح والمساء',
+    'أذكار النوم',
+    'أذكار الاستيقاظ من النوم',
+    'الأذكار بعد السلام من الصلاة',
+    'أذكار الآذان',
+    'دعاء الذهاب إلى المسجد',
+    'المفضلة ⭐'
+  ];
 
-  const handleCopy = (id: string, text: string) => {
+  useEffect(() => {
+    let isMounted = true;
+    fetchAllAdhkar().then((data) => {
+      if (isMounted) {
+        setCategories(data);
+        setIsLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleCopy = (uid: string, text: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedId(id);
+    setCopiedId(uid);
     setTimeout(() => setCopiedId(null), 2000);
   };
+
+  const handleToggleFav = (uid: string) => {
+    toggleFavoriteAdhkar(uid);
+    setFavoriteIds(getFavoriteAdhkarIds());
+  };
+
+  const handleItemTap = (uid: string, targetCount: number) => {
+    const current = itemProgress[uid] ?? targetCount;
+    audioService.playBeep(0.12);
+
+    if (current <= 1) {
+      // Completed cycle!
+      setItemProgress({ ...itemProgress, [uid]: 0 });
+      audioService.playChime(0.4);
+    } else {
+      setItemProgress({ ...itemProgress, [uid]: current - 1 });
+    }
+  };
+
+  const handleResetItem = (uid: string, targetCount: number) => {
+    setItemProgress({ ...itemProgress, [uid]: targetCount });
+  };
+
+  // Build flattened or filtered list
+  const filteredItems = useMemo(() => {
+    const list: { categoryTitle: string; item: AdhkarItem; uid: string }[] = [];
+
+    categories.forEach((cat) => {
+      const catTitle = cat.category || 'أذكار';
+      cat.array?.forEach((item) => {
+        const uid = `${catTitle}_${item.id}`;
+        list.push({ categoryTitle: catTitle, item, uid });
+      });
+    });
+
+    // 1. Search Query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      return list.filter(
+        (entry) =>
+          entry.item.text.toLowerCase().includes(q) ||
+          entry.categoryTitle.toLowerCase().includes(q)
+      );
+    }
+
+    // 2. Favorites Tab
+    if (selectedCategoryName === 'المفضلة ⭐') {
+      return list.filter((entry) => favoriteIds.includes(entry.uid));
+    }
+
+    // 3. Category Tab
+    return list.filter((entry) => entry.categoryTitle === selectedCategoryName);
+  }, [categories, selectedCategoryName, searchQuery, favoriteIds]);
 
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6 text-right font-readex">
@@ -111,85 +119,201 @@ export const DuasView: React.FC = () => {
             <span>من هدي النبي المصطفى ﷺ</span>
           </div>
           <p className="font-amiri text-2xl font-bold text-white leading-loose my-2">
-            « خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ »
+            « مَثَلُ الَّذِي يَذْكُرُ رَبَّهُ وَالَّذِي لا يَذْكُرُ رَبَّهُ، مَثَلُ الحَيِّ وَالمَيِّتِ »
           </p>
           <span className="text-xs text-emerald-100 font-semibold bg-white/10 px-3 py-1 rounded-none border border-white/15">
-            صحيح البخاري - حديث ٥٠٢٧
+            صحيح البخاري - حديث ٦٤٠٧
           </span>
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {[
-          { id: 'all', label: 'جميع الأدعية' },
-          { id: 'morning', label: 'أذكار الصباح' },
-          { id: 'evening', label: 'أذكار المساء' },
-          { id: 'sleep', label: 'أذكار النوم' },
-          { id: 'parents', label: 'بر الوالدين' },
-          { id: 'hardship', label: 'تفريج الكروب' }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setSelectedCategory(tab.id)}
-            className={`px-4 py-2 rounded-none text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              selectedCategory === tab.id
-                ? 'bg-emerald-800 text-white shadow-xs font-bold'
-                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Search & Category Selector Bar */}
+      <div className="bg-white rounded-none p-4 border border-slate-200/90 shadow-sm space-y-4">
+        {/* Search input */}
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="ابحث في الأذكار والأدعية (مثال: آية الكرسي، الاستفتاح، النوم، الصباح...)"
+            className="w-full bg-slate-50 border border-slate-200 rounded-none px-10 py-2.5 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+          />
+          <Search size={16} className="absolute right-3.5 top-3 text-slate-400" />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute left-3.5 top-2.5 text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
+            >
+              مسح
+            </button>
+          )}
+        </div>
+
+        {/* Quick Filter Tabs */}
+        {!searchQuery && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {PRIMARY_TABS.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setSelectedCategoryName(tab)}
+                className={`px-3.5 py-1.5 rounded-none text-xs font-semibold whitespace-nowrap transition-all cursor-pointer font-readex ${
+                  selectedCategoryName === tab
+                    ? 'bg-emerald-800 text-white shadow-xs font-bold'
+                    : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+
+            {/* Dropdown for All 130+ Categories */}
+            <div className="relative shrink-0">
+              <select
+                value={selectedCategoryName}
+                onChange={(e) => setSelectedCategoryName(e.target.value)}
+                className="bg-slate-50 border border-slate-200 rounded-none px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-700 cursor-pointer font-readex"
+                title="تصفح جميع أبواب حصن المسلم"
+              >
+                <option disabled value="">— تصفح جميع أبواب حصن المسلم ({categories.length} باب) —</option>
+                {categories.map((cat, i) => (
+                  <option key={i} value={cat.category}>
+                    {cat.category} ({cat.array?.length || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Results Header Info */}
+      <div className="flex items-center justify-between text-xs text-slate-500 font-readex px-1">
+        <span>
+          {searchQuery
+            ? `نتائج البحث عن "${searchQuery}": ${filteredItems.length} ذكر`
+            : `باب: ${selectedCategoryName} (${filteredItems.length} ذكر)`}
+        </span>
+        <span className="text-[11px] text-slate-400">
+          مصدر الأذكار: كتاب حصن المسلم المعتمد
+        </span>
       </div>
 
       {/* Duas List Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((dua) => (
-          <div key={dua.id} className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-none border flex items-center justify-center shrink-0 ${dua.bgTint}`}>
-                    {dua.icon}
+      {isLoading ? (
+        <div className="p-12 text-center text-sm text-slate-500 font-readex">
+          جاري تحميل وتحديث الأذكار...
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div className="bg-white rounded-none p-12 text-center border border-slate-200/90 text-slate-500 font-readex">
+          لا توجد أذكار مطابقة لبحثك في هذا القسم.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {filteredItems.map(({ item, categoryTitle, uid }) => {
+            const isFav = favoriteIds.includes(uid);
+            const remaining = itemProgress[uid] !== undefined ? itemProgress[uid] : item.count;
+            const isCompleted = remaining === 0;
+
+            return (
+              <div
+                key={uid}
+                className={`bg-white rounded-none p-6 border transition-all ${
+                  isCompleted
+                    ? 'border-emerald-300 bg-emerald-50/20'
+                    : 'border-slate-200/90 shadow-sm'
+                }`}
+              >
+                {/* Header row: Category & Action icons */}
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-none border border-emerald-200 font-readex">
+                      {categoryTitle}
+                    </span>
+                    {item.count > 1 && (
+                      <span className="text-xs font-semibold text-slate-500 font-readex">
+                        التكرار المستحب: <strong className="font-mono text-slate-800">{item.count}</strong> مرات
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900 font-readex">{dua.title}</h4>
-                    <p className="text-xs text-slate-500 font-readex">{dua.subtitle}</p>
+
+                  <div className="flex items-center gap-1.5">
+                    {/* Favorite Button */}
+                    <button
+                      onClick={() => handleToggleFav(uid)}
+                      className={`p-1.5 rounded-none border transition-colors cursor-pointer ${
+                        isFav
+                          ? 'bg-amber-50 border-amber-300 text-amber-500'
+                          : 'border-slate-200 text-slate-400 hover:text-slate-600'
+                      }`}
+                      title={isFav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+                    >
+                      <Star size={14} className={isFav ? 'fill-amber-400' : ''} />
+                    </button>
+
+                    {/* Copy Button */}
+                    <button
+                      onClick={() => handleCopy(uid, item.text)}
+                      className="p-1.5 rounded-none border border-slate-200 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                      title="نسخ الذكر"
+                    >
+                      {copiedId === uid ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleCopy(dua.id, `${dua.arabic}\n\n${dua.explanation}`)}
-                  className="p-1.5 rounded-none border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
-                  title="نسخ الدعاء"
-                >
-                  {copiedId === dua.id ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                </button>
+
+                {/* Main Quranic / Prophetic Text with Tashkeel */}
+                <div className="py-2">
+                  <p className="font-amiri text-2xl font-bold text-slate-900 leading-loose text-right">
+                    {item.text}
+                  </p>
+                </div>
+
+                {/* Repetition Countdown & Tap Button */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleItemTap(uid, item.count)}
+                      className={`flex items-center gap-2 px-4 py-1.5 rounded-none font-bold text-xs transition-all cursor-pointer font-readex ${
+                        isCompleted
+                          ? 'bg-emerald-800 text-white'
+                          : 'bg-emerald-700 hover:bg-emerald-800 text-white active:scale-95 shadow-sm'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <>
+                          <CheckCircle2 size={14} />
+                          <span>اكتمل التكرار ✓</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>اضغط للعد</span>
+                          <span className="font-mono bg-black/20 px-1.5 py-0.2">
+                            {remaining} / {item.count}
+                          </span>
+                        </>
+                      )}
+                    </button>
+
+                    {remaining < item.count && (
+                      <button
+                        onClick={() => handleResetItem(uid, item.count)}
+                        className="p-1.5 rounded-none border border-slate-200 text-slate-400 hover:text-slate-700 cursor-pointer"
+                        title="إعادة التكرار"
+                      >
+                        <RotateCcw size={12} />
+                      </button>
+                    )}
+                  </div>
+
+                  <span className="text-[11px] text-slate-400 font-readex">
+                    {isCompleted ? 'تم ختم هذا الذكر' : `المتبقي: ${remaining} من ${item.count}`}
+                  </span>
+                </div>
               </div>
-
-              {/* Arabic Calligraphy */}
-              <div className="bg-emerald-50/40 border border-emerald-100 rounded-none p-4 my-3 text-right">
-                <p className="font-amiri text-2xl font-bold text-slate-900 leading-loose">
-                  {dua.arabic}
-                </p>
-              </div>
-
-              {/* Virtue / Explanation */}
-              <p className="text-xs text-emerald-800 font-medium font-readex leading-relaxed">
-                {dua.explanation}
-              </p>
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-readex">
-              <span className="flex items-center gap-1">
-                <BookOpen size={11} className="text-emerald-700" />
-                <span>{dua.reference}</span>
-              </span>
-              <span className="font-semibold text-emerald-800">{dua.categoryLabel}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
