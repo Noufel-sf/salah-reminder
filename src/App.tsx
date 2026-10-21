@@ -17,7 +17,6 @@ const STORAGE_KEY = 'noor_prayer_settings';
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('prayers');
 
-  // Load saved settings or fallback to default
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -33,25 +32,21 @@ export const App: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const lastAlertedPrayerRef = useRef<string>('');
 
-  // Apply theme to document element
   useEffect(() => {
     const theme = settings.theme || 'light';
     document.documentElement.setAttribute('data-theme', theme);
   }, [settings.theme]);
 
-  // Save settings when changed
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
   };
 
-  // Toggle light/dark theme
   const handleToggleTheme = () => {
     const nextTheme = settings.theme === 'dark' ? 'light' : 'dark';
     handleSaveSettings({ ...settings, theme: nextTheme });
   };
 
-  // Toggle individual prayer notification
   const handleToggleNotification = (prayerId: PrayerName) => {
     const updated: AppSettings = {
       ...settings,
@@ -63,13 +58,11 @@ export const App: React.FC = () => {
     handleSaveSettings(updated);
   };
 
-  // Quick mute toggle
   const handleToggleMute = () => {
     const nextSound = settings.soundOption === 'silent' ? 'takbeer' : 'silent';
     handleSaveSettings({ ...settings, soundOption: nextSound });
   };
 
-  // Clock tick every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -77,12 +70,10 @@ export const App: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Calculate prayer times
   const prayerData = useMemo(() => {
     return calculatePrayerTimes(settings, currentTime);
   }, [settings, currentTime.toDateString()]);
 
-  // Check for prayer alert triggers
   useEffect(() => {
     if (!prayerData || !prayerData.prayers) return;
 
@@ -156,13 +147,7 @@ export const App: React.FC = () => {
   const headerInfo = getTabHeader();
 
   return (
-    <div 
-      className="flex h-screen w-screen overflow-hidden select-none font-sans transition-colors"
-      style={{
-        backgroundColor: 'var(--color-bg)',
-        color: 'var(--color-text-primary)'
-      }}
-    >
+    <div className="flex h-screen w-screen overflow-hidden select-none bg-[#f8faf8] text-slate-900 font-sans">
       {/* Left Application Sidebar */}
       <AppSidebar
         currentTab={currentTab}
@@ -185,10 +170,7 @@ export const App: React.FC = () => {
         />
 
         {/* Scrollable View Container */}
-        <main 
-          className="flex-1 overflow-y-auto transition-colors"
-          style={{ backgroundColor: 'var(--color-bg)' }}
-        >
+        <main className="flex-1 overflow-y-auto bg-[#f8faf8]">
           {currentTab === 'prayers' && (
             <PrayerDashboardView
               prayers={prayerData.prayers}

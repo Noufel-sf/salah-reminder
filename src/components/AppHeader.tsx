@@ -46,39 +46,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   return (
-    <header 
-      className="titlebar-drag border-b px-8 py-4 flex flex-wrap items-center justify-between gap-4 shrink-0 select-none transition-colors"
-      style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)'
-      }}
-    >
-      {/* Left: Page Title & Subtitle with responsive hierarchy */}
-      <div className="min-w-0">
-        <h2 
-          className="text-2xl font-bold tracking-tight"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
+    <header className="titlebar-drag h-16 px-8 bg-white border-b border-slate-200/90 flex items-center justify-between shrink-0 select-none">
+      {/* Left: View Title & Subtitle */}
+      <div className="leading-tight">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900">
           {title}
         </h2>
-        <div className="flex flex-wrap items-center gap-2 mt-1">
-          <p 
-            className="text-xs font-normal"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {subtitle}
-          </p>
-          <span 
-            className="hidden sm:inline text-xs"
-            style={{ color: 'var(--color-text-tertiary)' }}
-          >
-            •
-          </span>
+        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+          <span>{subtitle}</span>
+          <span>•</span>
           <button
             onClick={onOpenLocationSettings}
-            className="titlebar-no-drag inline-flex items-center gap-1 text-xs font-medium cursor-pointer hover:underline transition-colors"
-            style={{ color: 'var(--color-primary)' }}
-            title="Change City"
+            className="titlebar-no-drag inline-flex items-center gap-1 font-semibold text-emerald-800 hover:underline cursor-pointer"
+            title="Change City & Coordinates"
           >
             <MapPin size={11} strokeWidth={2.2} />
             <span>{cityName}, {countryName}</span>
@@ -86,50 +66,37 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Date Badge, Notification & Desktop Window Controls */}
-      <div className="titlebar-no-drag flex items-center gap-3 ml-auto">
-        {/* Compact Gregorian + Hijri Date badge */}
-        <div 
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs shadow-2xs"
-          style={{
-            backgroundColor: 'var(--color-surface-subtle)',
-            borderColor: 'var(--color-border)',
-            color: 'var(--color-text-primary)'
-          }}
-        >
-          <Calendar size={13} strokeWidth={2} style={{ color: 'var(--color-primary)' }} />
+      {/* Right: Date Badge & Window Controls */}
+      <div className="titlebar-no-drag flex items-center gap-3">
+        {/* Date pill */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
+          <Calendar size={13} strokeWidth={2} className="text-emerald-700" />
           <span className="font-medium">{gregorianStr}</span>
-          <span style={{ color: 'var(--color-border)' }}>|</span>
-          <span className="font-semibold" style={{ color: 'var(--color-primary)' }}>{hijri.formatted}</span>
+          <span className="text-slate-300">|</span>
+          <span className="font-semibold text-emerald-900">{hijri.formatted}</span>
         </div>
 
         {/* Window controls */}
-        <div 
-          className="flex items-center gap-1 pl-2 border-l"
-          style={{ borderColor: 'var(--color-border)' }}
-        >
+        <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
           <button
             onClick={handleMinimize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-            style={{ color: 'var(--color-text-secondary)' }}
-            title="Minimize window"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Minimize"
             aria-label="Minimize window"
           >
             <Minus size={14} strokeWidth={2} />
           </button>
           <button
             onClick={handleMaximize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-            style={{ color: 'var(--color-text-secondary)' }}
-            title={isMaximized ? 'Restore window' : 'Maximize window'}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            title={isMaximized ? 'Restore' : 'Maximize'}
             aria-label={isMaximized ? 'Restore window' : 'Maximize window'}
           >
             {isMaximized ? <Copy size={12} strokeWidth={2} /> : <Square size={12} strokeWidth={2} />}
           </button>
           <button
             onClick={handleClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-rose-500/10 hover:text-rose-600 transition-colors cursor-pointer"
-            style={{ color: 'var(--color-text-secondary)' }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="Close to tray"
             aria-label="Close to tray"
           >

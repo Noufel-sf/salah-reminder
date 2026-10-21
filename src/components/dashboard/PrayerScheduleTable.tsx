@@ -46,41 +46,21 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
   };
 
   return (
-    <div 
-      className="pro-card p-6 transition-colors"
-      style={{
-        backgroundColor: 'var(--color-surface)',
-        borderColor: 'var(--color-border)'
-      }}
-    >
+    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
       {/* Table Section Header */}
-      <div 
-        className="flex items-center justify-between pb-4 mb-2 border-b"
-        style={{ borderColor: 'var(--color-border-subtle)' }}
-      >
+      <div className="flex items-center justify-between pb-4 mb-2 border-b border-slate-100">
         <div>
-          <h3 
-            className="text-base font-bold tracking-tight"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
+          <h3 className="text-base font-bold tracking-tight text-slate-900">
             Today's Prayers
           </h3>
-          <p 
-            className="text-xs mt-0.5"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
+          <p className="text-xs text-slate-500 mt-0.5">
             Calculated via {calculationMethod}
           </p>
         </div>
 
         <button
           onClick={onOpenSettingsTab}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-colors cursor-pointer hover:underline"
-          style={{
-            backgroundColor: 'var(--color-surface-subtle)',
-            borderColor: 'var(--color-border)',
-            color: 'var(--color-primary)'
-          }}
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-200 transition-colors cursor-pointer"
           title="Configure calculation method and juristic school"
         >
           <Sliders size={12} strokeWidth={2} />
@@ -88,8 +68,8 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
         </button>
       </div>
 
-      {/* Unified clean prayer rows with subtle row dividers */}
-      <div className="divide-y" style={{ borderColor: 'var(--color-border-subtle)' }}>
+      {/* Unified prayer rows with subtle row dividers */}
+      <div className="divide-y divide-slate-100">
         {prayers.map((prayer) => {
           const isNext = prayer.isNext;
           const isPassed = prayer.isPassed;
@@ -100,32 +80,22 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
               key={prayer.id}
               className={`flex items-center justify-between py-3 px-3 rounded-xl transition-all ${
                 isNext
-                  ? 'my-1 shadow-xs font-medium'
-                  : 'hover:bg-black/[0.015] dark:hover:bg-white/[0.02]'
+                  ? 'bg-emerald-50/90 border border-emerald-300/80 my-1 shadow-xs font-medium'
+                  : 'hover:bg-slate-50/80 border border-transparent'
               }`}
-              style={{
-                backgroundColor: isNext ? 'var(--color-primary-highlight)' : 'transparent',
-                border: isNext ? '1px solid rgba(21, 92, 69, 0.2)' : '1px solid transparent'
-              }}
             >
               {/* Left Column: Icon + Prayer Name + Arabic */}
               <div className="flex items-center gap-3.5 min-w-0">
                 <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors"
-                  style={{
-                    backgroundColor: isNext 
-                      ? 'var(--color-primary)' 
-                      : isSunrise 
-                      ? 'var(--color-gold-soft)' 
-                      : 'var(--color-surface-muted)',
-                    color: isNext 
-                      ? '#FFFFFF' 
-                      : isSunrise 
-                      ? 'var(--color-gold)' 
-                      : isPassed 
-                      ? 'var(--color-text-tertiary)' 
-                      : 'var(--color-text-secondary)'
-                  }}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                    isNext
+                      ? 'bg-emerald-700 text-white'
+                      : isSunrise
+                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                      : isPassed
+                      ? 'bg-slate-100 text-slate-400'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
                 >
                   {getPrayerIcon(prayer.id)}
                 </div>
@@ -134,51 +104,31 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                   <span 
                     className={`text-sm tracking-tight ${
                       isNext 
-                        ? 'font-bold' 
+                        ? 'font-bold text-emerald-950' 
                         : isPassed 
-                        ? 'font-normal' 
-                        : 'font-semibold'
+                        ? 'font-normal text-slate-400' 
+                        : 'font-semibold text-slate-900'
                     }`}
-                    style={{
-                      color: isNext 
-                        ? 'var(--color-primary)' 
-                        : isPassed 
-                        ? 'var(--color-text-tertiary)' 
-                        : 'var(--color-text-primary)'
-                    }}
                   >
                     {prayer.name}
                   </span>
 
                   <span 
-                    className="arabic-text text-xs"
-                    style={{
-                      color: isNext 
-                        ? 'var(--color-primary)' 
-                        : 'var(--color-text-tertiary)'
-                    }}
+                    className={`arabic-text text-xs ${
+                      isNext ? 'text-emerald-800 font-bold' : 'text-slate-400'
+                    }`}
                   >
                     {prayer.arabicName}
                   </span>
 
                   {isSunrise && (
-                    <span 
-                      className="text-[10px] font-medium px-1.5 py-0.5 rounded border"
-                      style={{
-                        backgroundColor: 'var(--color-gold-soft)',
-                        borderColor: 'rgba(198, 161, 91, 0.25)',
-                        color: 'var(--color-gold)'
-                      }}
-                    >
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
                       Shurooq
                     </span>
                   )}
 
                   {isNext && (
-                    <span 
-                      className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full text-white"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
-                    >
+                    <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-700 text-white">
                       Next
                     </span>
                   )}
@@ -190,42 +140,26 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                 {/* Status indicator */}
                 <div className="text-right hidden sm:block">
                   {isPassed ? (
-                    <span 
-                      className="inline-flex items-center gap-1 text-xs"
-                      style={{ color: 'var(--color-text-tertiary)' }}
-                    >
-                      <Check size={12} strokeWidth={2.5} style={{ color: 'var(--color-primary)' }} />
+                    <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                      <Check size={12} strokeWidth={2.5} className="text-emerald-600" />
                       Completed
                     </span>
                   ) : isNext ? (
-                    <span 
-                      className="text-xs font-semibold"
-                      style={{ color: 'var(--color-primary)' }}
-                    >
+                    <span className="text-xs font-semibold text-emerald-800">
                       Upcoming
                     </span>
                   ) : (
-                    <span 
-                      className="text-xs font-normal"
-                      style={{ color: 'var(--color-text-tertiary)' }}
-                    >
+                    <span className="text-xs font-normal text-slate-400">
                       Upcoming
                     </span>
                   )}
                 </div>
 
-                {/* Scheduled time with tabular alignment */}
+                {/* Scheduled time */}
                 <span 
                   className={`font-mono text-sm tracking-tight w-20 text-right ${
-                    isNext ? 'font-bold text-base' : isPassed ? 'font-normal' : 'font-semibold'
+                    isNext ? 'font-bold text-base text-emerald-950' : isPassed ? 'font-normal text-slate-400' : 'font-semibold text-slate-900'
                   }`}
-                  style={{
-                    color: isNext 
-                      ? 'var(--color-primary)' 
-                      : isPassed 
-                      ? 'var(--color-text-tertiary)' 
-                      : 'var(--color-text-primary)'
-                  }}
                 >
                   {prayer.timeString}
                 </span>
@@ -234,18 +168,11 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                 {!isSunrise ? (
                   <button
                     onClick={() => onToggleNotification(prayer.id)}
-                    className="p-1.5 rounded-lg border transition-colors cursor-pointer"
-                    style={{
-                      backgroundColor: prayer.notificationEnabled 
-                        ? 'var(--color-primary-highlight)' 
-                        : 'var(--color-surface-subtle)',
-                      borderColor: prayer.notificationEnabled 
-                        ? 'rgba(21, 92, 69, 0.25)' 
-                        : 'var(--color-border)',
-                      color: prayer.notificationEnabled 
-                        ? 'var(--color-primary)' 
-                        : 'var(--color-text-tertiary)'
-                    }}
+                    className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                      prayer.notificationEnabled
+                        ? 'bg-emerald-100/70 border-emerald-300 text-emerald-800'
+                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
+                    }`}
                     title={prayer.notificationEnabled ? `Mute ${prayer.name} reminder` : `Enable ${prayer.name} reminder`}
                     aria-label={prayer.notificationEnabled ? `Mute ${prayer.name} reminder` : `Enable ${prayer.name} reminder`}
                   >
@@ -256,7 +183,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                     )}
                   </button>
                 ) : (
-                  <div className="w-7 h-7" /> // spacing placeholder for alignment
+                  <div className="w-7 h-7" />
                 )}
               </div>
             </div>

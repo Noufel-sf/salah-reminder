@@ -30,17 +30,17 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
-      {/* 1. Next Prayer Hero Section (Refined, no clipped text, no giant silhouette) */}
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
+      {/* 1. Next Prayer Hero Section */}
       <NextPrayerHero
         nextPrayer={nextPrayer}
         currentPrayer={currentPrayer}
       />
 
-      {/* 2. Responsive 2-Column Grid: Main Schedule & Right Supporting Panel */}
-      <div className="flex flex-col xl:flex-row gap-6 items-start">
-        {/* Main Schedule Column (Flexible, Takes Priority) */}
-        <div className="flex-1 min-w-0 w-full space-y-5">
+      {/* 2. Responsive 2-Column Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        {/* Main Schedule Column (xl:col-span-8) */}
+        <div className="xl:col-span-8 space-y-6">
           <PrayerScheduleTable
             prayers={prayers}
             calculationMethod={settings.calculationMethod}
@@ -48,19 +48,13 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
             onOpenSettingsTab={onOpenSettingsTab}
           />
 
-          {/* Daily Encouragement message below schedule */}
           <DailyEncouragement />
         </div>
 
-        {/* Right Supporting Panel (320px–340px, non-intrusive, no crowding) */}
-        <div className="w-full xl:w-80 shrink-0 space-y-5">
-          {/* Daily Quranic Verse */}
+        {/* Right Supporting Panel (xl:col-span-4) */}
+        <div className="xl:col-span-4 space-y-6">
           <DailyVerseCard />
-
-          {/* Focused Digital Tasbih Counter */}
           <TasbihCard />
-
-          {/* Qibla Direction Shortcut */}
           <QiblaShortcutCard
             qiblaAngle={qiblaAngle}
             cityName={settings.city}

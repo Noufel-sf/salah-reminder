@@ -15,13 +15,11 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
     hours: number;
     minutes: number;
     seconds: number;
-    totalMinutes: number;
     progress: number;
   }>({
     hours: 0,
     minutes: 0,
     seconds: 0,
-    totalMinutes: 0,
     progress: 0
   });
 
@@ -36,7 +34,6 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
       const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      const totalMinutes = Math.floor(diff / (1000 * 60));
 
       const prevTime = currentPrayer ? new Date(currentPrayer.time).getTime() : target - 3.5 * 3600 * 1000;
       const totalSpan = Math.max(1000, target - prevTime);
@@ -47,7 +44,6 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
         hours,
         minutes,
         seconds,
-        totalMinutes,
         progress: progressPercent
       });
     };
@@ -59,7 +55,6 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
 
   if (!nextPrayer) return null;
 
-  // Format natural language relative time (e.g. "Begins in 56 minutes" or "Begins in 1 hour 12 minutes")
   const getRelativeText = () => {
     if (countdown.hours === 0 && countdown.minutes === 0) {
       return `Begins in ${countdown.seconds} seconds`;
@@ -73,60 +68,63 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
   const padZero = (n: number) => n.toString().padStart(2, '0');
 
   return (
-    <div className="hero-card p-6 md:p-7 relative select-none">
-      <div className="relative z-10 flex flex-col justify-between h-full">
+    <div className="bg-gradient-to-r from-[#113829] via-[#164e3c] to-[#205c47] rounded-2xl p-7 text-white shadow-md relative overflow-hidden select-none">
+      {/* Decorative ambient radial glow */}
+      <div className="absolute -right-8 -top-8 w-64 h-64 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+
+      <div className="relative z-10">
         {/* Top Meta Row */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-white/10 text-white/90 border border-white/15">
+            <span className="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-white/15 text-emerald-100 border border-white/15">
               Next Prayer
             </span>
             {nextPrayer.notificationEnabled && (
-              <span className="flex items-center gap-1 text-[11px] text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1 text-[11px] text-emerald-200 bg-white/10 px-2 py-0.5 rounded-full">
                 <Bell size={11} strokeWidth={2.2} />
                 <span>Alert On</span>
               </span>
             )}
           </div>
 
-          {/* Clean live countdown pill */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/20 border border-white/10 font-mono text-xs font-semibold text-white/95">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#44B892] animate-pulse" />
+          {/* Live countdown pill */}
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 border border-white/15 font-mono text-xs font-semibold text-white">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>{padZero(countdown.hours)}:{padZero(countdown.minutes)}:{padZero(countdown.seconds)}</span>
           </div>
         </div>
 
         {/* Center: Prayer Name, Arabic & Scheduled Time */}
-        <div className="flex flex-wrap items-baseline justify-between gap-4 my-1">
+        <div className="flex flex-wrap items-baseline justify-between gap-4 my-2">
           <div className="flex items-baseline gap-3">
-            <h3 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+            <h3 className="text-4xl font-extrabold tracking-tight text-white">
               {nextPrayer.name}
             </h3>
             <span className="text-white/40 text-xl font-light">|</span>
-            <span className="arabic-text text-2xl md:text-3xl font-bold text-white/90">
+            <span className="arabic-text text-3xl font-bold text-emerald-100">
               {nextPrayer.arabicName}
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-2xl md:text-3xl font-bold font-mono tracking-tight text-white/95">
-            <Clock size={20} strokeWidth={2} className="text-[#44B892]" />
+          <div className="flex items-center gap-2 text-3xl font-bold font-mono tracking-tight text-white">
+            <Clock size={22} strokeWidth={2} className="text-emerald-400" />
             <span>{nextPrayer.timeString}</span>
           </div>
         </div>
 
-        {/* Natural Language Countdown & Progress Indicator */}
-        <div className="mt-5 pt-3.5 border-t border-white/10">
-          <div className="flex items-center justify-between text-xs text-white/80 mb-2">
+        {/* Bottom: Natural Language Countdown & Progress Bar */}
+        <div className="mt-5 pt-3.5 border-t border-white/15">
+          <div className="flex items-center justify-between text-xs text-emerald-100 mb-2">
             <span className="font-medium">{getRelativeText()}</span>
-            <span className="text-[11px] text-white/60 font-mono">
+            <span className="text-[11px] text-white/70 font-mono">
               {Math.round(countdown.progress)}% elapsed
             </span>
           </div>
 
-          {/* Refined restrained progress bar */}
+          {/* Progress bar track */}
           <div className="h-1.5 w-full bg-black/30 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-[#44B892] to-[#80E5BE] rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-emerald-400 to-teal-200 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${countdown.progress}%` }}
               role="progressbar"
               aria-valuenow={Math.round(countdown.progress)}
