@@ -13,7 +13,8 @@ import {
   Check, 
   Compass, 
   Quote, 
-  RotateCcw
+  RotateCcw,
+  ChevronRight
 } from 'lucide-react';
 import { PrayerItem, PrayerName, AppSettings } from '../../types/prayer';
 import { calculateQibla } from '../../utils/prayerTimes';
@@ -37,7 +38,6 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onOpenQiblaTab,
   onOpenSettingsTab
 }) => {
-  // Live countdown state
   const [countdown, setCountdown] = useState<{ hours: number; minutes: number; seconds: number; progress: number }>({
     hours: 0,
     minutes: 0,
@@ -45,7 +45,6 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
     progress: 0
   });
 
-  // Quick Tasbih counter inside dashboard
   const [tasbihCount, setTasbihCount] = useState<number>(0);
   const [tasbihPhraseIndex, setTasbihPhraseIndex] = useState<number>(0);
 
@@ -86,23 +85,23 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   const getPrayerIcon = (id: PrayerName) => {
     switch (id) {
       case 'Fajr':
-        return <Moon size={18} className="text-[#6366f1]" />;
+        return <Moon size={16} className="text-[#6366f1]" />;
       case 'Sunrise':
-        return <Sunrise size={18} className="text-[#f59e0b]" />;
+        return <Sunrise size={16} className="text-[#d97706]" />;
       case 'Dhuhr':
-        return <Sun size={18} className="text-[#2d6a4f]" />;
+        return <Sun size={16} className="text-[#24634c]" />;
       case 'Asr':
-        return <SunMedium size={18} className="text-[#eab308]" />;
+        return <SunMedium size={16} className="text-[#ca8a04]" />;
       case 'Maghrib':
-        return <Sunset size={18} className="text-[#ea580c]" />;
+        return <Sunset size={16} className="text-[#ea580c]" />;
       case 'Isha':
-        return <Moon size={18} className="text-[#3b82f6]" />;
+        return <Moon size={16} className="text-[#2563eb]" />;
       default:
-        return <Sparkles size={18} className="text-[#2d6a4f]" />;
+        return <Sparkles size={16} className="text-[#24634c]" />;
     }
   };
 
-  const getPrayerBgTint = (id: PrayerName) => {
+  const getPrayerBg = (id: PrayerName) => {
     switch (id) {
       case 'Fajr':
         return 'bg-indigo-50 border-indigo-100';
@@ -124,56 +123,55 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   const padZero = (n: number) => n.toString().padStart(2, '0');
 
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
-      {/* 1. Hero Next Prayer Panoramic Card (Forest Green with Mosque Silhouette) */}
-      <div className="mosque-banner rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs uppercase font-bold tracking-widest text-[#a3e4c0] bg-white/10 px-3 py-1 rounded-full border border-white/15 backdrop-blur-sm">
-              Upcoming Prayer
-            </span>
-            <button
-              onClick={onOpenSettingsTab}
-              className="flex items-center gap-1.5 text-xs text-[#d8f3dc] hover:text-white transition-colors bg-black/10 px-3 py-1 rounded-full"
-            >
-              <MapPin size={12} className="text-[#52b788]" />
-              <span>{settings.city}, {settings.country}</span>
-            </button>
+    <div className="p-8 space-y-6 max-w-6xl mx-auto">
+      {/* 1. Hero Next Prayer Banner (Fixed Spacing, No Overlap, Elegant Proportions) */}
+      <div className="hero-banner p-6 text-white shadow-md">
+        <div className="relative z-10 max-w-xl">
+          {/* Top Info Row */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold tracking-wider uppercase bg-white/15 px-2.5 py-0.5 rounded-full text-[#d2ecde] border border-white/10">
+                Next Prayer
+              </span>
+              <button
+                onClick={onOpenSettingsTab}
+                className="flex items-center gap-1 text-xs text-[#d2ecde] hover:text-white transition-colors bg-black/15 px-2.5 py-0.5 rounded-full"
+              >
+                <MapPin size={11} className="text-[#48a07f]" />
+                <span>{settings.city}, {settings.country}</span>
+              </button>
+            </div>
+
+            {/* Live Countdown Pill */}
+            <div className="flex items-center gap-1.5 bg-black/20 px-3 py-1 rounded-full text-xs font-mono font-bold text-white border border-white/15">
+              <span className="w-2 h-2 rounded-full bg-[#48a07f] animate-pulse"></span>
+              <span>In {padZero(countdown.hours)}h {padZero(countdown.minutes)}m {padZero(countdown.seconds)}s</span>
+            </div>
           </div>
 
-          <div className="flex items-baseline gap-4 mt-2">
-            <h2 className="text-5xl font-black tracking-tight text-white">
+          {/* Prayer Name & Scheduled Time */}
+          <div className="flex items-baseline gap-4 my-2">
+            <h2 className="text-4xl font-extrabold tracking-tight text-white">
               {nextPrayer?.name || 'Prayer'}
             </h2>
-            <span className="arabic-calligraphy text-4xl text-[#d8f3dc] font-bold drop-shadow">
+            <span className="arabic-calligraphy text-3xl font-bold text-[#d2ecde]">
               {nextPrayer?.arabicName}
             </span>
-          </div>
-
-          <div className="flex items-center gap-6 mt-4">
-            <div className="flex items-center gap-2 text-2xl font-bold font-mono text-white/95">
-              <Clock size={20} className="text-[#52b788]" />
+            <div className="ml-auto text-xl font-bold font-mono text-white/90 flex items-center gap-1.5">
+              <Clock size={18} className="text-[#48a07f]" />
               <span>{nextPrayer?.timeString}</span>
             </div>
-
-            {/* Countdown Badge */}
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/25">
-              <span className="text-xs text-[#d8f3dc] font-medium">In</span>
-              <span className="font-mono text-sm font-bold text-white tracking-wider">
-                {padZero(countdown.hours)}h {padZero(countdown.minutes)}m {padZero(countdown.seconds)}s
-              </span>
-            </div>
           </div>
 
-          {/* Progress to next prayer */}
-          <div className="mt-6 max-w-md">
-            <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden p-0.5">
+          {/* Progress Bar */}
+          <div className="mt-4 pt-3 border-t border-white/10">
+            <div className="h-1.5 w-full bg-black/25 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-[#52b788] to-[#95d5b2] rounded-full transition-all duration-1000"
+                className="h-full bg-gradient-to-r from-[#48a07f] to-[#a3e4c0] rounded-full transition-all duration-1000"
                 style={{ width: `${countdown.progress}%` }}
               />
             </div>
-            <div className="flex justify-between items-center text-[11px] text-[#b7e4c7] mt-1.5">
+            <div className="flex justify-between items-center text-[10px] text-[#b7ddc8] mt-1.5">
               <span>{currentPrayer?.name || 'Previous'}</span>
               <span>{Math.round(countdown.progress)}% elapsed</span>
               <span>{nextPrayer?.name}</span>
@@ -182,26 +180,27 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
         </div>
       </div>
 
-      {/* 2. Main Desktop Multi-Column Grid */}
-      <div className="grid grid-cols-12 gap-6 items-start">
-        {/* Left Column: 6 Waqt Prayer Timetable & Advice (Col span 7) */}
-        <div className="col-span-12 lg:col-span-7 space-y-6">
-          <div className="sage-card p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-[#edf3ee] mb-4">
+      {/* 2. Main Two-Column Layout (Spacious, No Clipping) */}
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* Left Column: 6 Waqt Prayer Timetable & Motivation Card */}
+        <div className="flex-1 min-w-0 w-full space-y-5">
+          <div className="ramadhan-card p-5">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3.5 border-b border-[#edf3ee] mb-3">
               <div>
-                <h3 className="text-base font-bold text-[#114232]">Today's Prayer Times</h3>
-                <p className="text-xs text-[#74897f]">Accurate local calculations based on {settings.calculationMethod}</p>
+                <h3 className="text-sm font-bold text-[#123d2e]">Today's Prayer Schedule</h3>
+                <p className="text-[11px] text-[#71887e]">Based on {settings.calculationMethod}</p>
               </div>
               <button
                 onClick={onOpenSettingsTab}
-                className="text-xs font-semibold text-[#2d6a4f] hover:text-[#114232] bg-[#f0f7f2] px-3 py-1.5 rounded-xl border border-[#d8e6dc] transition-colors"
+                className="text-xs font-semibold text-[#24634c] hover:text-[#123d2e] bg-[#f1f6f2] px-2.5 py-1 rounded-lg border border-[#dbe6df] transition-colors"
               >
                 Change Method
               </button>
             </div>
 
-            {/* Table Rows */}
-            <div className="space-y-2.5">
+            {/* List of 6 prayers */}
+            <div className="space-y-2">
               {prayers.map((prayer) => {
                 const isNext = prayer.isNext;
                 const isPassed = prayer.isPassed;
@@ -209,41 +208,42 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
                 return (
                   <div
                     key={prayer.id}
-                    className={`flex items-center justify-between px-5 py-3.5 rounded-2xl border transition-all ${
+                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all ${
                       isNext
-                        ? 'next-prayer-row'
+                        ? 'bg-[#e8f5ee] border-[#48a07f] shadow-xs'
                         : isPassed
-                        ? 'bg-[#fafbfa] border-[#edf3ee] opacity-80'
-                        : 'bg-white border-[#e6efe8] hover:border-[#b7ddc4]'
+                        ? 'bg-[#fafcfa] border-[#edf3ee] opacity-75'
+                        : 'bg-white border-[#e5ede7] hover:border-[#b8d6c3]'
                     }`}
                   >
-                    {/* Left: Icon, Name, Arabic Name */}
-                    <div className="flex items-center gap-3.5">
-                      <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${getPrayerBgTint(prayer.id)}`}>
+                    {/* Left: Icon, Name, Arabic */}
+                    <div className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${getPrayerBg(prayer.id)}`}>
                         {getPrayerIcon(prayer.id)}
                       </div>
-                      <div>
+
+                      <div className="leading-tight">
                         <div className="flex items-center gap-2">
-                          <span className={`text-sm font-bold ${isNext ? 'text-[#114232]' : isPassed ? 'text-[#74897f]' : 'text-[#1f5945]'}`}>
+                          <span className={`text-xs font-bold ${isNext ? 'text-[#123d2e]' : isPassed ? 'text-[#71887e]' : 'text-[#184e3b]'}`}>
                             {prayer.name}
                           </span>
-                          <span className="arabic-calligraphy text-xs font-bold text-[#74897f]">
+                          <span className="arabic-calligraphy text-[11px] font-bold text-[#71887e]">
                             {prayer.arabicName}
                           </span>
                           {isNext && (
-                            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#2d6a4f] text-white">
+                            <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-[#24634c] text-white">
                               Next
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-[#74897f] flex items-center gap-1.5 mt-0.5">
+                        <div className="text-[10px] text-[#71887e] mt-0.5">
                           {isPassed ? (
-                            <span className="flex items-center gap-1 text-[#52b788]">
-                              <Check size={12} />
+                            <span className="flex items-center gap-1 text-[#48a07f]">
+                              <Check size={10} />
                               Passed
                             </span>
                           ) : isNext ? (
-                            <span className="text-[#2d6a4f] font-semibold">Active next</span>
+                            <span className="text-[#24634c] font-semibold">Current upcoming</span>
                           ) : (
                             <span>Upcoming</span>
                           )}
@@ -252,9 +252,9 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
                     </div>
 
                     {/* Right: Time & Notification Bell */}
-                    <div className="flex items-center gap-4">
-                      <span className={`font-mono text-base font-bold ${
-                        isNext ? 'text-[#114232] text-lg font-black' : isPassed ? 'text-[#74897f]' : 'text-[#1f5945]'
+                    <div className="flex items-center gap-3">
+                      <span className={`font-mono text-xs font-bold ${
+                        isNext ? 'text-[#123d2e] font-extrabold text-sm' : isPassed ? 'text-[#71887e]' : 'text-[#184e3b]'
                       }`}>
                         {prayer.timeString}
                       </span>
@@ -262,14 +262,14 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
                       {prayer.id !== 'Sunrise' && (
                         <button
                           onClick={() => onToggleNotification(prayer.id)}
-                          className={`p-2 rounded-xl border transition-colors ${
+                          className={`p-1.5 rounded-lg border transition-colors ${
                             prayer.notificationEnabled
-                              ? 'bg-[#eaf4ee] border-[#b7ddc4] text-[#2d6a4f]'
-                              : 'bg-white border-[#edf3ee] text-[#a9bea1] hover:text-[#74897f]'
+                              ? 'bg-[#e8f5ee] border-[#b8d6c3] text-[#24634c]'
+                              : 'bg-white border-[#edf3ee] text-[#98aba2] hover:text-[#556e62]'
                           }`}
-                          title={prayer.notificationEnabled ? 'Mute notification' : 'Enable notification'}
+                          title={prayer.notificationEnabled ? 'Mute alert' : 'Enable alert'}
                         >
-                          {prayer.notificationEnabled ? <Bell size={15} /> : <BellOff size={15} />}
+                          {prayer.notificationEnabled ? <Bell size={13} /> : <BellOff size={13} />}
                         </button>
                       )}
                     </div>
@@ -279,105 +279,103 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
             </div>
           </div>
 
-          {/* "Never miss a prayer" Banner matching image design */}
-          <div className="bg-[#eaf4ee] border border-[#b7ddc4] p-5 rounded-3xl flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#2d6a4f] flex items-center justify-center text-white shrink-0 shadow-md shadow-[#2d6a4f]/20">
-              <Sparkles size={22} className="text-[#a3e4c0]" />
+          {/* Advice card */}
+          <div className="bg-[#e8f5ee] border border-[#d2ecde] p-4 rounded-2xl flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#24634c] flex items-center justify-center text-white shrink-0">
+              <Sparkles size={18} className="text-[#a3e4c0]" />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-[#114232]">Never miss a prayer</h4>
-              <p className="text-xs text-[#40916c] mt-0.5">
-                "Keep your connection with Allah strong. Prayer is the comfort of the soul and light for the heart."
+              <h4 className="font-bold text-xs text-[#123d2e]">Never miss a prayer</h4>
+              <p className="text-[11px] text-[#347d62] mt-0.5">
+                "Keep your connection with Allah strong. Prayer is the comfort of the soul and peace of mind."
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Today's Verse, Quick Tasbih & Qibla Widget (Col span 5) */}
-        <div className="col-span-12 lg:col-span-5 space-y-6">
-          {/* Today's Verse (Identical styling to reference image) */}
-          <div className="sage-card p-6 bg-gradient-to-b from-white to-[#f9fcf9] relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-[#114232] uppercase tracking-wider flex items-center gap-1.5">
-                <Quote size={14} className="text-[#52b788]" />
+        {/* Right Column: Today's Verse, Quick Tasbih & Qibla Direction (Fixed Width, Clean Cards) */}
+        <div className="w-full lg:w-[380px] shrink-0 space-y-5">
+          {/* 1. Today's Verse Card */}
+          <div className="ramadhan-card p-5">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#edf3ee]">
+              <span className="text-[11px] font-bold text-[#123d2e] uppercase tracking-wider flex items-center gap-1.5">
+                <Quote size={13} className="text-[#24634c]" />
                 Today's Verse
               </span>
-              <span className="text-[11px] font-semibold text-[#52b788] bg-[#eaf4ee] px-2 py-0.5 rounded-full border border-[#d8e6dc]">
+              <span className="text-[10px] font-semibold text-[#24634c] bg-[#e8f5ee] px-2 py-0.5 rounded-md border border-[#d2ecde]">
                 Surah Al-Inshirah 94:6
               </span>
             </div>
 
-            <div className="text-center py-4 px-2">
-              <p className="arabic-calligraphy text-3xl font-bold text-[#114232] leading-relaxed drop-shadow-sm mb-3">
+            <div className="text-center py-2 px-1">
+              <p className="arabic-calligraphy text-2xl font-bold text-[#123d2e] leading-relaxed my-2">
                 إِنَّ مَعَ الْعُسْرِ يُسْرًا
               </p>
-              <p className="text-sm font-semibold text-[#2d6a4f] italic">
+              <p className="text-xs font-semibold text-[#24634c] italic">
                 "Indeed, with hardship comes ease."
               </p>
-              <p className="text-xs text-[#74897f] mt-1">
-                Reflect upon Allah's promise of relief and peace in every struggle.
+              <p className="text-[11px] text-[#71887e] mt-1.5">
+                A reminder of hope and divine relief through every difficulty.
               </p>
             </div>
           </div>
 
-          {/* Quick Digital Tasbih Card */}
-          <div className="sage-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-[#114232] uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles size={14} className="text-[#52b788]" />
+          {/* 2. Quick Digital Tasbih Card */}
+          <div className="ramadhan-card p-5">
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#edf3ee]">
+              <span className="text-[11px] font-bold text-[#123d2e] uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles size={13} className="text-[#24634c]" />
                 Quick Tasbih
               </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setTasbihCount(0)}
-                  className="p-1 rounded-lg text-[#74897f] hover:text-[#114232] hover:bg-[#f0f7f2]"
-                  title="Reset"
-                >
-                  <RotateCcw size={13} />
-                </button>
-              </div>
+              <button
+                onClick={() => setTasbihCount(0)}
+                className="p-1 rounded-md text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2]"
+                title="Reset Count"
+              >
+                <RotateCcw size={12} />
+              </button>
             </div>
 
             <div className="text-center">
               <button
                 onClick={() => setTasbihPhraseIndex((tasbihPhraseIndex + 1) % tasbihPhrases.length)}
-                className="text-xs font-semibold text-[#52b788] hover:text-[#2d6a4f] transition-colors"
+                className="text-[11px] font-semibold text-[#24634c] hover:underline"
               >
                 {tasbihPhrases[tasbihPhraseIndex].english} • {tasbihPhrases[tasbihPhraseIndex].meaning}
               </button>
-              <p className="arabic-calligraphy text-2xl font-bold text-[#114232] my-2">
+              <p className="arabic-calligraphy text-xl font-bold text-[#123d2e] my-1">
                 {tasbihPhrases[tasbihPhraseIndex].arabic}
               </p>
 
-              {/* Tap Counter Bead Dial */}
+              {/* Tap Button */}
               <button
                 onClick={() => setTasbihCount(tasbihCount + 1)}
-                className="w-24 h-24 mx-auto rounded-full bg-gradient-to-b from-[#164e3c] to-[#2d6a4f] text-white flex flex-col items-center justify-center shadow-lg shadow-[#164e3c]/25 hover:scale-105 active:scale-95 transition-transform cursor-pointer my-3"
+                className="w-20 h-20 mx-auto rounded-full bg-gradient-to-b from-[#133e2c] to-[#24634c] text-white flex flex-col items-center justify-center shadow-md shadow-[#133e2c]/20 hover:scale-105 active:scale-95 transition-transform cursor-pointer my-2.5"
               >
-                <span className="text-3xl font-black font-mono">{tasbihCount}</span>
-                <span className="text-[10px] text-[#a3e4c0] uppercase tracking-wider">Tap</span>
+                <span className="text-2xl font-black font-mono">{tasbihCount}</span>
+                <span className="text-[9px] text-[#a3e4c0] uppercase font-bold tracking-wider">Tap</span>
               </button>
-              <span className="text-[11px] text-[#74897f]">Daily Dhikr goal: 33 / 100</span>
+              <span className="text-[10px] text-[#71887e]">Dhikr Target: 33 / 100</span>
             </div>
           </div>
 
-          {/* Qibla Direction Mini Preview */}
+          {/* 3. Qibla Direction Preview Card */}
           <div 
             onClick={onOpenQiblaTab}
-            className="sage-card p-5 cursor-pointer hover:border-[#52b788] group transition-all"
+            className="ramadhan-card p-4 cursor-pointer hover:border-[#48a07f] transition-all group"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#eaf4ee] text-[#2d6a4f] flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Compass size={20} />
+                <div className="w-9 h-9 rounded-xl bg-[#e8f5ee] text-[#24634c] flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Compass size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-[#114232]">Qibla Direction</h4>
-                  <p className="text-xs text-[#74897f]">{qiblaAngle}° Clockwise from North</p>
+                  <h4 className="font-bold text-xs text-[#123d2e]">Qibla Direction</h4>
+                  <p className="text-[11px] text-[#71887e]">{qiblaAngle}° Clockwise from North</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-[#2d6a4f] bg-[#f0f7f2] px-3 py-1 rounded-xl border border-[#d8e6dc]">
-                View Compass →
+              <span className="text-xs font-bold text-[#24634c] flex items-center gap-0.5">
+                View <ChevronRight size={14} />
               </span>
             </div>
           </div>

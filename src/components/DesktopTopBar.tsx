@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Minus, Square, Copy, X, Calendar, Sparkles } from 'lucide-react';
+import { Minus, Square, Copy, X, Calendar, Bell } from 'lucide-react';
 import { getHijriDate } from '../utils/prayerTimes';
 
 interface DesktopTopBarProps {
-  title?: string;
+  title: string;
+  subtitle: string;
 }
 
-export const DesktopTopBar: React.FC<DesktopTopBarProps> = ({ title }) => {
+export const DesktopTopBar: React.FC<DesktopTopBarProps> = ({ title, subtitle }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -17,10 +18,9 @@ export const DesktopTopBar: React.FC<DesktopTopBarProps> = ({ title }) => {
 
   const hijri = getHijriDate(currentTime);
   const gregorianStr = currentTime.toLocaleDateString('en-US', {
-    weekday: 'long',
+    weekday: 'short',
     month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+    day: 'numeric'
   });
 
   const handleMinimize = () => {
@@ -37,52 +37,56 @@ export const DesktopTopBar: React.FC<DesktopTopBarProps> = ({ title }) => {
   };
 
   return (
-    <div className="titlebar-drag bg-white border-b border-[#e4eee6] px-8 py-3.5 flex items-center justify-between sticky top-0 z-20 select-none">
-      {/* Left: Greeting & Current View Title */}
-      <div className="flex items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-[#114232]">
-              {title || 'Assalamu Alaikum'}
-            </h2>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-[#2d6a4f] bg-[#eaf4ee] px-2.5 py-0.5 rounded-full border border-[#d8e6dc]">
-              <Sparkles size={11} className="text-[#52b788]" />
-              Blessed Day
-            </span>
-          </div>
-          <div className="flex items-center gap-2 mt-0.5 text-xs text-[#74897f]">
-            <Calendar size={12} className="text-[#52b788]" />
-            <span>{gregorianStr}</span>
-            <span>•</span>
-            <span className="font-semibold text-[#2d6a4f]">{hijri.formatted}</span>
-            <span className="arabic-calligraphy text-xs text-[#40916c] font-bold">({hijri.arabic})</span>
-          </div>
-        </div>
+    <div className="titlebar-drag bg-white border-b border-[#e5ede7] px-8 py-3.5 flex items-center justify-between shrink-0 select-none">
+      {/* Left: View Title & Subtitle matching Ramadhan Pro */}
+      <div className="leading-tight">
+        <h2 className="text-lg font-bold text-[#123d2e] tracking-tight">
+          {title}
+        </h2>
+        <p className="text-xs text-[#71887e] mt-0.5">
+          {subtitle}
+        </p>
       </div>
 
-      {/* Right: Window Controls */}
-      <div className="titlebar-no-drag flex items-center gap-1.5">
-        <button
-          onClick={handleMinimize}
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-[#74897f] hover:text-[#114232] hover:bg-[#f0f7f2] transition-colors"
-          title="Minimize"
-        >
-          <Minus size={15} />
-        </button>
-        <button
-          onClick={handleMaximize}
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-[#74897f] hover:text-[#114232] hover:bg-[#f0f7f2] transition-colors"
-          title={isMaximized ? 'Restore Window' : 'Maximize Window'}
-        >
-          {isMaximized ? <Copy size={13} /> : <Square size={13} />}
-        </button>
-        <button
-          onClick={handleClose}
-          className="w-8 h-8 rounded-xl flex items-center justify-center text-[#74897f] hover:text-rose-600 hover:bg-rose-50 transition-colors"
-          title="Close to Tray"
-        >
-          <X size={15} />
-        </button>
+      {/* Right: Date Badge, Notification & Window Controls */}
+      <div className="titlebar-no-drag flex items-center gap-3">
+        {/* Date pill */}
+        <div className="flex items-center gap-2 bg-[#f4f7f5] border border-[#e5ede7] px-3.5 py-1.5 rounded-xl text-xs text-[#3c5248]">
+          <Calendar size={13} className="text-[#24634c]" />
+          <span className="font-medium">{gregorianStr}</span>
+          <span className="text-[#98aba2]">•</span>
+          <span className="font-semibold text-[#123d2e]">{hijri.formatted}</span>
+        </div>
+
+        {/* Bell icon button */}
+        <div className="w-8 h-8 rounded-xl border border-[#e5ede7] bg-white flex items-center justify-center text-[#556e62]">
+          <Bell size={14} />
+        </div>
+
+        {/* Window controls */}
+        <div className="flex items-center gap-1 pl-2 border-l border-[#e5ede7]">
+          <button
+            onClick={handleMinimize}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors"
+            title="Minimize"
+          >
+            <Minus size={14} />
+          </button>
+          <button
+            onClick={handleMaximize}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors"
+            title={isMaximized ? 'Restore Window' : 'Maximize Window'}
+          >
+            {isMaximized ? <Copy size={12} /> : <Square size={12} />}
+          </button>
+          <button
+            onClick={handleClose}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            title="Close to Tray"
+          >
+            <X size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );

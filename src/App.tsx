@@ -84,16 +84,13 @@ export const App: React.FC = () => {
       const prayerTime = new Date(prayer.time);
       const diffMs = now.getTime() - prayerTime.getTime();
 
-      // Trigger if within 45 seconds after prayer time has arrived
       if (diffMs >= 0 && diffMs < 45000) {
         const alertKey = `${todayStr}_${prayer.id}`;
         if (lastAlertedPrayerRef.current !== alertKey) {
           lastAlertedPrayerRef.current = alertKey;
 
-          // 1. Play audio
           audioService.playSound(settings.soundOption, settings.adhanVolume);
 
-          // 2. Trigger native OS notification
           if (window.electronAPI) {
             window.electronAPI.showNotification(
               `Hayya 'ala-s-Salah - ${prayer.name} (${prayer.arabicName})`,
@@ -109,26 +106,46 @@ export const App: React.FC = () => {
     });
   }, [currentTime, prayerData, settings]);
 
-  const getTabTitle = () => {
+  const getTabHeader = () => {
     switch (currentTab) {
       case 'prayers':
-        return 'Assalamu Alaikum';
+        return {
+          title: 'Sholat & Timetable',
+          subtitle: 'Monitor daily waqt prayer times with accurate offline calculation'
+        };
       case 'qibla':
-        return 'Qibla Direction & Alignment';
+        return {
+          title: 'Qibla Direction',
+          subtitle: 'Precise compass alignment relative to the Holy Kaaba in Mecca'
+        };
       case 'tasbih':
-        return 'Digital Tasbih & Dhikr';
+        return {
+          title: 'Digital Tasbih',
+          subtitle: 'Count your daily dhikr and keep your tongue moist with remembrance'
+        };
       case 'duas':
-        return 'Duas & Hadith Collection';
+        return {
+          title: 'Doa & Hadith',
+          subtitle: 'Authentic prophetic morning, evening, and daily supplications'
+        };
       case 'calendar':
-        return 'Hijri Islamic Calendar';
+        return {
+          title: 'Islamic Calendar',
+          subtitle: 'Track Hijri lunar dates, blessed nights, and upcoming Islamic milestones'
+        };
       case 'settings':
-        return 'Preferences & Settings';
+        return {
+          title: 'Settings & Preferences',
+          subtitle: 'Configure calculation methods, location coordinates, and audio alerts'
+        };
     }
   };
 
+  const headerInfo = getTabHeader();
+
   return (
-    <div className="flex h-screen w-screen bg-[#f4f7f4] text-[#142820] overflow-hidden select-none font-sans">
-      {/* Left Full-Height Desktop Sidebar */}
+    <div className="flex h-screen w-screen bg-[#f6f8f6] text-[#132b21] overflow-hidden select-none font-sans">
+      {/* Left Sidebar */}
       <DesktopSidebar
         currentTab={currentTab}
         onTabChange={setCurrentTab}
@@ -137,13 +154,13 @@ export const App: React.FC = () => {
         onToggleMute={handleToggleMute}
       />
 
-      {/* Main Desktop Workspace Area */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      {/* Main Workspace Area */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
         {/* Top Window Bar */}
-        <DesktopTopBar title={getTabTitle()} />
+        <DesktopTopBar title={headerInfo.title} subtitle={headerInfo.subtitle} />
 
         {/* Scrollable View Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-[#f6f8f6]">
           {currentTab === 'prayers' && (
             <PrayerDashboardView
               prayers={prayerData.prayers}
