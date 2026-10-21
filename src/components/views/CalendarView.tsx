@@ -24,10 +24,10 @@ export const CalendarView: React.FC = () => {
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6 text-right font-readex">
       {/* Calendar Card */}
-      <div className="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-sm">
+      <div className="bg-white rounded-none p-8 border border-slate-200/90 shadow-sm">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
               <CalendarIcon size={20} />
             </div>
             <div>
@@ -60,7 +60,7 @@ export const CalendarView: React.FC = () => {
             return (
               <div
                 key={dayNum}
-                className={`h-12 rounded-xl flex items-center justify-center text-sm font-semibold transition-all cursor-pointer font-mono ${
+                className={`h-12 rounded-none flex items-center justify-center text-sm font-semibold transition-all cursor-pointer font-mono ${
                   isToday
                     ? 'bg-emerald-800 text-white shadow-sm font-bold scale-105'
                     : 'bg-slate-50 text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 border border-slate-200/80'
@@ -74,7 +74,7 @@ export const CalendarView: React.FC = () => {
       </div>
 
       {/* Islamic Events Cards */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+      <div className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm">
         <h3 className="font-bold text-sm text-slate-900 mb-4 flex items-center gap-2 font-readex">
           <Sparkles size={16} className="text-emerald-700" />
           <span>المناسبات والأيام الإسلامية المباركة</span>
@@ -84,10 +84,10 @@ export const CalendarView: React.FC = () => {
           {upcomingEvents.map((event, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/70 border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all"
+              className="flex items-center justify-between p-3.5 rounded-none bg-slate-50/70 border border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100/70 border border-emerald-200 text-emerald-900 flex flex-col items-center justify-center font-bold text-xs shrink-0 font-amiri">
+                <div className="w-10 h-10 rounded-none bg-emerald-100/70 border border-emerald-200 text-emerald-900 flex flex-col items-center justify-center font-bold text-xs shrink-0 font-amiri">
                   <span className="text-sm font-bold">{event.day}</span>
                   <span className="text-[9px] text-emerald-700 font-readex">يوم</span>
                 </div>
@@ -96,7 +96,7 @@ export const CalendarView: React.FC = () => {
                   <p className="text-[11px] text-slate-500 font-readex mt-0.5">{event.month}</p>
                 </div>
               </div>
-              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/60 border border-emerald-200 px-3 py-1 rounded-full font-readex">
+              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100/60 border border-emerald-200 px-3 py-1 rounded-none font-readex">
                 مناسبة مباركة
               </span>
             </div>

@@ -3,8 +3,8 @@ import { Sparkles } from 'lucide-react';
 
 export const DailyEncouragement: React.FC = () => {
   return (
-    <div className="p-4 rounded-2xl border border-emerald-200/90 bg-emerald-50/70 flex items-center gap-3.5 shadow-2xs text-right">
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-emerald-700 text-white shadow-xs">
+    <div className="p-4 rounded-none border border-emerald-200/90 bg-emerald-50/70 flex items-center gap-3.5 shadow-2xs text-right">
+      <div className="w-9 h-9 rounded-none flex items-center justify-center shrink-0 bg-emerald-700 text-white shadow-xs">
         <Sparkles size={16} strokeWidth={2} />
       </div>
 

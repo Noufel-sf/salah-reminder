@@ -49,7 +49,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
   const methodNameArabic = CALCULATION_METHOD_LABELS_AR[calculationMethod] || calculationMethod;
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+    <div className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm">
       {/* Table Section Header */}
       <div className="flex items-center justify-between pb-4 mb-2 border-b border-slate-100">
         <div className="text-right">
@@ -63,7 +63,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
 
         <button
           onClick={onOpenSettingsTab}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-200 transition-colors cursor-pointer font-readex"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-none border border-slate-200 bg-slate-50/80 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-200 transition-colors cursor-pointer font-readex"
           title="تغيير طريقة الحساب والمذهب الفقهي"
         >
           <Sliders size={12} strokeWidth={2} />
@@ -81,7 +81,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
           return (
             <div
               key={prayer.id}
-              className={`flex items-center justify-between py-3 px-3 rounded-xl transition-all ${
+              className={`flex items-center justify-between py-3 px-3 rounded-none transition-all ${
                 isNext
                   ? 'bg-emerald-50/90 border border-emerald-300/80 my-1 shadow-xs font-medium'
                   : 'hover:bg-slate-50/80 border border-transparent'
@@ -90,7 +90,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
               {/* Right Column in RTL: Icon + Prayer Name + Arabic */}
               <div className="flex items-center gap-3.5 min-w-0">
                 <div 
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                  className={`w-8 h-8 rounded-none flex items-center justify-center shrink-0 transition-colors ${
                     isNext
                       ? 'bg-emerald-700 text-white'
                       : isSunrise
@@ -125,13 +125,13 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                   </span>
 
                   {isSunrise && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-readex">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-none bg-amber-50 text-amber-700 border border-amber-200 font-readex">
                       شروق
                     </span>
                   )}
 
                   {isNext && (
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-700 text-white font-readex">
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-none bg-emerald-700 text-white font-readex">
                       الصلاة القادمة
                     </span>
                   )}
@@ -171,7 +171,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                 {!isSunrise ? (
                   <button
                     onClick={() => onToggleNotification(prayer.id)}
-                    className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                    className={`p-1.5 rounded-none border transition-colors cursor-pointer ${
                       prayer.notificationEnabled
                         ? 'bg-emerald-100/70 border-emerald-300 text-emerald-800'
                         : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'

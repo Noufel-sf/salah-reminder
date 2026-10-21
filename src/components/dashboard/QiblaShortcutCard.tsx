@@ -15,7 +15,7 @@ export const QiblaShortcutCard: React.FC<QiblaShortcutCardProps> = ({
   return (
     <div 
       onClick={onOpenQiblaTab}
-      className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group flex items-center justify-between text-right"
+      className="bg-white rounded-none p-5 border border-slate-200/90 shadow-sm hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer group flex items-center justify-between text-right"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -26,7 +26,7 @@ export const QiblaShortcutCard: React.FC<QiblaShortcutCardProps> = ({
       aria-label={`اتجاه القبلة هو ${qiblaAngle} درجة من الشمال في ${cityName}. انقر لفتح البوصلة الكاملة.`}
     >
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 group-hover:scale-105 transition-transform">
+        <div className="w-10 h-10 rounded-none flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 group-hover:scale-105 transition-transform">
           <Compass size={20} strokeWidth={2.2} />
         </div>
         <div className="truncate">

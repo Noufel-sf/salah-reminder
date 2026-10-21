@@ -104,7 +104,7 @@ export const DuasView: React.FC = () => {
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-6 text-right font-readex">
       {/* Hadith Feature Card */}
-      <div className="bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] rounded-3xl p-8 text-white shadow-md relative overflow-hidden select-none">
+      <div className="bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] rounded-none p-8 text-white shadow-md relative overflow-hidden select-none">
         <div className="max-w-2xl relative z-10">
           <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-wider text-emerald-200">
             <Sparkles size={14} />
@@ -113,7 +113,7 @@ export const DuasView: React.FC = () => {
           <p className="font-amiri text-2xl font-bold text-white leading-loose my-2">
             « خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ »
           </p>
-          <span className="text-xs text-emerald-100 font-semibold bg-white/10 px-3 py-1 rounded-full border border-white/15">
+          <span className="text-xs text-emerald-100 font-semibold bg-white/10 px-3 py-1 rounded-none border border-white/15">
             صحيح البخاري - حديث ٥٠٢٧
           </span>
         </div>
@@ -132,7 +132,7 @@ export const DuasView: React.FC = () => {
           <button
             key={tab.id}
             onClick={() => setSelectedCategory(tab.id)}
-            className={`px-4 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-none text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategory === tab.id
                 ? 'bg-emerald-800 text-white shadow-xs font-bold'
                 : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -146,11 +146,11 @@ export const DuasView: React.FC = () => {
       {/* Duas List Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((dua) => (
-          <div key={dua.id} className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+          <div key={dua.id} className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0 ${dua.bgTint}`}>
+                  <div className={`w-10 h-10 rounded-none border flex items-center justify-center shrink-0 ${dua.bgTint}`}>
                     {dua.icon}
                   </div>
                   <div>
@@ -160,7 +160,7 @@ export const DuasView: React.FC = () => {
                 </div>
                 <button
                   onClick={() => handleCopy(dua.id, `${dua.arabic}\n\n${dua.explanation}`)}
-                  className="p-1.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-none border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
                   title="نسخ الدعاء"
                 >
                   {copiedId === dua.id ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
@@ -168,7 +168,7 @@ export const DuasView: React.FC = () => {
               </div>
 
               {/* Arabic Calligraphy */}
-              <div className="bg-emerald-50/40 border border-emerald-100 rounded-2xl p-4 my-3 text-right">
+              <div className="bg-emerald-50/40 border border-emerald-100 rounded-none p-4 my-3 text-right">
                 <p className="font-amiri text-2xl font-bold text-slate-900 leading-loose">
                   {dua.arabic}
                 </p>

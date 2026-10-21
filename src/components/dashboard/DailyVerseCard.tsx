@@ -3,14 +3,14 @@ import { BookOpen } from 'lucide-react';
 
 export const DailyVerseCard: React.FC = () => {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm text-right">
+    <div className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm text-right">
       {/* Header Label */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
         <span className="text-[11px] font-bold flex items-center gap-1.5 text-slate-500 font-readex">
           <BookOpen size={13} strokeWidth={2.2} className="text-emerald-700" />
           آية اليوم
         </span>
-        <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded border border-emerald-200 bg-emerald-50 text-emerald-800 font-readex">
+        <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-none border border-emerald-200 bg-emerald-50 text-emerald-800 font-readex">
           سورة الشرح - الآية ٦
         </span>
       </div>

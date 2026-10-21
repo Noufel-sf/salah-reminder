@@ -18,7 +18,7 @@ export const QiblaView: React.FC<QiblaViewProps> = ({ settings }) => {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <div className="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-sm text-center max-w-xl mx-auto">
+      <div className="bg-white rounded-none p-8 border border-slate-200/90 shadow-sm text-center max-w-xl mx-auto">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Compass size={22} className="text-[#164e3c]" />
           <h2 className="text-xl font-bold text-slate-900 font-readex">اتجاه القبلة</h2>
@@ -27,8 +27,8 @@ export const QiblaView: React.FC<QiblaViewProps> = ({ settings }) => {
           محاذاة دقيقة باتجاه الكعبة المشرفة بمكة المكرمة محسوبة وفق المثلثات الكروية
         </p>
 
-        {/* Circular Compass Dial */}
-        <div className="relative w-72 h-72 mx-auto rounded-full border-2 border-emerald-200 flex items-center justify-center bg-emerald-50/30 shadow-inner mb-8">
+        {/* Compass Dial */}
+        <div className="relative w-72 h-72 mx-auto rounded-none border-2 border-emerald-200 flex items-center justify-center bg-emerald-50/30 shadow-inner mb-8">
           {/* Degree circle markings */}
           <span className="absolute top-3 font-bold text-xs text-emerald-800 font-readex">الشمال (0°)</span>
           <span className="absolute right-3 font-bold text-xs text-slate-500 font-readex">الشرق (90°)</span>
@@ -36,7 +36,7 @@ export const QiblaView: React.FC<QiblaViewProps> = ({ settings }) => {
           <span className="absolute left-3 font-bold text-xs text-slate-500 font-readex">الغرب (270°)</span>
 
           {/* Internal concentric ring */}
-          <div className="w-52 h-52 rounded-full border border-emerald-100 flex items-center justify-center bg-white shadow-xs">
+          <div className="w-52 h-52 rounded-none border border-emerald-100 flex items-center justify-center bg-white shadow-xs">
             {/* Rotating Needle pointing towards Qibla */}
             <div
               className={`w-full h-full flex items-center justify-center transition-transform duration-1000 ease-out ${
@@ -46,22 +46,22 @@ export const QiblaView: React.FC<QiblaViewProps> = ({ settings }) => {
             >
               <div className="flex flex-col items-center">
                 <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[36px] border-b-emerald-800 filter drop-shadow-md" />
-                <div className="w-2 h-14 bg-emerald-500 rounded-full" />
+                <div className="w-2 h-14 bg-emerald-500 rounded-none" />
               </div>
             </div>
 
             {/* Central Kaaba Marker */}
-            <div className="absolute w-10 h-10 rounded-2xl bg-[#113829] border border-emerald-400 flex items-center justify-center text-sm shadow-md">
+            <div className="absolute w-10 h-10 rounded-none bg-[#113829] border border-emerald-400 flex items-center justify-center text-sm shadow-md">
               🕋
             </div>
           </div>
         </div>
 
         {/* Card info below compass */}
-        <div className="bg-emerald-50/60 border border-emerald-200/90 rounded-2xl p-4 max-w-sm mx-auto mb-6">
+        <div className="bg-emerald-50/60 border border-emerald-200/90 rounded-none p-4 max-w-sm mx-auto mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-right">
-              <div className="w-8 h-8 rounded-xl bg-emerald-800 text-white flex items-center justify-center">
+              <div className="w-8 h-8 rounded-none bg-emerald-800 text-white flex items-center justify-center">
                 <Navigation size={16} />
               </div>
               <div>
@@ -80,7 +80,7 @@ export const QiblaView: React.FC<QiblaViewProps> = ({ settings }) => {
         <button
           onClick={handleCalibrate}
           disabled={isCalibrating}
-          className="w-full max-w-sm py-3 px-6 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer font-readex mx-auto"
+          className="w-full max-w-sm py-3 px-6 rounded-none bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer font-readex mx-auto"
         >
           <RotateCw size={14} className={isCalibrating ? 'animate-spin text-emerald-700' : ''} />
           <span>{isCalibrating ? 'جاري ضبط البوصلة...' : 'إعادة ضبط البوصلة'}</span>

@@ -89,10 +89,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6 text-right font-readex">
-      <div className="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-sm">
+      <div className="bg-white rounded-none p-8 border border-slate-200/90 shadow-sm">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
               <SettingsIcon size={20} />
             </div>
             <div>
@@ -103,7 +103,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
 
           <button
             onClick={handleSaveAll}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-sm transition-all cursor-pointer font-readex"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-none bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-sm transition-all cursor-pointer font-readex"
           >
             {isSaved ? <Check size={14} className="text-emerald-300" /> : <Sparkles size={14} />}
             <span>{isSaved ? 'تم الحفظ بنجاح!' : 'حفظ التغييرات'}</span>
@@ -121,7 +121,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               <button
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
-                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 cursor-pointer font-readex"
+                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-none border border-emerald-200 cursor-pointer font-readex"
               >
                 <RotateCcw size={12} className={isDetecting ? 'animate-spin' : ''} />
                 <span>{isDetecting ? 'جاري التحديد عبر IP...' : 'تحديد الموقع تلقائياً'}</span>
@@ -134,7 +134,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 <button
                   key={p.city}
                   onClick={() => handlePreset(p)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer font-readex ${
+                  className={`px-3 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer font-readex ${
                     formData.city === p.city
                       ? 'bg-emerald-800 text-white shadow-xs font-bold'
                       : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -152,7 +152,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
@@ -161,7 +161,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   type="text"
                   value={formData.country}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
@@ -171,7 +171,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   step="any"
                   value={formData.latitude}
                   onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
               <div>
@@ -181,7 +181,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   step="any"
                   value={formData.longitude}
                   onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
             </div>
@@ -200,7 +200,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 <select
                   value={formData.calculationMethod}
                   onChange={(e) => setFormData({ ...formData, calculationMethod: e.target.value as CalculationMethodKey })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 >
                   <option value="MuslimWorldLeague">رابطة العالم الإسلامي</option>
                   <option value="Egyptian">الهيئة المصرية العامة للمساحة</option>
@@ -221,7 +221,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, madhab: 'shafi' })}
-                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
+                    className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'shafi'
                         ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
                         : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -232,7 +232,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, madhab: 'hanafi' })}
-                    className={`py-2 px-3 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
+                    className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'hanafi'
                         ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
                         : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -255,7 +255,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               <button
                 type="button"
                 onClick={handleTestSound}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
               >
                 {isPlayingAudio ? <Square size={12} /> : <Play size={12} />}
                 <span>{isPlayingAudio ? 'إيقاف الصوت' : 'تجربة الصوت'}</span>
@@ -274,7 +274,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   key={s.id}
                   type="button"
                   onClick={() => setFormData({ ...formData, soundOption: s.id as SoundOption })}
-                  className={`p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer font-readex ${
+                  className={`p-3 rounded-none border text-xs font-semibold transition-all cursor-pointer font-readex ${
                     formData.soundOption === s.id
                       ? 'bg-emerald-800 border-emerald-800 text-white shadow-xs font-bold'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -316,7 +316,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 setFormData({ ...formData, autoStart: checked });
                 window.electronAPI?.setStartup(checked);
               }}
-              className="w-5 h-5 accent-emerald-700 rounded-lg cursor-pointer"
+              className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
             />
           </div>
         </div>

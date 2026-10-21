@@ -41,7 +41,7 @@ export const TasbihCard: React.FC = () => {
   const progress = Math.min(100, Math.round((count / target) * 100));
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm text-right">
+    <div className="bg-white rounded-none p-6 border border-slate-200/90 shadow-sm text-right">
       {/* Header with Dhikr selector & Reset */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
         <span className="text-[11px] font-bold flex items-center gap-1.5 text-slate-500 font-readex">
@@ -51,7 +51,7 @@ export const TasbihCard: React.FC = () => {
 
         <button
           onClick={handleResetClick}
-          className={`text-[11px] font-medium inline-flex items-center gap-1 px-2.5 py-0.5 rounded transition-colors cursor-pointer font-readex ${
+          className={`text-[11px] font-medium inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none transition-colors cursor-pointer font-readex ${
             isConfirmingReset
               ? 'bg-rose-50 text-rose-600 font-bold'
               : 'text-slate-400 hover:text-slate-600'
@@ -80,11 +80,11 @@ export const TasbihCard: React.FC = () => {
           {phrases[activePhraseIndex].arabic}
         </p>
 
-        {/* Circular Tap Increment Control */}
+        {/* Tap Increment Control */}
         <div className="py-2.5 flex justify-center">
           <button
             onClick={handleTap}
-            className="w-20 h-20 rounded-full flex flex-col items-center justify-center text-white bg-emerald-800 hover:bg-emerald-900 shadow-md active:scale-95 transition-all cursor-pointer"
+            className="w-20 h-20 rounded-none flex flex-col items-center justify-center text-white bg-emerald-800 hover:bg-emerald-900 shadow-md active:scale-95 transition-all cursor-pointer"
             aria-label={`العدد الحالي هو ${count} من ${target}. اضغط للعد.`}
           >
             <span className="font-mono text-2xl font-bold tracking-tight">{count}</span>
@@ -107,9 +107,9 @@ export const TasbihCard: React.FC = () => {
           <span>مكتمل {progress}%</span>
         </div>
 
-        <div className="h-1.5 w-full rounded-full overflow-hidden mt-1.5 bg-slate-100">
+        <div className="h-1.5 w-full rounded-none overflow-hidden mt-1.5 bg-slate-100">
           <div 
-            className="h-full rounded-full transition-all duration-300 bg-emerald-700"
+            className="h-full rounded-none transition-all duration-300 bg-emerald-700"
             style={{ width: `${progress}%` }}
           />
         </div>

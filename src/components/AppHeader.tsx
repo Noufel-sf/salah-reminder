@@ -65,7 +65,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       {/* Left in RTL: Date Badge & Window Controls */}
       <div className="titlebar-no-drag flex items-center gap-3">
         {/* Date pill */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-none border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
           <Calendar size={13} strokeWidth={2} className="text-emerald-700" />
           <span className="font-medium text-slate-700">{gregorianStr}</span>
           <span className="text-slate-300">|</span>
@@ -76,7 +76,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <div className="flex items-center gap-1 pr-2 border-r border-slate-200">
           <button
             onClick={handleMinimize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title="تصغير النافذة"
             aria-label="تصغير النافذة"
           >
@@ -84,7 +84,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
           <button
             onClick={handleMaximize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
             aria-label={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
           >
@@ -92,7 +92,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
           <button
             onClick={handleClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="إغلاق إلى شريط المهام"
             aria-label="إغلاق إلى شريط المهام"
           >

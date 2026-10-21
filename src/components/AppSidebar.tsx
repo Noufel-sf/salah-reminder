@@ -69,7 +69,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <div className="flex flex-col flex-1 overflow-y-auto px-4 py-5">
         {/* Brand Header */}
         <div className="titlebar-drag px-2 mb-6 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+          <div className="w-9 h-9 rounded-none flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
             <Moon size={18} strokeWidth={2.2} className="fill-emerald-800/20" />
           </div>
           <div className="leading-tight text-right">
@@ -96,10 +96,10 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     <button
                       key={item.id}
                       onClick={() => onTabChange(item.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-right transition-all cursor-pointer ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-xs font-semibold text-right transition-all cursor-pointer rounded-none ${
                         isActive
-                          ? 'bg-emerald-50 text-emerald-900 font-bold border-r-4 border-emerald-700 rounded-l-xl rounded-r-none'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl'
+                          ? 'bg-emerald-50 text-emerald-900 font-bold border-r-4 border-emerald-700'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                       }`}
                       aria-current={isActive ? 'page' : undefined}
                     >
@@ -118,13 +118,13 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
       {/* Bottom Sticky Section */}
       <div className="p-3 border-t border-slate-200/80 bg-slate-50/50">
-        <div className="flex items-center justify-between p-2 rounded-xl border border-slate-200/90 bg-white shadow-2xs">
+        <div className="flex items-center justify-between p-2 rounded-none border border-slate-200/90 bg-white shadow-2xs">
           <button
             onClick={onOpenSettingsLocation}
             className="flex items-center gap-2 text-right truncate flex-1 min-w-0 group cursor-pointer"
             title="انقر لتغيير المدينة"
           >
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-100">
+            <div className="w-7 h-7 rounded-none flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-800 border border-emerald-100">
               <MapPin size={13} strokeWidth={2.2} />
             </div>
             <div className="truncate pl-1">
@@ -141,7 +141,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                className="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-none border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors cursor-pointer"
                 title={currentTheme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي'}
               >
                 {currentTheme === 'dark' ? <Sun size={13} strokeWidth={2} /> : <Moon size={13} strokeWidth={2} />}
@@ -150,7 +150,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
             <button
               onClick={onToggleMute}
-              className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-colors cursor-pointer ${
+              className={`w-7 h-7 rounded-none border flex items-center justify-center transition-colors cursor-pointer ${
                 isMuted
                   ? 'bg-rose-50 border-rose-200 text-rose-600'
                   : 'bg-white border-slate-200 text-emerald-800 hover:bg-emerald-50'

@@ -68,19 +68,19 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
   const padZero = (n: number) => n.toString().padStart(2, '0');
 
   return (
-    <div className="bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] rounded-2xl p-7 text-white shadow-md relative overflow-hidden select-none">
+    <div className="bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] rounded-none p-7 text-white shadow-md relative overflow-hidden select-none">
       {/* Decorative ambient radial glow */}
-      <div className="absolute -left-8 -top-8 w-64 h-64 bg-emerald-400/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -left-8 -top-8 w-64 h-64 bg-emerald-400/10 blur-2xl pointer-events-none" />
 
       <div className="relative z-10">
         {/* Top Meta Row */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-wide px-3 py-1 rounded-full bg-white/15 text-emerald-100 border border-white/15 font-readex">
+            <span className="text-[11px] font-bold tracking-wide px-3 py-1 rounded-none bg-white/15 text-emerald-100 border border-white/15 font-readex">
               الصلاة القادمة
             </span>
             {nextPrayer.notificationEnabled && (
-              <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-200 bg-white/10 px-2.5 py-0.5 rounded-full font-readex">
+              <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-200 bg-white/10 px-2.5 py-0.5 rounded-none font-readex">
                 <Bell size={11} strokeWidth={2.2} />
                 <span>التنبيه مفعّل</span>
               </span>
@@ -88,8 +88,8 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
           </div>
 
           {/* Live countdown pill */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 border border-white/15 font-mono text-xs font-semibold text-white">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-2 px-3 py-1 rounded-none bg-black/25 border border-white/15 font-mono text-xs font-semibold text-white">
+            <span className="w-2 h-2 rounded-none bg-emerald-400 animate-pulse" />
             <span>{padZero(countdown.hours)}:{padZero(countdown.minutes)}:{padZero(countdown.seconds)}</span>
           </div>
         </div>
@@ -122,9 +122,9 @@ export const NextPrayerHero: React.FC<NextPrayerHeroProps> = ({
           </div>
 
           {/* Progress bar track */}
-          <div className="h-1.5 w-full bg-black/30 rounded-full overflow-hidden">
+          <div className="h-1.5 w-full bg-black/30 rounded-none overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-l from-emerald-400 to-teal-200 rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-l from-emerald-400 to-teal-200 rounded-none transition-all duration-1000 ease-out"
               style={{ width: `${countdown.progress}%` }}
               role="progressbar"
               aria-valuenow={Math.round(countdown.progress)}

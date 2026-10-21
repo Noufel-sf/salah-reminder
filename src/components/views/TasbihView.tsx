@@ -41,7 +41,7 @@ export const TasbihView: React.FC = () => {
 
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-6 text-right font-readex">
-      <div className="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-sm text-center relative overflow-hidden">
+      <div className="bg-white rounded-none p-8 border border-slate-200/90 shadow-sm text-center relative overflow-hidden">
         {/* Top Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
           <div className="flex items-center gap-2">
@@ -51,14 +51,14 @@ export const TasbihView: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 cursor-pointer"
+              className="p-2 rounded-none border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 cursor-pointer"
               title={soundEnabled ? 'كتم صوت النقرة' : 'تفعيل صوت النقرة'}
             >
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
             <button
               onClick={handleReset}
-              className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 cursor-pointer"
+              className="p-2 rounded-none border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 cursor-pointer"
               title="إعادة تصفير العداد"
             >
               <RotateCcw size={15} />
@@ -75,7 +75,7 @@ export const TasbihView: React.FC = () => {
                 setActivePhraseIndex(idx);
                 setCount(0);
               }}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer ${
                 activePhraseIndex === idx
                   ? 'bg-emerald-800 text-white shadow-xs font-bold'
                   : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -99,11 +99,11 @@ export const TasbihView: React.FC = () => {
           </p>
         </div>
 
-        {/* Big Tap Dial Button */}
+        {/* Tap Dial Button */}
         <div className="my-8">
           <button
             onClick={handleTap}
-            className="w-48 h-48 mx-auto rounded-full bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] text-white flex flex-col items-center justify-center shadow-xl shadow-emerald-950/20 hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-white"
+            className="w-48 h-48 mx-auto rounded-none bg-gradient-to-l from-[#113829] via-[#164e3c] to-[#205c47] text-white flex flex-col items-center justify-center shadow-xl shadow-emerald-950/20 hover:scale-105 active:scale-95 transition-all cursor-pointer border-4 border-white"
           >
             <span className="text-6xl font-black font-mono tracking-tight">{count}</span>
             <span className="text-xs text-emerald-200 tracking-wider mt-1 font-bold font-readex">اضغط للتسبيح</span>
@@ -117,9 +117,9 @@ export const TasbihView: React.FC = () => {
             <span>مكتمل {Math.round(progress)}%</span>
           </div>
 
-          <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-2.5 w-full bg-slate-100 rounded-none overflow-hidden">
             <div
-              className="h-full bg-emerald-700 rounded-full transition-all duration-300"
+              className="h-full bg-emerald-700 rounded-none transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -134,7 +134,7 @@ export const TasbihView: React.FC = () => {
                   setTarget(t);
                   setCount(0);
                 }}
-                className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer font-mono ${
+                className={`px-3 py-1 rounded-none text-xs font-bold cursor-pointer font-mono ${
                   target === t
                     ? 'bg-emerald-800 text-white'
                     : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
