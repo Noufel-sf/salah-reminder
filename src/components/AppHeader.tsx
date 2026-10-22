@@ -29,16 +29,29 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const gregorianStr = getGregorianDateArabic(currentTime);
 
   const handleMinimize = () => {
-    window.electronAPI?.minimize();
+    if (window.electronAPI?.minimize) {
+      window.electronAPI.minimize();
+    } else if ((window as any).ipcRenderer) {
+      (window as any).ipcRenderer.send('window-minimize');
+    }
   };
 
   const handleMaximize = () => {
-    window.electronAPI?.maximize();
-    setIsMaximized(!isMaximized);
+    if (window.electronAPI?.maximize) {
+      window.electronAPI.maximize();
+      setIsMaximized((prev) => !prev);
+    } else if ((window as any).ipcRenderer) {
+      (window as any).ipcRenderer.send('window-maximize');
+      setIsMaximized((prev) => !prev);
+    }
   };
 
   const handleClose = () => {
-    window.electronAPI?.close();
+    if (window.electronAPI?.close) {
+      window.electronAPI.close();
+    } else if ((window as any).ipcRenderer) {
+      (window as any).ipcRenderer.send('window-close');
+    }
   };
 
   return (
@@ -53,6 +66,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <span>•</span>
           <button
             onClick={onOpenLocationSettings}
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
             className="titlebar-no-drag inline-flex items-center gap-1 font-semibold text-emerald-800 hover:underline cursor-pointer"
             title="تغيير المدينة والإحداثيات"
           >
@@ -63,7 +77,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       </div>
 
       {/* Left in RTL: Date Badge & Window Controls */}
-      <div className="titlebar-no-drag flex items-center gap-3">
+      <div 
+        className="titlebar-no-drag flex items-center gap-3"
+        style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+      >
         {/* Date pill */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-none border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
           <Calendar size={13} strokeWidth={2} className="text-emerald-700" />
@@ -73,26 +90,35 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </div>
 
         {/* Window controls */}
-        <div className="flex items-center gap-1 pr-2 border-r border-slate-200">
+        <div 
+          className="titlebar-no-drag flex items-center gap-1 pr-2 border-r border-slate-200"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
           <button
+            type="button"
             onClick={handleMinimize}
-            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title="تصغير النافذة"
             aria-label="تصغير النافذة"
           >
             <Minus size={14} strokeWidth={2} />
           </button>
           <button
+            type="button"
             onClick={handleMaximize}
-            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
             aria-label={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
           >
             {isMaximized ? <Copy size={12} strokeWidth={2} /> : <Square size={12} strokeWidth={2} />}
           </button>
           <button
+            type="button"
             onClick={handleClose}
-            className="w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="إغلاق إلى شريط المهام"
             aria-label="إغلاق إلى شريط المهام"
           >

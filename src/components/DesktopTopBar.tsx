@@ -64,24 +64,33 @@ export const DesktopTopBar: React.FC<DesktopTopBarProps> = ({ title, subtitle })
         </div>
 
         {/* Window controls */}
-        <div className="flex items-center gap-1 pl-2 border-l border-[#e5ede7]">
+        <div 
+          className="titlebar-no-drag flex items-center gap-1 pl-2 border-l border-[#e5ede7]"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
           <button
+            type="button"
             onClick={handleMinimize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors cursor-pointer"
             title="Minimize"
           >
             <Minus size={14} />
           </button>
           <button
+            type="button"
             onClick={handleMaximize}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-[#123d2e] hover:bg-[#f1f6f2] transition-colors cursor-pointer"
             title={isMaximized ? 'Restore Window' : 'Maximize Window'}
           >
             {isMaximized ? <Copy size={12} /> : <Square size={12} />}
           </button>
           <button
+            type="button"
             onClick={handleClose}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-7 h-7 rounded-lg flex items-center justify-center text-[#71887e] hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="Close to Tray"
           >
             <X size={14} />

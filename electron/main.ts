@@ -89,6 +89,10 @@ function createTray() {
 function createWindow() {
   const iconData = getAppIcon();
 
+  const preloadPath = fs.existsSync(path.join(__dirname, 'preload.cjs'))
+    ? path.join(__dirname, 'preload.cjs')
+    : path.join(__dirname, 'preload.js');
+
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -102,9 +106,10 @@ function createWindow() {
     show: false,
     icon: iconData?.filePath || iconData?.image,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: preloadPath,
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      sandbox: false
     }
   });
 
@@ -128,20 +133,23 @@ function createWindow() {
 }
 
 // Window control IPC handlers
-ipcMain.on('window-minimize', () => {
-  mainWindow?.minimize();
+ipcMain.on('window-minimize', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+  win?.minimize();
 });
 
-ipcMain.on('window-maximize', () => {
-  if (mainWindow?.isMaximized()) {
-    mainWindow.unmaximize();
+ipcMain.on('window-maximize', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+  if (win?.isMaximized()) {
+    win.unmaximize();
   } else {
-    mainWindow?.maximize();
+    win?.maximize();
   }
 });
 
-ipcMain.on('window-close', () => {
-  mainWindow?.hide();
+ipcMain.on('window-close', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+  win?.hide();
 });
 
 // Native Notification IPC handler

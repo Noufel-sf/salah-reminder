@@ -58,17 +58,24 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Window controls */}
-        <div className="titlebar-no-drag flex items-center gap-1">
+        <div 
+          className="titlebar-no-drag flex items-center gap-1"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
           <button
+            type="button"
             onClick={handleMinimize}
-            className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
             title="Minimize"
           >
             <Minus size={13} />
           </button>
           <button
+            type="button"
             onClick={handleClose}
-            className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors"
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag w-6 h-6 flex items-center justify-center rounded-md hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors cursor-pointer"
             title="Close to Tray"
           >
             <X size={13} />
