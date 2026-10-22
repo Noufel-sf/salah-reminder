@@ -1,12 +1,12 @@
-import { Coordinates, CalculationMethod, PrayerTimes, Madhab } from 'adhan';
+import { Coordinates, CalculationMethod, CalculationParameters, PrayerTimes, Madhab } from 'adhan';
 import { AppSettings, CalculationMethodKey, PrayerItem, PrayerName } from '../types/prayer';
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  city: 'الجزائر',
+  city: 'قسنطينة',
   country: 'الجزائر',
-  latitude: 36.7538,
-  longitude: 3.0588,
-  calculationMethod: 'MuslimWorldLeague',
+  latitude: 36.3650,
+  longitude: 6.6147,
+  calculationMethod: 'Algeria',
   madhab: 'shafi',
   soundOption: 'takbeer',
   adhanVolume: 0.8,
@@ -20,10 +20,19 @@ export const DEFAULT_SETTINGS: AppSettings = {
     Maghrib: true,
     Isha: true
   },
+  prayerAdjustments: {
+    Fajr: 0,
+    Sunrise: 0,
+    Dhuhr: 0,
+    Asr: 0,
+    Maghrib: 0,
+    Isha: 0
+  },
   theme: 'light'
 };
 
 export const CALCULATION_METHOD_LABELS_AR: Record<CalculationMethodKey, string> = {
+  Algeria: 'وزارة الشؤون الدينية والأوقاف (الجزائر)',
   MuslimWorldLeague: 'رابطة العالم الإسلامي',
   Egyptian: 'الهيئة المصرية العامة للمساحة',
   Karachi: 'جامعة العلوم الإسلامية بكراتشي',
@@ -48,6 +57,13 @@ const PRAYER_METADATA: Record<PrayerName, { name: string; arabicName: string }> 
 
 export function getCalculationMethodParams(methodKey: CalculationMethodKey) {
   switch (methodKey) {
+    case 'Algeria': {
+      // Official Algerian Ministry standard: Fajr 18°, Isha 17°, Maghrib +3min sunset precaution
+      const params = new CalculationParameters(null, 18, 17);
+      params.methodAdjustments = { fajr: 0, sunrise: 0, dhuhr: 0, asr: 0, maghrib: 3, isha: 0 };
+      params.adjustments = { fajr: 0, sunrise: 0, dhuhr: 0, asr: 0, maghrib: 3, isha: 0 };
+      return params;
+    }
     case 'MuslimWorldLeague':
       return CalculationMethod.MuslimWorldLeague();
     case 'Egyptian':
@@ -91,7 +107,7 @@ export function calculatePrayerTimes(settings: AppSettings, date: Date = new Dat
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowTimes = new PrayerTimes(coordinates, tomorrow, params);
 
-  const rawList: { id: PrayerName; time: Date }[] = [
+  const rawBase: { id: PrayerName; time: Date }[] = [
     { id: 'Fajr', time: rawTimes.fajr },
     { id: 'Sunrise', time: rawTimes.sunrise },
     { id: 'Dhuhr', time: rawTimes.dhuhr },
@@ -99,6 +115,14 @@ export function calculatePrayerTimes(settings: AppSettings, date: Date = new Dat
     { id: 'Maghrib', time: rawTimes.maghrib },
     { id: 'Isha', time: rawTimes.isha }
   ];
+
+  const rawList: { id: PrayerName; time: Date }[] = rawBase.map((item) => {
+    const adjMinutes = settings.prayerAdjustments?.[item.id] || 0;
+    if (adjMinutes !== 0) {
+      return { id: item.id, time: new Date(item.time.getTime() + adjMinutes * 60 * 1000) };
+    }
+    return item;
+  });
 
   // Find next and current prayer
   let nextPrayerId: PrayerName | null = null;

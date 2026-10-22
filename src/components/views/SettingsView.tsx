@@ -11,9 +11,12 @@ import {
   Sparkles,
   Sun,
   Moon,
-  Keyboard
+  Keyboard,
+  Sliders,
+  Plus,
+  Minus
 } from 'lucide-react';
-import { AppSettings, CalculationMethodKey, SoundOption } from '../../types/prayer';
+import { AppSettings, CalculationMethodKey, SoundOption, PrayerName } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
 
 interface SettingsViewProps {
@@ -21,10 +24,28 @@ interface SettingsViewProps {
   onSave: (newSettings: AppSettings) => void;
 }
 
-const CITY_PRESETS = [
-  { city: 'الجزائر', country: 'الجزائر', lat: 36.7538, lng: 3.0588, method: 'MuslimWorldLeague' },
+const ALGERIAN_CITIES = [
+  { city: 'قسنطينة', country: 'الجزائر', lat: 36.3650, lng: 6.6147, method: 'Algeria' },
+  { city: 'الخروب (قسنطينة)', country: 'الجزائر', lat: 36.2625, lng: 6.6917, method: 'Algeria' },
+  { city: 'علي منجلي (قسنطينة)', country: 'الجزائر', lat: 36.2411, lng: 6.5708, method: 'Algeria' },
+  { city: 'الجزائر العاصمة', country: 'الجزائر', lat: 36.7538, lng: 3.0588, method: 'Algeria' },
+  { city: 'وهران', country: 'الجزائر', lat: 35.6987, lng: -0.6349, method: 'Algeria' },
+  { city: 'عنابة', country: 'الجزائر', lat: 36.9000, lng: 7.7667, method: 'Algeria' },
+  { city: 'سطيف', country: 'الجزائر', lat: 36.1911, lng: 5.4137, method: 'Algeria' },
+  { city: 'باتنة', country: 'الجزائر', lat: 35.5559, lng: 6.1741, method: 'Algeria' },
+  { city: 'بسكرة', country: 'الجزائر', lat: 34.8500, lng: 5.7333, method: 'Algeria' },
+  { city: 'بجاية', country: 'الجزائر', lat: 36.7500, lng: 5.0667, method: 'Algeria' },
+  { city: 'تلمسان', country: 'الجزائر', lat: 34.8783, lng: -1.3150, method: 'Algeria' },
+  { city: 'البليدة', country: 'الجزائر', lat: 36.4700, lng: 2.8300, method: 'Algeria' },
+  { city: 'جيجل', country: 'الجزائر', lat: 36.8206, lng: 5.7667, method: 'Algeria' },
+  { city: 'ورقلة', country: 'الجزائر', lat: 31.9500, lng: 5.3333, method: 'Algeria' },
+  { city: 'الشلف', country: 'الجزائر', lat: 36.1654, lng: 1.3345, method: 'Algeria' }
+];
+
+const INTERNATIONAL_CITIES = [
   { city: 'مكة المكرمة', country: 'السعودية', lat: 21.4225, lng: 39.8262, method: 'UmmAlQura' },
   { city: 'المدينة المنورة', country: 'السعودية', lat: 24.5247, lng: 39.5692, method: 'UmmAlQura' },
+  { city: 'القدس الشريف', country: 'فلسطين', lat: 31.7683, lng: 35.2137, method: 'MuslimWorldLeague' },
   { city: 'القاهرة', country: 'مصر', lat: 30.0444, lng: 31.2357, method: 'Egyptian' },
   { city: 'إسطنبول', country: 'تركيا', lat: 41.0082, lng: 28.9784, method: 'MuslimWorldLeague' },
   { city: 'دبي', country: 'الإمارات', lat: 25.2048, lng: 55.2708, method: 'Dubai' },
@@ -34,13 +55,23 @@ const CITY_PRESETS = [
   { city: 'الكويت', country: 'الكويت', lat: 29.3759, lng: 47.9774, method: 'Kuwait' }
 ];
 
+const PRAYERS_LIST: { id: PrayerName; label: string }[] = [
+  { id: 'Fajr', label: 'الفجر' },
+  { id: 'Sunrise', label: 'الشروق' },
+  { id: 'Dhuhr', label: 'الظهر' },
+  { id: 'Asr', label: 'العصر' },
+  { id: 'Maghrib', label: 'المغرب' },
+  { id: 'Isha', label: 'العشاء' }
+];
+
 export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) => {
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [presetTab, setPresetTab] = useState<'algeria' | 'international'>('algeria');
 
-  const handlePreset = (p: typeof CITY_PRESETS[0]) => {
+  const handlePreset = (p: { city: string; country: string; lat: number; lng: number; method: string }) => {
     setFormData((prev) => ({
       ...prev,
       city: p.city,
@@ -49,6 +80,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
       longitude: p.lng,
       calculationMethod: p.method as CalculationMethodKey
     }));
+  };
+
+  const handleAdjustmentChange = (prayerId: PrayerName, delta: number) => {
+    setFormData((prev) => {
+      const current = prev.prayerAdjustments?.[prayerId] || 0;
+      const updated = Math.max(-20, Math.min(20, current + delta));
+      return {
+        ...prev,
+        prayerAdjustments: {
+          ...prev.prayerAdjustments,
+          [prayerId]: updated
+        }
+      };
+    });
   };
 
   const handleAutoDetect = async () => {
@@ -131,21 +176,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </button>
             </div>
 
-            {/* Quick presets */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {CITY_PRESETS.map((p) => (
+            {/* Quick presets with Algerian and International tabs */}
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2.5">
                 <button
-                  key={p.city}
-                  onClick={() => handlePreset(p)}
-                  className={`px-3 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer font-readex ${
-                    formData.city === p.city
-                      ? 'bg-emerald-800 text-white shadow-xs font-bold'
-                      : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                  type="button"
+                  onClick={() => setPresetTab('algeria')}
+                  className={`px-3 py-1 text-xs font-semibold rounded-none cursor-pointer font-readex transition-colors ${
+                    presetTab === 'algeria'
+                      ? 'bg-emerald-800 text-white font-bold'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
-                  {p.city}
+                  الولايات والمدن الجزائرية
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setPresetTab('international')}
+                  className={`px-3 py-1 text-xs font-semibold rounded-none cursor-pointer font-readex transition-colors ${
+                    presetTab === 'international'
+                      ? 'bg-emerald-800 text-white font-bold'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  مدن وعواصم إسلامية
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {(presetTab === 'algeria' ? ALGERIAN_CITIES : INTERNATIONAL_CITIES).map((p) => (
+                  <button
+                    key={p.city}
+                    type="button"
+                    onClick={() => handlePreset(p)}
+                    className={`px-3 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer font-readex ${
+                      formData.city === p.city
+                        ? 'bg-emerald-800 text-white shadow-xs font-bold'
+                        : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {p.city}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -205,6 +278,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   onChange={(e) => setFormData({ ...formData, calculationMethod: e.target.value as CalculationMethodKey })}
                   className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 >
+                  <option value="Algeria">وزارة الشؤون الدينية والأوقاف - الجزائر (رسمي 18°/17°)</option>
                   <option value="MuslimWorldLeague">رابطة العالم الإسلامي</option>
                   <option value="Egyptian">الهيئة المصرية العامة للمساحة</option>
                   <option value="Karachi">جامعة العلوم الإسلامية بكراتشي</option>
@@ -216,6 +290,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   <option value="Singapore">المجلس الإسلامي بسنغافورة (MUIS)</option>
                   <option value="NorthAmerica">الجمعية الإسلامية لأمريكا الشمالية (ISNA)</option>
                 </select>
+
+                {formData.calculationMethod === 'Algeria' && (
+                  <div className="mt-2.5 p-2.5 bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 font-readex leading-relaxed">
+                    <span className="font-bold">✓ معتمد بالجزائر:</span> زاوية الفجر 18°، زاوية العشاء 17°، واحتياط الغروب +3 دقائق. مطابق لرزنامة وزارة الشؤون الدينية والأوقاف لولاية قسنطينة والمدن الجزائرية.
+                  </div>
+                )}
               </div>
 
               <div>
@@ -230,7 +310,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                         : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    الجمهور (الشافعي، المالكي، الحنبلي)
+                    الجمهور (المالكي، الشافعي، الحنبلي)
                   </button>
                   <button
                     type="button"
@@ -245,6 +325,63 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Manual Prayer Time Adjustments */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <Sliders size={16} className="text-emerald-700" />
+                <span>الضبط اليدوي بالدقائق لمواقيت الصلاة</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    prayerAdjustments: { Fajr: 0, Sunrise: 0, Dhuhr: 0, Asr: 0, Maghrib: 0, Isha: 0 }
+                  }));
+                }}
+                className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer font-readex"
+              >
+                تصفير التعديلات
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-3 font-readex">
+              إذا كان أذان المسجد في منطقتك بقسنطينة يختلف بدقيقة أو دقيقتين، يمكنك تقديم أو تأخير أي صلاة بدقة:
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+              {PRAYERS_LIST.map((pr) => {
+                const adj = formData.prayerAdjustments?.[pr.id] || 0;
+                return (
+                  <div key={pr.id} className="p-2.5 bg-slate-50 border border-slate-200 text-center font-readex">
+                    <span className="block text-xs font-bold text-slate-800 mb-1.5">{pr.label}</span>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleAdjustmentChange(pr.id, -1)}
+                        className="w-6 h-6 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center font-bold text-xs cursor-pointer"
+                        title="إنقاص دقيقة"
+                      >
+                        <Minus size={11} />
+                      </button>
+                      <span className={`font-mono text-xs font-bold min-w-[2.2rem] ${adj > 0 ? 'text-emerald-700' : adj < 0 ? 'text-amber-700' : 'text-slate-600'}`}>
+                        {adj > 0 ? `+${adj}` : adj} د
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleAdjustmentChange(pr.id, 1)}
+                        className="w-6 h-6 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center font-bold text-xs cursor-pointer"
+                        title="زيادة دقيقة"
+                      >
+                        <Plus size={11} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

@@ -13,6 +13,7 @@ export interface PrayerItem {
 }
 
 export type CalculationMethodKey = 
+  | 'Algeria'
   | 'MuslimWorldLeague'
   | 'Egyptian'
   | 'Karachi'
@@ -41,6 +42,7 @@ export interface AppSettings {
   autoStart: boolean;
   remindMinutesBefore: number; // e.g. 0 or 15 mins before
   enabledPrayers: Record<PrayerName, boolean>;
+  prayerAdjustments?: Partial<Record<PrayerName, number>>;
   theme?: 'light' | 'dark' | 'system';
 }
 

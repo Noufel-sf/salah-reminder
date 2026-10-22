@@ -22,7 +22,14 @@ export const App: React.FC = () => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        // If the stored setting was the old default Algiers coordinates, migrate to Constantine Algeria
+        if (parsed.city === 'الجزائر' && Math.abs((parsed.latitude || 0) - 36.7538) < 0.05) {
+          const migrated = { ...DEFAULT_SETTINGS };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch {
       // ignore
