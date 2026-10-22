@@ -19,11 +19,24 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [browserNotice, setBrowserNotice] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const handleFullscreenChange = () => {
+      setIsMaximized(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, []);
+
+  const showNotice = (msg: string) => {
+    setBrowserNotice(msg);
+    setTimeout(() => setBrowserNotice(null), 3000);
+  };
 
   const hijri = getHijriDate(currentTime);
   const gregorianStr = getGregorianDateArabic(currentTime);
@@ -33,6 +46,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       window.electronAPI.minimize();
     } else if ((window as any).ipcRenderer) {
       (window as any).ipcRenderer.send('window-minimize');
+    } else {
+      showNotice('خاصية التصغير لشريط المهام تعمل في تطبيق سطح المكتب المستقل (Windows App)');
     }
   };
 
@@ -43,6 +58,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     } else if ((window as any).ipcRenderer) {
       (window as any).ipcRenderer.send('window-maximize');
       setIsMaximized((prev) => !prev);
+    } else {
+      // Browser preview mode: Toggle Fullscreen
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+        setIsMaximized(true);
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+        setIsMaximized(false);
+      }
     }
   };
 
@@ -51,6 +75,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       window.electronAPI.close();
     } else if ((window as any).ipcRenderer) {
       (window as any).ipcRenderer.send('window-close');
+    } else {
+      showNotice('إغلاق التطبيق إلى صينية النظام (System Tray) يعمل في تطبيق سطح المكتب المستقل');
     }
   };
 
@@ -126,6 +152,14 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Floating notice for browser preview */}
+      {browserNotice && (
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs px-4 py-2 border border-emerald-500/50 shadow-xl flex items-center gap-2 font-readex animate-fade-in">
+          <span className="w-2 h-2 bg-emerald-400 rounded-none animate-ping" />
+          <span>{browserNotice}</span>
+        </div>
+      )}
     </header>
   );
 };
