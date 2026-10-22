@@ -11,6 +11,7 @@ import { SettingsView } from './components/views/SettingsView';
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes } from './utils/prayerTimes';
 import { audioService } from './utils/audio';
+import { incrementDhikr } from './utils/worshipStats';
 
 const STORAGE_KEY = 'noor_prayer_settings';
 
@@ -73,6 +74,45 @@ export const App: React.FC = () => {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  const [spaceToast, setSpaceToast] = useState<{ count: number } | null>(null);
+  const toastTimeoutRef = useRef<any>(null);
+
+  // Global Hotkey: Space for Quick Tasbih across the app
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const record = incrementDhikr('tasbih', 1);
+        audioService.playBeep(0.12);
+
+        setSpaceToast({ count: record.tasbih });
+        if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+        toastTimeoutRef.current = setTimeout(() => {
+          setSpaceToast(null);
+        }, 1200);
+
+        window.dispatchEvent(new CustomEvent('space-tasbih-tap'));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
   }, []);
 
   const prayerData = useMemo(() => {
@@ -214,6 +254,19 @@ export const App: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Floating Quick Tasbih Toast Notification */}
+      {spaceToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white border border-emerald-500/60 px-5 py-2.5 shadow-2xl flex items-center gap-3 font-readex rounded-none backdrop-blur-md animate-fade-in">
+          <span className="w-2 h-2 bg-emerald-400 rounded-none animate-ping" />
+          <span className="font-amiri text-lg font-bold text-emerald-300">سُبْحَانَ اللَّهِ</span>
+          <span className="text-xs text-slate-500">|</span>
+          <span className="text-xs font-semibold text-slate-200">تسبيح سريع:</span>
+          <span className="font-mono text-sm font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 border border-emerald-500/30">
+            {spaceToast.count}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

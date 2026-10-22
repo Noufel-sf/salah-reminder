@@ -20,6 +20,21 @@ export const TasbihView: React.FC = () => {
     return () => window.removeEventListener('worship-stats-updated', handleUpdate);
   }, []);
 
+  useEffect(() => {
+    const handleSpaceTap = () => {
+      setCount((prev) => {
+        const next = prev + 1;
+        if (next >= target) {
+          audioService.playChime(0.5);
+          return 0;
+        }
+        return next;
+      });
+    };
+    window.addEventListener('space-tasbih-tap', handleSpaceTap);
+    return () => window.removeEventListener('space-tasbih-tap', handleSpaceTap);
+  }, [target]);
+
   const currentDhikr = DHIKR_ITEMS[activePhraseIndex] || DHIKR_ITEMS[0];
 
   const handleTap = () => {
@@ -117,6 +132,11 @@ export const TasbihView: React.FC = () => {
             <span className="text-6xl font-black font-mono tracking-tight">{count}</span>
             <span className="text-xs text-emerald-200 tracking-wider mt-1 font-bold font-readex">اضغط للتسبيح</span>
           </button>
+          <div className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-readex">
+            <span>أو اضغط مفتاح</span>
+            <kbd className="px-2 py-0.5 bg-slate-100 border border-slate-300 font-mono text-slate-800 font-bold shadow-xs">Space</kbd>
+            <span>في أي مكان للتسبيح السريع</span>
+          </div>
         </div>
 
         {/* Progress & Target Settings */}

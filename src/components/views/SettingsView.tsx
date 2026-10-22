@@ -10,7 +10,8 @@ import {
   Check, 
   Sparkles,
   Sun,
-  Moon
+  Moon,
+  Keyboard
 } from 'lucide-react';
 import { AppSettings, CalculationMethodKey, SoundOption } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
@@ -337,6 +338,44 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 <Moon size={14} />
                 <span>الوضع الليلي (داكن)</span>
               </button>
+            </div>
+          </div>
+
+          {/* Global Hotkeys */}
+          <div className="pt-4 border-t border-slate-100">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
+              <Keyboard size={16} className="text-emerald-700" />
+              <span>اختصارات لوحة المفاتيح (Global Hotkeys)</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-800 font-readex">إظهار / إخفاء التطبيق</span>
+                  <div className="flex items-center gap-1 font-mono text-xs">
+                    <kbd className="px-2 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Ctrl</kbd>
+                    <span className="text-slate-400">+</span>
+                    <kbd className="px-2 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Shift</kbd>
+                    <span className="text-slate-400">+</span>
+                    <kbd className="px-2 py-0.5 bg-emerald-800 text-white font-bold border border-emerald-900 shadow-xs">P</kbd>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                  اختصار عالمي يعمل من أي نافذة أو برنامج في نظام ويندوز لإظهار شاشة الصلاة أو إخفائها فوراً.
+                </p>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-800 font-readex">التسبيح السريع</span>
+                  <div className="flex items-center gap-1 font-mono text-xs">
+                    <kbd className="px-3 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Space</kbd>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                  اضغط مفتاح المسافة في أي مكان داخل التطبيق للعد الفوري مع إشعار طافي وحفظ في الإحصائيات (يتوقف تلقائياً عند الكتابة في الخانات).
+                </p>
+              </div>
             </div>
           </div>
 
