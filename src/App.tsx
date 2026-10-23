@@ -685,7 +685,7 @@ export const App: React.FC = () => {
   const headerInfo = getTabHeader();
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden select-none bg-[#f8faf8] text-slate-900 font-readex">
+    <div className="flex h-screen w-screen overflow-hidden select-none bg-[#f8faf8] dark:bg-[#09120d] text-slate-900 dark:text-slate-100 font-readex">
       {/* Left Application Sidebar */}
       <AppSidebar
         currentTab={currentTab}
@@ -709,7 +709,7 @@ export const App: React.FC = () => {
         />
 
         {/* Scrollable View Container */}
-        <main className="flex-1 overflow-y-auto bg-[#f8faf8]">
+        <main className="flex-1 overflow-y-auto bg-[#f8faf8] dark:bg-[#09120d]">
           {currentTab === 'prayers' && (
             <PrayerDashboardView
               prayers={prayerData.prayers}

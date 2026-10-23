@@ -83,19 +83,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   return (
-    <header className="titlebar-drag h-16 px-8 bg-white border-b border-slate-200/90 flex items-center justify-between shrink-0 select-none">
+    <header className="titlebar-drag h-16 px-8 bg-white dark:bg-[#0c1611] border-b border-slate-200/90 dark:border-[#1a2c25] flex items-center justify-between shrink-0 select-none">
       {/* Right in RTL: View Title & Subtitle */}
       <div className="leading-tight text-right">
-        <h2 className="text-xl font-bold tracking-tight text-slate-900 font-readex">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 font-readex">
           {title}
         </h2>
-        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
           <span>{subtitle}</span>
-          <span>•</span>
+          <span className="text-slate-300 dark:text-slate-600">•</span>
           <button
             onClick={onOpenLocationSettings}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            className="titlebar-no-drag inline-flex items-center gap-1 font-semibold text-emerald-800 hover:underline cursor-pointer"
+            className="titlebar-no-drag inline-flex items-center gap-1 font-semibold text-emerald-800 dark:text-emerald-400 hover:underline cursor-pointer"
             title="تغيير المدينة والإحداثيات"
           >
             <MapPin size={11} strokeWidth={2.2} />
@@ -110,11 +110,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
       >
         {/* Date pill */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-none border border-slate-200 bg-slate-50/80 text-xs text-slate-700">
-          <Calendar size={13} strokeWidth={2} className="text-emerald-700" />
-          <span className="font-medium text-slate-700">{gregorianStr}</span>
-          <span className="text-slate-300">|</span>
-          <span className="font-bold text-emerald-900 font-amiri text-sm">{hijri.arabic}</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-none border border-slate-200 dark:border-[#233b31] bg-slate-50/80 dark:bg-[#12201b] text-xs text-slate-700 dark:text-slate-300">
+          <Calendar size={13} strokeWidth={2} className="text-emerald-700 dark:text-emerald-400" />
+          <span className="font-medium text-slate-700 dark:text-slate-200">{gregorianStr}</span>
+          <span className="text-slate-300 dark:text-slate-600">|</span>
+          <span className="font-bold text-emerald-900 dark:text-emerald-300 font-amiri text-sm">{hijri.arabic}</span>
         </div>
 
         {/* Mini Widget button */}
@@ -123,24 +123,24 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             type="button"
             onClick={onToggleWidget}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            className="titlebar-no-drag flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-emerald-300/80 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 text-xs font-bold transition-colors cursor-pointer"
+            className="titlebar-no-drag flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-emerald-300/80 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-xs font-bold transition-colors cursor-pointer"
             title="تشغيل الودجت المصغر العائم لسطح المكتب (Always-on-top)"
           >
-            <AppWindow size={13} strokeWidth={2} className="text-emerald-700" />
+            <AppWindow size={13} strokeWidth={2} className="text-emerald-700 dark:text-emerald-400" />
             <span className="hidden sm:inline">الودجت العائم</span>
           </button>
         )}
 
         {/* Window controls */}
         <div 
-          className="titlebar-no-drag flex items-center gap-1 pr-2 border-r border-slate-200"
+          className="titlebar-no-drag flex items-center gap-1 pr-2 border-r border-slate-200 dark:border-[#233b31]"
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
         >
           <button
             type="button"
             onClick={handleMinimize}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1b2f27] transition-colors cursor-pointer"
             title="تصغير النافذة"
             aria-label="تصغير النافذة"
           >
@@ -150,7 +150,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             type="button"
             onClick={handleMaximize}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1b2f27] transition-colors cursor-pointer"
             title={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
             aria-label={isMaximized ? 'استعادة الحجم' : 'تكبير النافذة'}
           >
@@ -160,7 +160,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             type="button"
             onClick={handleClose}
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
-            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+            className="titlebar-no-drag w-7 h-7 rounded-none flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
             title="إغلاق إلى شريط المهام"
             aria-label="إغلاق إلى شريط المهام"
           >

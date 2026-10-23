@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings as SettingsIcon, 
   MapPin, 
@@ -85,6 +85,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
   const [isSaved, setIsSaved] = useState(false);
   const [presetTab, setPresetTab] = useState<'algeria' | 'international'>('algeria');
 
+  useEffect(() => {
+    setFormData(settings);
+  }, [settings]);
+
   const handlePreset = (p: { city: string; country: string; lat: number; lng: number; method: string }) => {
     setFormData((prev) => ({
       ...prev,
@@ -146,10 +150,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleStop = () => setIsPlayingAudio(false);
     window.addEventListener('adhan-stopped', handleStop);
-    return () => window.removeEventListener('adhan-stopped', handleStop);
+    return () => {
+      window.removeEventListener('adhan-stopped', handleStop);
+      audioService.stop();
+    };
   }, []);
 
   const handleTestSound = () => {
@@ -157,6 +164,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
       audioService.stop();
       setIsPlayingAudio(false);
     } else {
+      if (formData.soundOption === 'silent') {
+        alert('وضع الصامت مفعل حالياً. اختر صوتاً كالأذان أو الرنين لتجربته.');
+        return;
+      }
       setIsPlayingAudio(true);
       audioService.playSound(formData.soundOption, formData.adhanVolume);
     }
@@ -169,17 +180,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
     setTimeout(() => setIsSaved(false), 2500);
   };
 
+  const handleThemeChange = (newTheme: 'light' | 'dark') => {
+    setFormData((prev) => ({ ...prev, theme: newTheme }));
+    document.documentElement.setAttribute('data-theme', newTheme);
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6 text-right font-readex">
-      <div className="bg-white rounded-none p-8 border border-slate-200/90 shadow-sm">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+      <div className="bg-white dark:bg-[#0e1914] rounded-none p-8 border border-slate-200/90 dark:border-[#233b31] shadow-sm">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-[#1a2c25] mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center shrink-0">
               <SettingsIcon size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 font-readex">إعدادات التطبيق</h2>
-              <p className="text-xs text-slate-500 font-readex">تهيئة مواقيت الصلاة، الصوت، وتفضيلات النظام</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 font-readex">إعدادات التطبيق</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-readex">تهيئة مواقيت الصلاة، الصوت، وتفضيلات النظام</p>
             </div>
           </div>
 
@@ -208,14 +229,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           {/* Location & Coordinates */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <MapPin size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <MapPin size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>الموقع الجغرافي والإحداثيات</span>
               </h3>
               <button
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
-                className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-none border border-emerald-200 cursor-pointer font-readex"
+                className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 dark:hover:text-white flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1.5 rounded-none border border-emerald-200 dark:border-emerald-800/60 cursor-pointer font-readex transition-colors"
               >
                 <RotateCcw size={12} className={isDetecting ? 'animate-spin' : ''} />
                 <span>{isDetecting ? 'جاري التحديد عبر IP...' : 'تحديد الموقع تلقائياً'}</span>
@@ -231,7 +252,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   className={`px-3 py-1 text-xs font-semibold rounded-none cursor-pointer font-readex transition-colors ${
                     presetTab === 'algeria'
                       ? 'bg-emerald-800 text-white font-bold'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      : 'bg-slate-100 dark:bg-[#162520] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#20362c]'
                   }`}
                 >
                   الولايات والمدن الجزائرية
@@ -242,7 +263,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   className={`px-3 py-1 text-xs font-semibold rounded-none cursor-pointer font-readex transition-colors ${
                     presetTab === 'international'
                       ? 'bg-emerald-800 text-white font-bold'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      : 'bg-slate-100 dark:bg-[#162520] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#20362c]'
                   }`}
                 >
                   مدن وعواصم إسلامية
@@ -258,7 +279,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     className={`px-3 py-1.5 rounded-none text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.city === p.city
                         ? 'bg-emerald-800 text-white shadow-xs font-bold'
-                        : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100'
+                        : 'bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                     }`}
                   >
                     {p.city}
@@ -269,60 +290,60 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">المدينة</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">المدينة</label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#2d493e] rounded-none px-3 py-2 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">الدولة</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">الدولة</label>
                 <input
                   type="text"
                   value={formData.country}
                   onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#2d493e] rounded-none px-3 py-2 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">خط العرض (Latitude)</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">خط العرض (Latitude)</label>
                 <input
                   type="number"
                   step="any"
                   value={formData.latitude}
                   onChange={(e) => setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
+                  className="w-full mt-1 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#2d493e] rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">خط الطول (Longitude)</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">خط الطول (Longitude)</label>
                 <input
                   type="number"
                   step="any"
                   value={formData.longitude}
                   onChange={(e) => setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 text-left"
+                  className="w-full mt-1 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#2d493e] rounded-none px-3 py-2 text-xs font-mono font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-600 text-left"
                 />
               </div>
             </div>
           </div>
 
           {/* Calculation Method */}
-          <div className="pt-4 border-t border-slate-100">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
-              <Compass size={16} className="text-emerald-700" />
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3 font-readex">
+              <Compass size={16} className="text-emerald-700 dark:text-emerald-400" />
               <span>طريقة الحساب والمذهب الفقهي</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">طريقة حساب المواقيت</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">طريقة حساب المواقيت</label>
                 <select
                   value={formData.calculationMethod}
                   onChange={(e) => setFormData({ ...formData, calculationMethod: e.target.value as CalculationMethodKey })}
-                  className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-none px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-emerald-600 font-readex text-right"
+                  className="w-full mt-1 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#2d493e] rounded-none px-3 py-2 text-xs font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:border-emerald-600 font-readex text-right"
                 >
                   <option value="Algeria">وزارة الشؤون الدينية والأوقاف - الجزائر (رسمي 18°/17°)</option>
                   <option value="MuslimWorldLeague">رابطة العالم الإسلامي</option>
@@ -338,14 +359,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 </select>
 
                 {formData.calculationMethod === 'Algeria' && (
-                  <div className="mt-2.5 p-2.5 bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-900 font-readex leading-relaxed">
+                  <div className="mt-2.5 p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-[11px] text-emerald-900 dark:text-emerald-200 font-readex leading-relaxed">
                     <span className="font-bold">✓ معتمد بالجزائر:</span> زاوية الفجر 18°، زاوية العشاء 17°، واحتياط الغروب +3 دقائق. مطابق لرزنامة وزارة الشؤون الدينية والأوقاف لولاية قسنطينة والمدن الجزائرية.
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-slate-600 font-readex">مذهب حساب صلاة العصر</label>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 font-readex">مذهب حساب صلاة العصر</label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
                   <button
                     type="button"
@@ -353,7 +374,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'shafi'
                         ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
-                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                     }`}
                   >
                     الجمهور (المالكي، الشافعي، الحنبلي)
@@ -364,7 +385,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.madhab === 'hanafi'
                         ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
-                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                     }`}
                   >
                     المذهب الحنفي
@@ -375,10 +396,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Manual Prayer Time Adjustments */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <Sliders size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <Sliders size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>الضبط اليدوي بالدقائق لمواقيت الصلاة</span>
               </h3>
               <button
@@ -389,37 +410,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     prayerAdjustments: { Fajr: 0, Sunrise: 0, Dhuhr: 0, Asr: 0, Maghrib: 0, Isha: 0 }
                   }));
                 }}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer font-readex"
+                className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline cursor-pointer font-readex"
               >
                 تصفير التعديلات
               </button>
             </div>
-            <p className="text-xs text-slate-500 mb-3 font-readex">
-              إذا كان أذان المسجد في منطقتك بقسنطينة يختلف بدقيقة أو دقيقتين، يمكنك تقديم أو تأخير أي صلاة بدقة:
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 font-readex">
+              إذا كان أذان المسجد في منطقتك يختلف بدقيقة أو دقيقتين، يمكنك تقديم أو تأخير أي صلاة بدقة:
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
               {PRAYERS_LIST.map((pr) => {
                 const adj = formData.prayerAdjustments?.[pr.id] || 0;
                 return (
-                  <div key={pr.id} className="p-2.5 bg-slate-50 border border-slate-200 text-center font-readex">
-                    <span className="block text-xs font-bold text-slate-800 mb-1.5">{pr.label}</span>
+                  <div key={pr.id} className="p-2.5 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-center font-readex">
+                    <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5">{pr.label}</span>
                     <div className="flex items-center justify-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleAdjustmentChange(pr.id, -1)}
-                        className="w-6 h-6 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center font-bold text-xs cursor-pointer"
+                        className="w-6 h-6 bg-white dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#253f34] flex items-center justify-center font-bold text-xs cursor-pointer transition-colors"
                         title="إنقاص دقيقة"
                       >
                         <Minus size={11} />
                       </button>
-                      <span className={`font-mono text-xs font-bold min-w-[2.2rem] ${adj > 0 ? 'text-emerald-700' : adj < 0 ? 'text-amber-700' : 'text-slate-600'}`}>
+                      <span className={`font-mono text-xs font-bold min-w-[2.2rem] ${adj > 0 ? 'text-emerald-700 dark:text-emerald-400' : adj < 0 ? 'text-amber-700 dark:text-amber-400' : 'text-slate-600 dark:text-slate-400'}`}>
                         {adj > 0 ? `+${adj}` : adj} د
                       </span>
                       <button
                         type="button"
                         onClick={() => handleAdjustmentChange(pr.id, 1)}
-                        className="w-6 h-6 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 flex items-center justify-center font-bold text-xs cursor-pointer"
+                        className="w-6 h-6 bg-white dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#253f34] flex items-center justify-center font-bold text-xs cursor-pointer transition-colors"
                         title="زيادة دقيقة"
                       >
                         <Plus size={11} />
@@ -432,16 +453,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Sound & Audio */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <Volume2 size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <Volume2 size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>أصوات الأذان والتنبيهات</span>
               </h3>
               <button
                 type="button"
                 onClick={handleTestSound}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-200 dark:border-emerald-800/60"
               >
                 {isPlayingAudio ? <Square size={12} /> : <Play size={12} />}
                 <span>{isPlayingAudio ? 'إيقاف الصوت' : 'تجربة الصوت'}</span>
@@ -460,11 +481,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setFormData({ ...formData, soundOption: s.id as SoundOption })}
+                  onClick={() => {
+                    if (isPlayingAudio) {
+                      audioService.stop();
+                      setIsPlayingAudio(false);
+                    }
+                    setFormData({ ...formData, soundOption: s.id as SoundOption });
+                  }}
                   className={`p-3 rounded-none border text-xs font-semibold transition-all cursor-pointer font-readex ${
                     formData.soundOption === s.id
                       ? 'bg-emerald-800 border-emerald-800 text-white shadow-xs font-bold'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                      : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                   }`}
                 >
                   {s.label}
@@ -473,9 +500,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold text-slate-600 mb-1.5 font-readex">
+              <div className="flex justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 font-readex">
                 <span>مستوى صوت الأذان</span>
-                <span className="font-mono">{Math.round(formData.adhanVolume * 100)}%</span>
+                <span className="font-mono text-emerald-800 dark:text-emerald-400 font-bold">{Math.round(formData.adhanVolume * 100)}%</span>
               </div>
               <input
                 type="range"
@@ -490,11 +517,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Pre-Adhan Preparation & Iqamah Countdown Timers */}
-          <div className="pt-4 border-t border-slate-100 space-y-4">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25] space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                  <Clock size={16} className="text-emerald-700" />
+                <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                  <Clock size={16} className="text-emerald-700 dark:text-emerald-400" />
                   <span>تنبيه الاستعداد للصلاة (قبل الأذان)</span>
                 </h3>
                 <button
@@ -506,7 +533,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                       })
                     );
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-amber-50 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors cursor-pointer font-readex border border-amber-300"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors cursor-pointer font-readex border border-amber-300 dark:border-amber-800/60"
                   title="تجربة إشعار الاستعداد قبل الأذان"
                 >
                   <Sparkles size={12} />
@@ -514,7 +541,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 </button>
               </div>
 
-              <p className="text-xs text-slate-500 mb-3 font-readex leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 font-readex leading-relaxed">
                 إشعار لطيف بصوت خافت «اقترب موعد صلاة الظهر - استعد للوضوء»، ليمنحك وقتاً كافياً للوضوء وأذكار المسجد قبل رفع الأذان:
               </p>
 
@@ -533,7 +560,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                       formData.remindMinutesBefore === opt.value
                         ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
-                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                        : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                     }`}
                   >
                     {opt.label}
@@ -543,13 +570,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
 
             {/* Iqamah Countdown Section */}
-            <div className="pt-3 border-t border-slate-200/70">
+            <div className="pt-3 border-t border-slate-200/70 dark:border-[#1a2c25]">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Hourglass size={16} className="text-emerald-700" />
+                  <Hourglass size={16} className="text-emerald-700 dark:text-emerald-400" />
                   <div>
-                    <h4 className="font-bold text-xs text-slate-900 font-readex">مؤقت إقامة الصلاة في المسجد (Iqamah Countdown)</h4>
-                    <p className="text-[11px] text-slate-500 font-readex">
+                    <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">مؤقت إقامة الصلاة في المسجد (Iqamah Countdown)</h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                       يبدأ مؤقت تنازلي بالدقائق والثواني بعد رفع الأذان مع شريط تقدم وتنبيه عند حلول الإقامة
                     </p>
                   </div>
@@ -565,7 +592,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                         })
                       );
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-300 dark:border-emerald-800/60"
                     title="تجربة إشعار حلول وقت الإقامة"
                   >
                     <Sparkles size={12} />
@@ -582,9 +609,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
 
               {formData.iqamahEnabled !== false && (
-                <div className="mt-3 p-3 bg-slate-50 border border-slate-200">
+                <div className="mt-3 p-3 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31]">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-700 font-readex">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 font-readex">
                       تحديد وقت الإقامة لكل صلاة (بالدقائق):
                     </span>
                     <button
@@ -595,7 +622,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                           iqamahDurations: { ...DEFAULT_IQAMAH_MINUTES }
                         }));
                       }}
-                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer font-readex"
+                      className="text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 underline cursor-pointer font-readex"
                     >
                       استعادة الأوقات الرسمية
                     </button>
@@ -605,24 +632,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     {OBLIGATORY_PRAYERS_LIST.map((pr) => {
                       const mins = formData.iqamahDurations?.[pr.id] ?? DEFAULT_IQAMAH_MINUTES[pr.id] ?? 15;
                       return (
-                        <div key={pr.id} className="p-2 bg-white border border-slate-200 text-center font-readex">
-                          <span className="block text-xs font-bold text-slate-800 mb-1">{pr.label}</span>
+                        <div key={pr.id} className="p-2 bg-white dark:bg-[#162520] border border-slate-200 dark:border-[#233b31] text-center font-readex">
+                          <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1">{pr.label}</span>
                           <div className="flex items-center justify-center gap-1.5">
                             <button
                               type="button"
                               onClick={() => handleIqamahDurationChange(pr.id, -1)}
-                              className="w-6 h-6 bg-slate-100 border border-slate-300 text-slate-700 hover:bg-slate-200 flex items-center justify-center font-bold text-xs cursor-pointer"
+                              className="w-6 h-6 bg-slate-100 dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#253f34] flex items-center justify-center font-bold text-xs cursor-pointer transition-colors"
                               title="إنقاص دقيقة"
                             >
                               <Minus size={11} />
                             </button>
-                            <span className="font-mono text-xs font-bold text-emerald-800 min-w-[2.2rem]">
+                            <span className="font-mono text-xs font-bold text-emerald-800 dark:text-emerald-400 min-w-[2.2rem]">
                               {mins} د
                             </span>
                             <button
                               type="button"
                               onClick={() => handleIqamahDurationChange(pr.id, 1)}
-                              className="w-6 h-6 bg-slate-100 border border-slate-300 text-slate-700 hover:bg-slate-200 flex items-center justify-center font-bold text-xs cursor-pointer"
+                              className="w-6 h-6 bg-slate-100 dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-[#253f34] flex items-center justify-center font-bold text-xs cursor-pointer transition-colors"
                               title="زيادة دقيقة"
                             >
                               <Plus size={11} />
@@ -638,16 +665,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Random & Periodic Dhikr Notifications */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <Bell size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <Bell size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>التذكير العشوائي والمجدول بالأذكار</span>
               </h3>
               <button
                 type="button"
                 onClick={() => sendDhikrNotification()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-200 dark:border-emerald-800/60"
                 title="إرسال إشعار ذكر فوري لتجربة الصوت والبطاقة"
               >
                 <Sparkles size={12} />
@@ -655,11 +682,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </button>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-4 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">تفعيل إشعارات الأذكار الدورية</h4>
-                  <p className="text-[11px] text-slate-500 font-readex">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">تفعيل إشعارات الأذكار الدورية</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                     إرسال إشعارات ويندوز مصحوبة برنين هادئ وبطاقة طافية بأذكار مأثورة وفضائلها
                   </p>
                 </div>
@@ -672,8 +699,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
 
               {formData.randomDhikrEnabled !== false && (
-                <div className="pt-3 border-t border-slate-200">
-                  <label className="text-xs font-semibold text-slate-600 block mb-2 font-readex">
+                <div className="pt-3 border-t border-slate-200 dark:border-[#1a2c25]">
+                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 block mb-2 font-readex">
                     الفترة الزمنية بين الإشعارات
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
@@ -692,7 +719,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                         className={`p-2.5 rounded-none border text-xs font-semibold transition-all cursor-pointer font-readex text-center ${
                           (formData.randomDhikrInterval ?? 0) === opt.value
                             ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
-                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                            : 'bg-white dark:bg-[#162520] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#20362c]'
                         }`}
                       >
                         {opt.label}
@@ -705,10 +732,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Sunnah Fasting Reminders */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <Moon size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <Moon size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>تنبيهات صيام النوافل والأيام البيض (Sunnah Fasting)</span>
               </h3>
               <button
@@ -724,7 +751,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     })
                   );
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-300 dark:border-emerald-800/60"
                 title="تجربة إشعار تذكير الصيام"
               >
                 <Sparkles size={12} />
@@ -732,12 +759,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </button>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-4 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] space-y-4">
               {/* Monday & Thursday */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">تنبيه صيام الإثنين والخميس</h4>
-                  <p className="text-[11px] text-slate-500 font-readex">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">تنبيه صيام الإثنين والخميس</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                     إشعار يظهر مساء الأحد ومساء الأربعاء للتذكير بفضل صيام الغد وعقد النية
                   </p>
                 </div>
@@ -750,10 +777,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
 
               {/* White Days */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-200 dark:border-[#1a2c25] flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">تنبيه الأيام البيض (13، 14، 15 هجري)</h4>
-                  <p className="text-[11px] text-slate-500 font-readex">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">تنبيه الأيام البيض (13، 14، 15 هجري)</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                     إشعار تلقائي يعتمد على التقويم الهجري القمري يذكرك بصيام الأيام البيض الثلاثة من كل شهر
                   </p>
                 </div>
@@ -768,9 +795,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Blessed Friday (Jumu'ah Mode) Settings */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
                 <span className="text-base">🕌</span>
                 <span>تنبيهات وضع الجمعة المباركة (Jumu'ah Mode)</span>
               </h3>
@@ -789,7 +816,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                       })
                     );
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-300 dark:border-emerald-800/60"
                   title="تجربة إشعار سورة الكهف"
                 >
                   <Sparkles size={11} />
@@ -809,7 +836,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                       })
                     );
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-amber-50 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors cursor-pointer font-readex border border-amber-300"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-semibold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors cursor-pointer font-readex border border-amber-300 dark:border-amber-800/60"
                   title="تجربة إشعار ساعة الاستجابة"
                 >
                   <Sparkles size={11} />
@@ -818,12 +845,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-4 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] space-y-4">
               {/* Surah Al-Kahf Reminder */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">تذكير قراءة سورة الكهف</h4>
-                  <p className="text-[11px] text-slate-500 font-readex">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">تذكير قراءة سورة الكهف</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                     إشعار صباح كل يوم جمعة مع زر لقراءة السورة مباشرة بالكامل داخل التطبيق
                   </p>
                 </div>
@@ -836,10 +863,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
 
               {/* Hour of Response Reminder */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-3 border-t border-slate-200 dark:border-[#1a2c25] flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">تذكير ساعة الاستجابة</h4>
-                  <p className="text-[11px] text-slate-500 font-readex">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">تذكير ساعة الاستجابة</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                     إشعار قبل غروب شمس يوم الجمعة بساعة للتفرغ للدعاء والابتهال لنيل فضل هذه الساعة
                   </p>
                 </div>
@@ -852,10 +879,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </div>
 
               {/* Friday Salawat Goal */}
-              <div className="pt-3 border-t border-slate-200">
+              <div className="pt-3 border-t border-slate-200 dark:border-[#1a2c25]">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold text-xs text-slate-900 font-readex">هدف عداد الصلاة على النبي ﷺ يوم الجمعة</h4>
-                  <span className="font-mono text-xs font-bold text-emerald-800">
+                  <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100 font-readex">هدف عداد الصلاة على النبي ﷺ يوم الجمعة</h4>
+                  <span className="font-mono text-xs font-bold text-emerald-800 dark:text-emerald-400">
                     {formData.jumuahSalawatGoal || 300} صلاة
                   </span>
                 </div>
@@ -868,7 +895,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                       className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
                         (formData.jumuahSalawatGoal || 300) === goal
                           ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
-                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                          : 'bg-white dark:bg-[#162520] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#20362c]'
                       }`}
                     >
                       {goal} صلاة
@@ -880,20 +907,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Theme / Appearance */}
-          <div className="pt-4 border-t border-slate-100">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
-              <Sun size={16} className="text-emerald-700" />
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3 font-readex">
+              <Sun size={16} className="text-emerald-700 dark:text-emerald-400" />
               <span>مظهر التطبيق (الوضع النهاري / الليلي)</span>
             </h3>
 
             <div className="grid grid-cols-2 gap-3 max-w-md">
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, theme: 'light' })}
+                onClick={() => handleThemeChange('light')}
                 className={`py-2.5 px-4 rounded-none border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer font-readex ${
                   formData.theme !== 'dark'
                     ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                 }`}
               >
                 <Sun size={14} />
@@ -902,11 +929,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
 
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, theme: 'dark' })}
+                onClick={() => handleThemeChange('dark')}
                 className={`py-2.5 px-4 rounded-none border flex items-center justify-center gap-2 text-xs font-semibold transition-all cursor-pointer font-readex ${
                   formData.theme === 'dark'
                     ? 'bg-emerald-800 border-emerald-800 text-white font-bold'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    : 'bg-slate-50 dark:bg-[#12201b] border-slate-200 dark:border-[#233b31] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029]'
                 }`}
               >
                 <Moon size={14} />
@@ -916,37 +943,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Global Hotkeys */}
-          <div className="pt-4 border-t border-slate-100">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">
-              <Keyboard size={16} className="text-emerald-700" />
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 mb-3 font-readex">
+              <Keyboard size={16} className="text-emerald-700 dark:text-emerald-400" />
               <span>اختصارات لوحة المفاتيح (Global Hotkeys)</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-right">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-800 font-readex">إظهار / إخفاء التطبيق</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-readex">إظهار / إخفاء التطبيق</span>
                   <div className="flex items-center gap-1 font-mono text-xs">
-                    <kbd className="px-2 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Ctrl</kbd>
-                    <span className="text-slate-400">+</span>
-                    <kbd className="px-2 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Shift</kbd>
-                    <span className="text-slate-400">+</span>
+                    <kbd className="px-2 py-0.5 bg-white dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-800 dark:text-slate-200 font-bold shadow-xs">Ctrl</kbd>
+                    <span className="text-slate-400 dark:text-slate-500">+</span>
+                    <kbd className="px-2 py-0.5 bg-white dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-800 dark:text-slate-200 font-bold shadow-xs">Shift</kbd>
+                    <span className="text-slate-400 dark:text-slate-500">+</span>
                     <kbd className="px-2 py-0.5 bg-emerald-800 text-white font-bold border border-emerald-900 shadow-xs">P</kbd>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex leading-relaxed">
                   اختصار عالمي يعمل من أي نافذة أو برنامج في نظام ويندوز لإظهار شاشة الصلاة أو إخفائها فوراً.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-right">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-800 font-readex">التسبيح السريع</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-readex">التسبيح السريع</span>
                   <div className="flex items-center gap-1 font-mono text-xs">
-                    <kbd className="px-3 py-0.5 bg-white border border-slate-300 text-slate-800 font-bold shadow-xs">Space</kbd>
+                    <kbd className="px-3 py-0.5 bg-white dark:bg-[#1a2c25] border border-slate-300 dark:border-[#2d493e] text-slate-800 dark:text-slate-200 font-bold shadow-xs">Space</kbd>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex leading-relaxed">
                   اضغط مفتاح المسافة في أي مكان داخل التطبيق للعد الفوري مع إشعار طافي وحفظ في الإحصائيات (يتوقف تلقائياً عند الكتابة في الخانات).
                 </p>
               </div>
@@ -954,10 +981,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Desktop Mini-Widget & Tray Section */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
-                <AppWindow size={16} className="text-emerald-700" />
+              <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2 font-readex">
+                <AppWindow size={16} className="text-emerald-700 dark:text-emerald-400" />
                 <span>شريط الودجت العائم وقائمة شريط المهام (Desktop Mini-Widget & Tray)</span>
               </h3>
               <button
@@ -969,7 +996,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                     alert('شريط الودجت العائم مخصص لتطبيق سطح المكتب (Always-on-top فوق جميع النوافذ)');
                   }
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer font-readex border border-emerald-300 dark:border-emerald-800/60"
               >
                 <AppWindow size={12} />
                 <span>تشغيل / تبديل الودجت الآن</span>
@@ -977,20 +1004,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
-                <span className="block text-xs font-bold text-slate-800 mb-1 font-readex">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-right">
+                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1 font-readex">
                   الودجت العائم (Always-on-top Compact Widget)
                 </span>
-                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex leading-relaxed">
                   شريط صغير وأنيق وشفاف يبقى دائماً في الواجهة أثناء استخدامك لأي برنامج أو تصفحك، يعرض اسم الصلاة القادمة والوقت المتبقي بدقة، مع إمكانية تحريكه بالسحب لأي زاوية من الشاشة وزر تسبيح سريع.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
-                <span className="block text-xs font-bold text-slate-800 mb-1 font-readex">
+              <div className="p-3.5 bg-slate-50 dark:bg-[#12201b] border border-slate-200 dark:border-[#233b31] text-right">
+                <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1 font-readex">
                   قائمة شريط المهام الذكية (Tray Menu Enhanced)
                 </span>
-                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex leading-relaxed">
                   بمجرد تمرير الفأرة فوق أيقونة التطبيق بجانب الساعة في ويندوز، يظهر نص مباشر بالصلاة القادمة والوقت المتبقي. وبالنقر بالزر الأيمن يمكنك كتم الصوت، التسبيح السريع (+1)، أو فتح الودجت.
                 </p>
               </div>
@@ -998,10 +1025,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
           </div>
 
           {/* Autostart */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-slate-100 dark:border-[#1a2c25] flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-sm text-slate-900 font-readex">التشغيل التلقائي مع إقلاع النظام</h4>
-              <p className="text-xs text-slate-500 font-readex">بدء تشغيل التطبيق في شريط المهام بهدوء عند إقلاع جهاز الكمبيوتر</p>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 font-readex">التشغيل التلقائي مع إقلاع النظام</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-readex">بدء تشغيل التطبيق في شريط المهام بهدوء عند إقلاع جهاز الكمبيوتر</p>
             </div>
             <input
               type="checkbox"
