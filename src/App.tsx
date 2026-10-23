@@ -12,6 +12,7 @@ import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes } from './utils/prayerTimes';
 import { audioService } from './utils/audio';
 import { incrementDhikr } from './utils/worshipStats';
+import { sendDhikrNotification, DhikrReminder } from './utils/dhikrNotifications';
 
 const STORAGE_KEY = 'noor_prayer_settings';
 
@@ -86,7 +87,9 @@ export const App: React.FC = () => {
   const [spaceToast, setSpaceToast] = useState<{ count: number } | null>(null);
   const [isAdhanPlaying, setIsAdhanPlaying] = useState<boolean>(false);
   const [activeAdhanPrayer, setActiveAdhanPrayer] = useState<string>('');
+  const [activeDhikrPop, setActiveDhikrPop] = useState<DhikrReminder | null>(null);
   const toastTimeoutRef = useRef<any>(null);
+  const dhikrPopTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     const handleStarted = () => setIsAdhanPlaying(true);
@@ -96,6 +99,54 @@ export const App: React.FC = () => {
     return () => {
       window.removeEventListener('adhan-started', handleStarted);
       window.removeEventListener('adhan-stopped', handleStopped);
+    };
+  }, []);
+
+  // Periodic & Random Dhikr Reminders Scheduler
+  useEffect(() => {
+    if (settings.randomDhikrEnabled === false) return;
+
+    let timeoutId: any;
+
+    const scheduleNext = () => {
+      // If interval is 0, choose random time between 20 and 45 minutes
+      // If > 0, use exact minutes
+      const intervalMinutes =
+        settings.randomDhikrInterval && settings.randomDhikrInterval > 0
+          ? settings.randomDhikrInterval
+          : 20 + Math.random() * 25;
+
+      const delayMs = intervalMinutes * 60 * 1000;
+
+      timeoutId = setTimeout(() => {
+        sendDhikrNotification();
+        scheduleNext();
+      }, delayMs);
+    };
+
+    scheduleNext();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [settings.randomDhikrEnabled, settings.randomDhikrInterval]);
+
+  // In-app visual notification listener
+  useEffect(() => {
+    const handleDhikrPop = (e: any) => {
+      if (e.detail) {
+        setActiveDhikrPop(e.detail);
+        if (dhikrPopTimeoutRef.current) clearTimeout(dhikrPopTimeoutRef.current);
+        dhikrPopTimeoutRef.current = setTimeout(() => {
+          setActiveDhikrPop(null);
+        }, 10000);
+      }
+    };
+
+    window.addEventListener('dhikr-notification-pop', handleDhikrPop);
+    return () => {
+      window.removeEventListener('dhikr-notification-pop', handleDhikrPop);
+      if (dhikrPopTimeoutRef.current) clearTimeout(dhikrPopTimeoutRef.current);
     };
   }, []);
 
@@ -307,6 +358,51 @@ export const App: React.FC = () => {
             <span>إيقاف الأذان</span>
             <span>✕</span>
           </button>
+        </div>
+      )}
+
+      {/* Floating Random Dhikr Notification Popup Card */}
+      {activeDhikrPop && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-lg w-full px-4 font-readex animate-fade-in">
+          <div className="bg-[#0b1f16]/95 border-2 border-emerald-400 text-white p-5 shadow-2xl backdrop-blur-md rounded-none relative">
+            <div className="flex items-start justify-between gap-3 pb-2 border-b border-emerald-500/30">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-emerald-400 rounded-none animate-ping" />
+                <span className="text-xs font-bold text-emerald-300">تذكير بذكر الله 🌿</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveDhikrPop(null)}
+                className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer"
+                title="إغلاق التنبيه"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="font-amiri text-2xl font-bold text-center text-emerald-100 my-3 leading-relaxed">
+              {activeDhikrPop.arabic}
+            </p>
+
+            <p className="text-xs text-center text-slate-200 leading-relaxed bg-emerald-950/70 p-2.5 border border-emerald-500/20">
+              💡 {activeDhikrPop.virtue}
+            </p>
+
+            <div className="mt-3.5 flex items-center justify-between text-[11px] text-slate-400">
+              <span>اجعل لسانك رطباً بذكر الله</span>
+              <button
+                type="button"
+                onClick={() => {
+                  incrementDhikr('tasbih', 1);
+                  audioService.playBeep(0.12);
+                  setActiveDhikrPop(null);
+                }}
+                className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold cursor-pointer transition-colors border border-emerald-500/40 shadow-xs"
+              >
+                تسبيح (+1)
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

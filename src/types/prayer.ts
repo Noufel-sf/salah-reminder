@@ -51,6 +51,8 @@ export interface AppSettings {
   remindMinutesBefore: number; // e.g. 0 or 15 mins before
   enabledPrayers: Record<PrayerName, boolean>;
   prayerAdjustments?: Partial<Record<PrayerName, number>>;
+  randomDhikrEnabled?: boolean;
+  randomDhikrInterval?: number; // 0 for random (20-45m), or 15, 30, 45, 60 mins
   theme?: 'light' | 'dark' | 'system';
 }
 

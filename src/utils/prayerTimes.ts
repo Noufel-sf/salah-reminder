@@ -28,6 +28,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
     Maghrib: 0,
     Isha: 0
   },
+  randomDhikrEnabled: true,
+  randomDhikrInterval: 0,
   theme: 'light'
 };
 

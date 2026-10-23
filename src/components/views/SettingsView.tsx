@@ -14,10 +14,12 @@ import {
   Keyboard,
   Sliders,
   Plus,
-  Minus
+  Minus,
+  Bell
 } from 'lucide-react';
 import { AppSettings, CalculationMethodKey, SoundOption, PrayerName } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
+import { sendDhikrNotification } from '../../utils/dhikrNotifications';
 
 interface SettingsViewProps {
   settings: AppSettings;
@@ -445,6 +447,72 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 onChange={(e) => setFormData({ ...formData, adhanVolume: parseFloat(e.target.value) })}
                 className="w-full accent-emerald-700 cursor-pointer"
               />
+            </div>
+          </div>
+
+          {/* Random & Periodic Dhikr Notifications */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <Bell size={16} className="text-emerald-700" />
+                <span>التذكير العشوائي والمجدول بالأذكار</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => sendDhikrNotification()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-200"
+                title="إرسال إشعار ذكر فوري لتجربة الصوت والبطاقة"
+              >
+                <Sparkles size={12} />
+                <span>تجربة إشعار الذكر الآن</span>
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">تفعيل إشعارات الأذكار الدورية</h4>
+                  <p className="text-[11px] text-slate-500 font-readex">
+                    إرسال إشعارات ويندوز مصحوبة برنين هادئ وبطاقة طافية بأذكار مأثورة وفضائلها
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.randomDhikrEnabled !== false}
+                  onChange={(e) => setFormData({ ...formData, randomDhikrEnabled: e.target.checked })}
+                  className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                />
+              </div>
+
+              {formData.randomDhikrEnabled !== false && (
+                <div className="pt-3 border-t border-slate-200">
+                  <label className="text-xs font-semibold text-slate-600 block mb-2 font-readex">
+                    الفترة الزمنية بين الإشعارات
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
+                    {[
+                      { value: 0, label: 'أوقات عشوائية (20-45 دقيقة)' },
+                      { value: 15, label: 'كل 15 دقيقة' },
+                      { value: 30, label: 'كل 30 دقيقة' },
+                      { value: 45, label: 'كل 45 دقيقة' },
+                      { value: 60, label: 'كل ساعة (60 دقيقة)' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, randomDhikrInterval: opt.value })}
+                        className={`p-2.5 rounded-none border text-xs font-semibold transition-all cursor-pointer font-readex text-center ${
+                          (formData.randomDhikrInterval ?? 0) === opt.value
+                            ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
