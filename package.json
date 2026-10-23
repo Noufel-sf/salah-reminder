@@ -38,6 +38,10 @@
     "directories": {
       "output": "release"
     },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
     "win": {
       "icon": "public/icon.ico",
       "target": [
@@ -47,6 +51,10 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "نور",
+      "runAfterFinish": true,
       "installerIcon": "public/icon.ico",
       "uninstallerIcon": "public/icon.ico"
     }

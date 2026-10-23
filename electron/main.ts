@@ -6,6 +6,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Single Instance Lock: Prevent multiple app instances running simultaneously
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+}
+
 let mainWindow: BrowserWindow | null = null;
 let widgetWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -242,8 +248,12 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
+  const isAutoStartHidden = process.argv.includes('--hidden') || app.getLoginItemSettings().wasOpenedAsHidden;
+
   mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
+    if (!isAutoStartHidden) {
+      mainWindow?.show();
+    }
   });
 
   // Minimize to tray on close button click
@@ -320,7 +330,8 @@ ipcMain.on('show-notification', (_, { title, body }: { title: string; body: stri
 ipcMain.handle('set-startup', async (_, enable: boolean) => {
   app.setLoginItemSettings({
     openAtLogin: enable,
-    path: app.getPath('exe')
+    path: app.getPath('exe'),
+    args: ['--hidden']
   });
   return enable;
 });
@@ -331,6 +342,15 @@ ipcMain.handle('get-startup', async () => {
 });
 
 app.whenReady().then(() => {
+  // Focus existing window when user attempts to launch a second instance
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (!mainWindow.isVisible()) mainWindow.show();
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
   // Register AppUserModelId for Windows Action Center notifications
   if (process.platform === 'win32') {
     app.setAppUserModelId('com.noor.app');
