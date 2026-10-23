@@ -570,7 +570,6 @@ export const App: React.FC = () => {
               onOpenTasbihTab={() => setCurrentTab('tasbih')}
               onOpenDuasTab={() => setCurrentTab('duas')}
               onOpenQuranTab={() => setCurrentTab('quran')}
-              onToggleFastingToday={handleToggleFastingToday}
             />
           )}
 
