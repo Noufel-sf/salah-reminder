@@ -84,7 +84,20 @@ export const App: React.FC = () => {
   }, []);
 
   const [spaceToast, setSpaceToast] = useState<{ count: number } | null>(null);
+  const [isAdhanPlaying, setIsAdhanPlaying] = useState<boolean>(false);
+  const [activeAdhanPrayer, setActiveAdhanPrayer] = useState<string>('');
   const toastTimeoutRef = useRef<any>(null);
+
+  useEffect(() => {
+    const handleStarted = () => setIsAdhanPlaying(true);
+    const handleStopped = () => setIsAdhanPlaying(false);
+    window.addEventListener('adhan-started', handleStarted);
+    window.addEventListener('adhan-stopped', handleStopped);
+    return () => {
+      window.removeEventListener('adhan-started', handleStarted);
+      window.removeEventListener('adhan-stopped', handleStopped);
+    };
+  }, []);
 
   // Global Hotkey: Space for Quick Tasbih across the app
   useEffect(() => {
@@ -144,7 +157,8 @@ export const App: React.FC = () => {
         if (lastAlertedPrayerRef.current !== alertKey) {
           lastAlertedPrayerRef.current = alertKey;
 
-          audioService.playSound(settings.soundOption, settings.adhanVolume);
+          setActiveAdhanPrayer(prayer.name);
+          audioService.playSound(settings.soundOption, settings.adhanVolume, prayer.id);
 
           if (window.electronAPI) {
             window.electronAPI.showNotification(
@@ -272,6 +286,27 @@ export const App: React.FC = () => {
           <span className="font-mono text-sm font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 border border-emerald-500/30">
             {spaceToast.count}
           </span>
+        </div>
+      )}
+
+      {/* Floating Active Adhan Playing Banner with Stop Button */}
+      {isAdhanPlaying && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white border-2 border-emerald-500 px-6 py-3.5 shadow-2xl flex items-center gap-4 font-readex rounded-none backdrop-blur-md animate-fade-in">
+          <span className="w-3 h-3 bg-emerald-400 rounded-none animate-ping shrink-0" />
+          <div className="text-right">
+            <p className="text-xs font-bold text-emerald-300">
+              يرفع الآن صوت الأذان المبارك {activeAdhanPrayer ? `(صلاة ${activeAdhanPrayer})` : ''}
+            </p>
+            <p className="text-[11px] text-slate-300">حيّ على الصلاة .. حيّ على الفلاح</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => audioService.stop()}
+            className="px-3.5 py-1.5 bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold rounded-none cursor-pointer flex items-center gap-1.5 transition-colors border border-rose-500 shadow-xs mr-2"
+          >
+            <span>إيقاف الأذان</span>
+            <span>✕</span>
+          </button>
         </div>
       )}
     </div>

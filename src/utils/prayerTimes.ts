@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   longitude: 6.6147,
   calculationMethod: 'Algeria',
   madhab: 'shafi',
-  soundOption: 'takbeer',
+  soundOption: 'full_adhan',
   adhanVolume: 0.8,
   autoStart: true,
   remindMinutesBefore: 0,

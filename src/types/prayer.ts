@@ -28,7 +28,15 @@ export type CalculationMethodKey =
 
 export type MadhabKey = 'shafi' | 'hanafi';
 
-export type SoundOption = 'full_adhan' | 'takbeer' | 'soft_chime' | 'beep' | 'silent';
+export type SoundOption = 
+  | 'full_adhan' 
+  | 'adhan_makkah' 
+  | 'adhan_algeria' 
+  | 'adhan_madinah' 
+  | 'takbeer' 
+  | 'soft_chime' 
+  | 'beep' 
+  | 'silent';
 
 export interface AppSettings {
   city: string;

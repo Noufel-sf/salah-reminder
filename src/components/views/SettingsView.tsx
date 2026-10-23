@@ -117,6 +117,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
     }
   };
 
+  React.useEffect(() => {
+    const handleStop = () => setIsPlayingAudio(false);
+    window.addEventListener('adhan-stopped', handleStop);
+    return () => window.removeEventListener('adhan-stopped', handleStop);
+  }, []);
+
   const handleTestSound = () => {
     if (isPlayingAudio) {
       audioService.stop();
@@ -124,7 +130,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
     } else {
       setIsPlayingAudio(true);
       audioService.playSound(formData.soundOption, formData.adhanVolume);
-      setTimeout(() => setIsPlayingAudio(false), 7000);
     }
   };
 
@@ -402,11 +407,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
               </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
               {[
-                { id: 'takbeer', label: 'تكبيرات الأذان' },
+                { id: 'full_adhan', label: 'الأذان كاملاً (الحرم المكي)' },
+                { id: 'adhan_algeria', label: 'الأذان كاملاً (الجزائري)' },
+                { id: 'adhan_madinah', label: 'الأذان كاملاً (الحرم المدني)' },
                 { id: 'soft_chime', label: 'رنين هادئ' },
-                { id: 'full_adhan', label: 'الأذان كاملاً' },
                 { id: 'beep', label: 'نغمة تنبيه بسيطة' },
                 { id: 'silent', label: 'وضع الصامت' }
               ].map((s) => (
