@@ -7,6 +7,7 @@ import { TasbihView } from './components/views/TasbihView';
 import { DuasView } from './components/views/DuasView';
 import { CalendarView } from './components/views/CalendarView';
 import { SettingsView } from './components/views/SettingsView';
+import { QuranView } from './components/views/QuranView';
 import { MiniWidgetView } from './components/MiniWidgetView';
 
 import { AppSettings, PrayerName } from './types/prayer';
@@ -407,6 +408,11 @@ export const App: React.FC = () => {
           title: 'مواقيت الصلاة',
           subtitle: 'أوقات الصلوات اليومية بدقة مع التنبيهات'
         };
+      case 'quran':
+        return {
+          title: 'المصحف الشريف والورد اليومي',
+          subtitle: 'آية اليوم وتفسيرها الميسر ومتابعة الورد والختمة'
+        };
       case 'qibla':
         return {
           title: 'اتجاه القبلة',
@@ -474,7 +480,12 @@ export const App: React.FC = () => {
               onOpenSettingsTab={() => setCurrentTab('settings')}
               onOpenTasbihTab={() => setCurrentTab('tasbih')}
               onOpenDuasTab={() => setCurrentTab('duas')}
+              onOpenQuranTab={() => setCurrentTab('quran')}
             />
+          )}
+
+          {currentTab === 'quran' && (
+            <QuranView />
           )}
 
           {currentTab === 'qibla' && (

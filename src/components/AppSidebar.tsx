@@ -4,6 +4,7 @@ import {
   Compass, 
   Sparkles, 
   BookOpen, 
+  ScrollText,
   Calendar, 
   Settings, 
   Volume2, 
@@ -14,7 +15,7 @@ import {
 } from 'lucide-react';
 import { AppSettings } from '../types/prayer';
 
-export type NavTab = 'prayers' | 'duas' | 'calendar' | 'qibla' | 'tasbih' | 'settings';
+export type NavTab = 'prayers' | 'quran' | 'duas' | 'calendar' | 'qibla' | 'tasbih' | 'settings';
 
 interface AppSidebarProps {
   currentTab: NavTab;
@@ -44,7 +45,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       category: 'الرئيسية',
       items: [
         { id: 'prayers', label: 'مواقيت الصلاة', icon: <Clock size={17} strokeWidth={2} /> },
-        { id: 'duas', label: 'الأذكار والحديث', icon: <BookOpen size={17} strokeWidth={2} /> },
+        { id: 'quran', label: 'المصحف والورد', icon: <BookOpen size={17} strokeWidth={2} /> },
+        { id: 'duas', label: 'الأذكار والحديث', icon: <ScrollText size={17} strokeWidth={2} /> },
         { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={17} strokeWidth={2} /> }
       ]
     },

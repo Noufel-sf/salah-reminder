@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, BookOpen, X } from 'lucide-react';
-import { PrayerItem } from '../../types/prayer';
+import React, { useState, useEffect } from "react";
+import { Clock, BookOpen, X } from "lucide-react";
+import { PrayerItem } from "../../types/prayer";
 
 interface IqamahCountdownBannerProps {
   currentPrayer: PrayerItem | null;
@@ -13,7 +13,7 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
   currentPrayer,
   iqamahMinutes,
   onDismiss,
-  onOpenDuas
+  onOpenDuas,
 }) => {
   const [timeLeft, setTimeLeft] = useState<{
     minutes: number;
@@ -42,7 +42,7 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
           seconds: 0,
           totalSecondsLeft: 0,
           progress: 100,
-          isFinished: true
+          isFinished: true,
         });
         return;
       }
@@ -58,7 +58,7 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
         seconds,
         totalSecondsLeft,
         progress,
-        isFinished: false
+        isFinished: false,
       });
     };
 
@@ -94,8 +94,8 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
 
             <p className="text-xs text-emerald-200/90 font-readex leading-relaxed">
               {timeLeft.isFinished
-                ? 'حان الآن موعد إقامة الصلاة في المسجد، أقم الصلاة يرحمك الله.'
-                : '«الدُّعَاءُ لَا يُرَدُّ بَيْنَ الأَذَانِ وَالإِقَامَةِ» — اغتنم هذا الوقت المبارك بالدعاء والسنن الراتبة.'}
+                ? "حان الآن موعد إقامة الصلاة في المسجد، أقم الصلاة يرحمك الله."
+                : "«الدُّعَاءُ لَا يُرَدُّ بَيْنَ الأَذَانِ وَالإِقَامَةِ» — اغتنم هذا الوقت المبارك بالدعاء والسنن الراتبة."}
             </p>
           </div>
         </div>
@@ -104,19 +104,21 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
         <div className="flex items-center gap-4 bg-black/40 px-5 py-2.5 border border-emerald-500/30">
           <div className="text-center">
             <span className="block text-[10px] text-emerald-300 font-bold uppercase tracking-wider">
-              {timeLeft.isFinished ? 'حالة الإقامة' : 'الوقت المتبقي'}
+              {timeLeft.isFinished ? "حالة الإقامة" : "الوقت المتبقي"}
             </span>
             <span className="font-mono text-2xl sm:text-3xl font-extrabold text-amber-300 tracking-wider">
               {timeLeft.isFinished
-                ? 'حان الوقت'
-                : `${timeLeft.minutes.toString().padStart(2, '0')}:${timeLeft.seconds.toString().padStart(2, '0')}`}
+                ? "حان الوقت"
+                : `${timeLeft.minutes.toString().padStart(2, "0")}:${timeLeft.seconds.toString().padStart(2, "0")}`}
             </span>
           </div>
 
           {!timeLeft.isFinished && (
             <div className="text-[11px] text-slate-300 hidden sm:block border-r border-emerald-500/30 pr-3">
               <div>الإجمالي: {iqamahMinutes} دقيقة</div>
-              <div className="text-emerald-400 font-bold">{Math.round(timeLeft.progress)}% انقضى</div>
+              <div className="text-emerald-400 font-bold">
+                {Math.round(timeLeft.progress)}% انقضى
+              </div>
             </div>
           )}
         </div>

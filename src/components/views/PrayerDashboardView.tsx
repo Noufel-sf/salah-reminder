@@ -20,6 +20,7 @@ interface PrayerDashboardViewProps {
   onOpenSettingsTab: () => void;
   onOpenTasbihTab?: () => void;
   onOpenDuasTab?: () => void;
+  onOpenQuranTab?: () => void;
 }
 
 export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
@@ -31,7 +32,8 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onOpenQiblaTab,
   onOpenSettingsTab,
   onOpenTasbihTab,
-  onOpenDuasTab
+  onOpenDuasTab,
+  onOpenQuranTab
 }) => {
   const [dismissedIqamahPrayer, setDismissedIqamahPrayer] = React.useState<string | null>(null);
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
@@ -99,7 +101,7 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
 
         {/* Right Supporting Panel (xl:col-span-4) */}
         <div className="xl:col-span-4 space-y-6">
-          <DailyVerseCard />
+          <DailyVerseCard onOpenQuranTab={onOpenQuranTab} />
           <TasbihCard />
           <QiblaShortcutCard
             qiblaAngle={qiblaAngle}
