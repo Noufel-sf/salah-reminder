@@ -754,6 +754,118 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
           </div>
 
+          {/* Blessed Friday (Jumu'ah Mode) Settings */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <span className="text-base">🕌</span>
+                <span>تنبيهات وضع الجمعة المباركة (Jumu'ah Mode)</span>
+              </h3>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(
+                      new CustomEvent('trigger-test-jumuah-kahf', {
+                        detail: {
+                          title: '🕌 نور ما بين الجمعتين - سورة الكهف',
+                          message: 'جمعة مباركة! تذكير بقراءة سورة الكهف لنيل النور والبركة.',
+                          hadith: '«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»'
+                        }
+                      })
+                    );
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                  title="تجربة إشعار سورة الكهف"
+                >
+                  <Sparkles size={11} />
+                  <span>تجربة تنبيه الكهف</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(
+                      new CustomEvent('trigger-test-jumuah-ijabah', {
+                        detail: {
+                          title: '🤲 ساعة الاستجابة يوم الجمعة',
+                          message: 'دخلت الآن آخر ساعة قبل غروب الشمس، تفرغ للدعاء وسؤال الله من فضله.',
+                          hadith: '«فِيهَا سَاعَةٌ لَا يُوَافِقُهَا عَبْدٌ مُسْلِمٌ يَسْأَلُ اللَّهَ خَيْراً إِلَّا أَعْطَاهُ إِيَّاهُ»'
+                        }
+                      })
+                    );
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-none bg-amber-50 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors cursor-pointer font-readex border border-amber-300"
+                  title="تجربة إشعار ساعة الاستجابة"
+                >
+                  <Sparkles size={11} />
+                  <span>تجربة ساعة الاستجابة</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+              {/* Surah Al-Kahf Reminder */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">تذكير قراءة سورة الكهف</h4>
+                  <p className="text-[11px] text-slate-500 font-readex">
+                    إشعار صباح كل يوم جمعة مع زر لقراءة السورة مباشرة بالكامل داخل التطبيق
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.jumuahKahfReminder !== false}
+                  onChange={(e) => setFormData({ ...formData, jumuahKahfReminder: e.target.checked })}
+                  className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                />
+              </div>
+
+              {/* Hour of Response Reminder */}
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">تذكير ساعة الاستجابة</h4>
+                  <p className="text-[11px] text-slate-500 font-readex">
+                    إشعار قبل غروب شمس يوم الجمعة بساعة للتفرغ للدعاء والابتهال لنيل فضل هذه الساعة
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.jumuahIjabahReminder !== false}
+                  onChange={(e) => setFormData({ ...formData, jumuahIjabahReminder: e.target.checked })}
+                  className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                />
+              </div>
+
+              {/* Friday Salawat Goal */}
+              <div className="pt-3 border-t border-slate-200">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">هدف عداد الصلاة على النبي ﷺ يوم الجمعة</h4>
+                  <span className="font-mono text-xs font-bold text-emerald-800">
+                    {formData.jumuahSalawatGoal || 300} صلاة
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[100, 300, 500, 1000].map((goal) => (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, jumuahSalawatGoal: goal })}
+                      className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
+                        (formData.jumuahSalawatGoal || 300) === goal
+                          ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {goal} صلاة
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Theme / Appearance */}
           <div className="pt-4 border-t border-slate-100">
             <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">

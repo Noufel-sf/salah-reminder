@@ -44,6 +44,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   fastingMondayThursdayReminder: true,
   fastingWhiteDaysReminder: true,
   isFastingToday: false,
+  jumuahKahfReminder: true,
+  jumuahIjabahReminder: true,
+  jumuahSalawatGoal: 300,
   theme: 'light'
 };
 

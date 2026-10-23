@@ -9,6 +9,7 @@ import { CalendarView } from './components/views/CalendarView';
 import { SettingsView } from './components/views/SettingsView';
 import { QuranView } from './components/views/QuranView';
 import { MiniWidgetView } from './components/MiniWidgetView';
+import { SurahAlKahfModal } from './components/quran/SurahAlKahfModal';
 
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES, getFastingDayInfo } from './utils/prayerTimes';
@@ -105,13 +106,18 @@ export const App: React.FC = () => {
   const [activePreAdhanToast, setActivePreAdhanToast] = useState<{ prayerName: string; minutesBefore: number } | null>(null);
   const [activeIqamahToast, setActiveIqamahToast] = useState<{ prayerName: string } | null>(null);
   const [activeFastingToast, setActiveFastingToast] = useState<{ title: string; message: string; virtue?: string } | null>(null);
+  const [isKahfModalOpen, setIsKahfModalOpen] = useState<boolean>(false);
+  const [activeJumuahToast, setActiveJumuahToast] = useState<{ title: string; message: string; hadith?: string; isKahf?: boolean } | null>(null);
   const [showInPageWidget, setShowInPageWidget] = useState<boolean>(false);
   const toastTimeoutRef = useRef<any>(null);
   const dhikrPopTimeoutRef = useRef<any>(null);
   const preAdhanTimeoutRef = useRef<any>(null);
   const iqamahTimeoutRef = useRef<any>(null);
   const fastingToastTimeoutRef = useRef<any>(null);
+  const jumuahToastTimeoutRef = useRef<any>(null);
   const lastFastingAlertRef = useRef<string>('');
+  const lastJumuahKahfAlertRef = useRef<string>('');
+  const lastJumuahIjabahAlertRef = useRef<string>('');
 
   const handleToggleMiniWidget = () => {
     if (window.electronAPI?.toggleWidget) {
@@ -287,6 +293,51 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Test event listeners for Friday Mode (Surah Al-Kahf & Hour of Response)
+  useEffect(() => {
+    const handleTestKahf = (e: any) => {
+      const title = e.detail?.title || '🕌 نور ما بين الجمعتين - سورة الكهف';
+      const message = e.detail?.message || 'جمعة مباركة! تذكير بقراءة سورة الكهف لنيل النور والبركة.';
+      const hadith = e.detail?.hadith || '«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»';
+      audioService.playChime(0.5);
+
+      if (window.electronAPI) {
+        window.electronAPI.showNotification(title, message);
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: message });
+      }
+
+      setActiveJumuahToast({ title, message, hadith, isKahf: true });
+      if (jumuahToastTimeoutRef.current) clearTimeout(jumuahToastTimeoutRef.current);
+      jumuahToastTimeoutRef.current = setTimeout(() => setActiveJumuahToast(null), 16000);
+    };
+
+    const handleTestIjabah = (e: any) => {
+      const title = e.detail?.title || '🤲 ساعة الاستجابة يوم الجمعة';
+      const message = e.detail?.message || 'دخلت الآن آخر ساعة قبل غروب الشمس، تفرغ للدعاء وسؤال الله من فضله.';
+      const hadith = e.detail?.hadith || '«فِيهَا سَاعَةٌ لَا يُوَافِقُهَا عَبْدٌ مُسْلِمٌ يَسْأَلُ اللَّهَ خَيْراً إِلَّا أَعْطَاهُ إِيَّاهُ»';
+      audioService.playChime(0.5);
+
+      if (window.electronAPI) {
+        window.electronAPI.showNotification(title, message);
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: message });
+      }
+
+      setActiveJumuahToast({ title, message, hadith, isKahf: false });
+      if (jumuahToastTimeoutRef.current) clearTimeout(jumuahToastTimeoutRef.current);
+      jumuahToastTimeoutRef.current = setTimeout(() => setActiveJumuahToast(null), 16000);
+    };
+
+    window.addEventListener('trigger-test-jumuah-kahf', handleTestKahf);
+    window.addEventListener('trigger-test-jumuah-ijabah', handleTestIjabah);
+    return () => {
+      window.removeEventListener('trigger-test-jumuah-kahf', handleTestKahf);
+      window.removeEventListener('trigger-test-jumuah-ijabah', handleTestIjabah);
+      if (jumuahToastTimeoutRef.current) clearTimeout(jumuahToastTimeoutRef.current);
+    };
+  }, []);
+
   // Sunnah Fasting Evening Check (evening reminder between 18:00 and 22:30 for Monday/Thursday or White Days)
   useEffect(() => {
     const now = new Date();
@@ -341,6 +392,69 @@ export const App: React.FC = () => {
       }
     }
   }, [currentTime, settings.fastingMondayThursdayReminder, settings.fastingWhiteDaysReminder]);
+
+  // Blessed Friday Scheduler: Surah Al-Kahf in the morning, Hour of Response before Maghrib
+  useEffect(() => {
+    const now = new Date();
+    // 5 = Friday
+    if (now.getDay() !== 5) return;
+
+    const todayStr = now.toDateString();
+    const hours = now.getHours();
+
+    // 1. Surah Al-Kahf Morning Reminder (between 07:00 and 12:00)
+    if (hours >= 7 && hours < 12 && settings.jumuahKahfReminder !== false) {
+      const kahfKey = `${todayStr}_jumuah_kahf`;
+      if (lastJumuahKahfAlertRef.current !== kahfKey) {
+        lastJumuahKahfAlertRef.current = kahfKey;
+        const title = '🕌 نور ما بين الجمعتين - سورة الكهف';
+        const message = 'جمعة مباركة! تذكير بقراءة سورة الكهف لنيل النور والمغفرة إلى الجمعة القادمة.';
+        const hadith = '«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»';
+
+        audioService.playChime(0.5);
+        if (window.electronAPI) {
+          window.electronAPI.showNotification(title, message);
+        } else if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification(title, { body: message });
+        }
+
+        setActiveJumuahToast({ title, message, hadith, isKahf: true });
+        if (jumuahToastTimeoutRef.current) clearTimeout(jumuahToastTimeoutRef.current);
+        jumuahToastTimeoutRef.current = setTimeout(() => setActiveJumuahToast(null), 18000);
+      }
+    }
+
+    // 2. Hour of Response (ساعة الاستجابة) Reminder (last 60 minutes before Maghrib)
+    if (prayerData && prayerData.prayers && settings.jumuahIjabahReminder !== false) {
+      const maghrib = prayerData.prayers.find((p) => p.id === 'Maghrib');
+      if (maghrib) {
+        const maghribMs = new Date(maghrib.time).getTime();
+        const nowMs = now.getTime();
+        const diffToMaghrib = maghribMs - nowMs;
+        // If within 60 minutes before Maghrib (0 to 60 minutes before)
+        if (diffToMaghrib > 0 && diffToMaghrib <= 60 * 60 * 1000) {
+          const ijabahKey = `${todayStr}_jumuah_ijabah`;
+          if (lastJumuahIjabahAlertRef.current !== ijabahKey) {
+            lastJumuahIjabahAlertRef.current = ijabahKey;
+            const title = '🤲 دخلت الآن ساعة الاستجابة يوم الجمعة';
+            const message = 'متبقي ساعة على غروب الشمس؛ تفرغ للدعاء والذكر والابتهال إلى الله تعالى.';
+            const hadith = '«فِيهَا سَاعَةٌ لَا يُوَافِقُهَا عَبْدٌ مُسْلِمٌ يَسْأَلُ اللَّهَ خَيْراً إِلَّا أَعْطَاهُ إِيَّاهُ»';
+
+            audioService.playChime(0.5);
+            if (window.electronAPI) {
+              window.electronAPI.showNotification(title, message);
+            } else if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification(title, { body: message });
+            }
+
+            setActiveJumuahToast({ title, message, hadith, isKahf: false });
+            if (jumuahToastTimeoutRef.current) clearTimeout(jumuahToastTimeoutRef.current);
+            jumuahToastTimeoutRef.current = setTimeout(() => setActiveJumuahToast(null), 20000);
+          }
+        }
+      }
+    }
+  }, [currentTime, prayerData, settings.jumuahKahfReminder, settings.jumuahIjabahReminder]);
 
   // Real-time System Tray synchronization with next prayer & tooltip
   useEffect(() => {
@@ -570,6 +684,7 @@ export const App: React.FC = () => {
               onOpenTasbihTab={() => setCurrentTab('tasbih')}
               onOpenDuasTab={() => setCurrentTab('duas')}
               onOpenQuranTab={() => setCurrentTab('quran')}
+              onOpenKahfReader={() => setIsKahfModalOpen(true)}
             />
           )}
 
@@ -802,6 +917,72 @@ export const App: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Friday Blessed Jumu'ah Notification Toast */}
+      {activeJumuahToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-lg w-full px-4 font-readex animate-fade-in">
+          <div className="bg-[#0b1f16]/95 border-2 border-emerald-400 text-white p-5 shadow-2xl backdrop-blur-md rounded-none relative">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-500/30">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-emerald-400 rounded-none animate-ping" />
+                <span className="text-xs font-bold text-emerald-300">{activeJumuahToast.title}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveJumuahToast(null)}
+                className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer"
+                title="إغلاق التنبيه"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm font-semibold text-slate-100 my-2.5 leading-relaxed text-right">
+              {activeJumuahToast.message}
+            </p>
+
+            {activeJumuahToast.hadith && (
+              <p className="font-amiri text-base font-bold text-center text-amber-200 bg-emerald-950/70 p-2.5 border border-emerald-500/20 leading-relaxed">
+                {activeJumuahToast.hadith}
+              </p>
+            )}
+
+            <div className="mt-3.5 flex items-center justify-between text-xs">
+              <span className="text-slate-400 text-[11px]">جمعة مباركة طيبة 🌿</span>
+              {activeJumuahToast.isKahf ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveJumuahToast(null);
+                    setIsKahfModalOpen(true);
+                  }}
+                  className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold cursor-pointer transition-colors border border-emerald-500/40 shadow-xs flex items-center gap-1.5"
+                >
+                  <span>قراءة سورة الكهف الآن</span>
+                  <span>📖</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentTab('duas');
+                    setActiveJumuahToast(null);
+                  }}
+                  className="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold cursor-pointer transition-colors shadow-xs"
+                >
+                  أدعية الجمعة 🤲
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Surah Al-Kahf In-App Full Reader Modal */}
+      <SurahAlKahfModal
+        isOpen={isKahfModalOpen}
+        onClose={() => setIsKahfModalOpen(false)}
+      />
 
       {/* Floating In-page Desktop Mini-Widget (Fallback or browser preview mode) */}
       {showInPageWidget && (

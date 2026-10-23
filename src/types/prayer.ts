@@ -59,6 +59,9 @@ export interface AppSettings {
   fastingMondayThursdayReminder?: boolean;
   fastingWhiteDaysReminder?: boolean;
   isFastingToday?: boolean;
+  jumuahKahfReminder?: boolean;
+  jumuahIjabahReminder?: boolean;
+  jumuahSalawatGoal?: number;
   theme?: 'light' | 'dark' | 'system';
 }
 

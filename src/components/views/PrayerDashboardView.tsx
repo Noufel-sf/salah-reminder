@@ -9,6 +9,7 @@ import { DailyEncouragement } from '../dashboard/DailyEncouragement';
 import { DailyVerseCard } from '../dashboard/DailyVerseCard';
 import { TasbihCard } from '../dashboard/TasbihCard';
 import { QiblaShortcutCard } from '../dashboard/QiblaShortcutCard';
+import { JumuahModeCard } from '../dashboard/JumuahModeCard';
 
 interface PrayerDashboardViewProps {
   prayers: PrayerItem[];
@@ -21,6 +22,7 @@ interface PrayerDashboardViewProps {
   onOpenTasbihTab?: () => void;
   onOpenDuasTab?: () => void;
   onOpenQuranTab?: () => void;
+  onOpenKahfReader?: () => void;
 }
 
 export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
@@ -33,10 +35,12 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onOpenSettingsTab,
   onOpenTasbihTab,
   onOpenDuasTab,
-  onOpenQuranTab
+  onOpenQuranTab,
+  onOpenKahfReader
 }) => {
   const [dismissedIqamahPrayer, setDismissedIqamahPrayer] = React.useState<string | null>(null);
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
+  const isFriday = new Date().getDay() === 5;
 
   const activeIqamahInfo = React.useMemo(() => {
     if (settings.iqamahEnabled === false || !currentPrayer || currentPrayer.id === 'Sunrise') {
@@ -76,6 +80,15 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
           iqamahMinutes={activeIqamahInfo.minutes}
           onDismiss={() => setDismissedIqamahPrayer(activeIqamahInfo.prayer.id)}
           onOpenDuas={onOpenDuasTab}
+        />
+      )}
+
+      {/* Friday Blessed Jumu'ah Mode Card */}
+      {isFriday && (
+        <JumuahModeCard
+          prayers={prayers}
+          onOpenKahfReader={onOpenKahfReader || (() => {})}
+          salawatGoal={settings.jumuahSalawatGoal || 300}
         />
       )}
 
