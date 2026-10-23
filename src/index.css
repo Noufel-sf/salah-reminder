@@ -209,21 +209,18 @@
   border-color: rgba(245, 158, 11, 0.3) !important;
 }
 
-/* Emerald accents in Dark Mode */
-[data-theme="dark"] .bg-emerald-50,
-.dark .bg-emerald-50 {
+/* Emerald accents in Dark Mode (catches all bg-emerald-50 opacities like /50, /70, /80, /90) */
+[data-theme="dark"] [class*="bg-emerald-50"],
+.dark [class*="bg-emerald-50"] {
   background-color: rgba(6, 78, 59, 0.35) !important;
   color: #6ee7b7 !important;
   border-color: rgba(16, 185, 129, 0.3) !important;
 }
 
-[data-theme="dark"] .bg-emerald-50\/30,
-[data-theme="dark"] .bg-emerald-50\/40,
-[data-theme="dark"] .bg-emerald-50\/60,
-.dark .bg-emerald-50\/30,
-.dark .bg-emerald-50\/40,
-.dark .bg-emerald-50\/60 {
-  background-color: rgba(6, 78, 59, 0.25) !important;
+[data-theme="dark"] [class*="border-emerald-200"],
+[data-theme="dark"] [class*="border-emerald-300"],
+.dark [class*="border-emerald-200"],
+.dark [class*="border-emerald-300"] {
   border-color: rgba(16, 185, 129, 0.25) !important;
 }
 

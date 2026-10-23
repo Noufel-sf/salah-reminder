@@ -83,7 +83,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
       </div>
 
       {/* Unified prayer rows */}
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-slate-100 dark:divide-[#1e332a]">
         {prayers.map((prayer) => {
           const isNext = prayer.isNext;
           const isPassed = prayer.isPassed;
@@ -94,55 +94,57 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
               key={prayer.id}
               className={`flex items-center justify-between py-3 px-3 rounded-none transition-all ${
                 isNext
-                  ? 'bg-emerald-50/90 border border-emerald-300/80 my-1 shadow-xs font-medium'
-                  : 'hover:bg-slate-50/80 border border-transparent'
+                  ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300/80 dark:border-emerald-800/60 my-1 shadow-xs font-medium'
+                  : 'hover:bg-slate-50/80 dark:hover:bg-emerald-950/20 border border-transparent'
               }`}
             >
               {/* Right Column in RTL: Icon + Prayer Name + Arabic */}
-              <div className="flex items-center gap-3.5 min-w-0">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div 
                   className={`w-8 h-8 rounded-none flex items-center justify-center shrink-0 transition-colors ${
                     isNext
                       ? 'bg-emerald-700 text-white'
                       : isSunrise
-                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                      ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50'
                       : isPassed
-                      ? 'bg-slate-100 text-slate-400'
-                      : 'bg-slate-100 text-slate-600'
+                      ? 'bg-slate-100 dark:bg-[#1a2c25] text-slate-400 dark:text-slate-500'
+                      : 'bg-slate-100 dark:bg-[#1a2c25] text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {getPrayerIcon(prayer.id)}
                 </div>
 
-                <div className="flex items-center gap-2.5 truncate">
+                <div className="flex items-center gap-2 min-w-0 flex-wrap sm:flex-nowrap">
                   <span 
-                    className={`text-sm tracking-tight font-readex ${
+                    className={`text-sm tracking-tight font-readex whitespace-nowrap shrink-0 ${
                       isNext 
-                        ? 'font-bold text-emerald-950' 
+                        ? 'font-bold text-emerald-950 dark:text-emerald-300' 
                         : isPassed 
-                        ? 'font-normal text-slate-400' 
-                        : 'font-semibold text-slate-900'
+                        ? 'font-normal text-slate-400 dark:text-slate-500' 
+                        : 'font-semibold text-slate-900 dark:text-slate-100'
                     }`}
                   >
                     {prayer.name}
                   </span>
 
                   <span 
-                    className={`font-amiri text-xs ${
-                      isNext ? 'text-emerald-800 font-bold' : 'text-slate-400'
+                    className={`font-amiri text-xs whitespace-nowrap ${
+                      isNext 
+                        ? 'hidden lg:inline text-emerald-800 dark:text-emerald-400 font-bold' 
+                        : 'hidden sm:inline text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {prayer.arabicName}
                   </span>
 
                   {isSunrise && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-none bg-amber-50 text-amber-700 border border-amber-200 font-readex">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-none bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50 font-readex shrink-0 whitespace-nowrap">
                       شروق
                     </span>
                   )}
 
                   {isNext && (
-                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-none bg-emerald-700 text-white font-readex">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-emerald-700 text-white font-readex shrink-0 whitespace-nowrap">
                       الصلاة القادمة
                     </span>
                   )}
@@ -150,29 +152,25 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
               </div>
 
               {/* Left Column in RTL: Status Tag, Time, Notification Toggle */}
-              <div className="flex items-center gap-4 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                 {/* Status indicator */}
-                <div className="text-left hidden sm:block font-readex">
+                <div className="text-left hidden md:block font-readex">
                   {isPassed ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-slate-400">
-                      <Check size={12} strokeWidth={2.5} className="text-emerald-600" />
+                    <span className="inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
+                      <Check size={12} strokeWidth={2.5} className="text-emerald-600 dark:text-emerald-400" />
                       مضت
                     </span>
-                  ) : isNext ? (
-                    <span className="text-xs font-semibold text-emerald-800">
-                      القادمة
-                    </span>
-                  ) : (
-                    <span className="text-xs font-normal text-slate-400">
+                  ) : !isNext ? (
+                    <span className="text-xs font-normal text-slate-400 dark:text-slate-500">
                       متبقية
                     </span>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Scheduled time */}
                 <span 
-                  className={`font-mono text-sm tracking-tight w-24 text-left ${
-                    isNext ? 'font-bold text-base text-emerald-950' : isPassed ? 'font-normal text-slate-400' : 'font-semibold text-slate-900'
+                  className={`font-mono text-sm tracking-tight w-20 sm:w-24 text-left shrink-0 ${
+                    isNext ? 'font-bold text-base text-emerald-950 dark:text-emerald-300' : isPassed ? 'font-normal text-slate-400 dark:text-slate-500' : 'font-semibold text-slate-900 dark:text-slate-100'
                   }`}
                 >
                   {prayer.timeString}
@@ -185,7 +183,7 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                     className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-none border transition-all cursor-pointer font-readex ${
                       prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']]
                         ? 'bg-emerald-700 border-emerald-700 text-white font-bold'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        : 'bg-slate-50 dark:bg-[#162520] border-slate-200 dark:border-[#233b31] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c3029] hover:text-slate-900 dark:hover:text-white'
                     }`}
                     title={prayerRecord.prayers[prayer.id as keyof DailyPrayerRecord['prayers']] ? 'انقر لإلغاء التحديد' : 'تحديد كصلاة مؤداة اليوم'}
                   >
@@ -200,8 +198,8 @@ export const PrayerScheduleTable: React.FC<PrayerScheduleTableProps> = ({
                     onClick={() => onToggleNotification(prayer.id)}
                     className={`p-1.5 rounded-none border transition-colors cursor-pointer ${
                       prayer.notificationEnabled
-                        ? 'bg-emerald-100/70 border-emerald-300 text-emerald-800'
-                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:text-slate-600'
+                        ? 'bg-emerald-100/70 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-slate-50 dark:bg-[#162520] border-slate-200 dark:border-[#233b31] text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
                     }`}
                     title={prayer.notificationEnabled ? `تعطيل تنبيه ${prayer.name}` : `تفعيل تنبيه ${prayer.name}`}
                     aria-label={prayer.notificationEnabled ? `تعطيل تنبيه ${prayer.name}` : `تفعيل تنبيه ${prayer.name}`}
