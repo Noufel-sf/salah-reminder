@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, Notification, globalShortcut } from 'electron';
+import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, Notification, globalShortcut, screen } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -7,8 +7,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
+let widgetWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+
+interface TrayData {
+  tooltip: string;
+  nextPrayerName: string;
+  nextPrayerTime: string;
+  remainingText: string;
+  isMuted?: boolean;
+}
+
+let lastTrayData: TrayData = {
+  tooltip: 'رمضان برو - منبّه الصلاة والأذكار',
+  nextPrayerName: '',
+  nextPrayerTime: '',
+  remainingText: '',
+  isMuted: false
+};
 
 function getAppIcon(): { image: Electron.NativeImage; filePath: string } | null {
   const possiblePaths = [
@@ -34,6 +51,70 @@ function getAppIcon(): { image: Electron.NativeImage; filePath: string } | null 
   return null;
 }
 
+function updateTrayMenu(data?: TrayData) {
+  if (!tray) return;
+  if (data) lastTrayData = data;
+
+  const tooltip = lastTrayData.nextPrayerName
+    ? `رمضان برو | ${lastTrayData.nextPrayerName} بعد ${lastTrayData.remainingText} (${lastTrayData.nextPrayerTime})`
+    : (lastTrayData.tooltip || 'رمضان برو - منبّه الصلاة والأذكار');
+
+  tray.setToolTip(tooltip);
+
+  const menuTemplate: Electron.MenuItemConstructorOptions[] = [];
+
+  if (lastTrayData.nextPrayerName) {
+    menuTemplate.push({
+      label: `🕌 ${lastTrayData.nextPrayerName}: بعد ${lastTrayData.remainingText} (${lastTrayData.nextPrayerTime})`,
+      enabled: false
+    });
+    menuTemplate.push({ type: 'separator' });
+  }
+
+  const isWidgetOpen = widgetWindow && !widgetWindow.isDestroyed() && widgetWindow.isVisible();
+
+  menuTemplate.push(
+    {
+      label: '🖥️ فتح التطبيق الرئيسي',
+      click: () => {
+        if (mainWindow) {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      }
+    },
+    {
+      label: isWidgetOpen ? '🪟 إخفاء الودجت العائم' : '🪟 إظهار الودجت العائم لسطح المكتب',
+      click: () => {
+        toggleWidgetWindow();
+      }
+    },
+    {
+      label: '📿 تسبيح سريع (+1)',
+      click: () => {
+        mainWindow?.webContents.send('tray-quick-tasbih');
+        widgetWindow?.webContents.send('tray-quick-tasbih');
+      }
+    },
+    {
+      label: lastTrayData.isMuted ? '🔊 إلغاء كتم الصوت' : '🔇 كتم أصوات التنبيهات',
+      click: () => {
+        mainWindow?.webContents.send('tray-toggle-mute');
+      }
+    },
+    { type: 'separator' },
+    {
+      label: '🚪 إغلاق التطبيق نهائياً',
+      click: () => {
+        isQuitting = true;
+        app.quit();
+      }
+    }
+  );
+
+  tray.setContextMenu(Menu.buildFromTemplate(menuTemplate));
+}
+
 function createTray() {
   const iconData = getAppIcon();
   let trayIcon: Electron.NativeImage;
@@ -50,29 +131,7 @@ function createTray() {
   }
 
   tray = new Tray(trayIcon);
-  tray.setToolTip('رمضان برو - منبّه الصلاة والأذكار');
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'فتح تطبيق رمضان برو',
-      click: () => {
-        if (mainWindow) {
-          mainWindow.show();
-          mainWindow.focus();
-        }
-      }
-    },
-    { type: 'separator' },
-    {
-      label: 'إغلاق التطبيق نهائياً',
-      click: () => {
-        isQuitting = true;
-        app.quit();
-      }
-    }
-  ]);
-
-  tray.setContextMenu(contextMenu);
+  updateTrayMenu();
 
   tray.on('double-click', () => {
     if (mainWindow) {
@@ -84,6 +143,70 @@ function createTray() {
       }
     }
   });
+}
+
+function createWidgetWindow() {
+  if (widgetWindow && !widgetWindow.isDestroyed()) {
+    widgetWindow.show();
+    widgetWindow.focus();
+    updateTrayMenu();
+    return;
+  }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
+  const widgetWidth = 330;
+  const widgetHeight = 76;
+  const x = screenWidth - widgetWidth - 24;
+  const y = screenHeight - widgetHeight - 24;
+
+  const preloadPath = fs.existsSync(path.join(__dirname, 'preload.cjs'))
+    ? path.join(__dirname, 'preload.cjs')
+    : path.join(__dirname, 'preload.js');
+
+  widgetWindow = new BrowserWindow({
+    width: widgetWidth,
+    height: widgetHeight,
+    x,
+    y,
+    alwaysOnTop: true,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    skipTaskbar: true,
+    hasShadow: false,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: preloadPath,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false
+    }
+  });
+
+  const widgetUrl = process.env.VITE_DEV_SERVER_URL
+    ? `${process.env.VITE_DEV_SERVER_URL}#widget`
+    : `file://${path.join(__dirname, '../dist/index.html')}#widget`;
+
+  widgetWindow.loadURL(widgetUrl);
+
+  widgetWindow.on('closed', () => {
+    widgetWindow = null;
+    updateTrayMenu();
+  });
+
+  updateTrayMenu();
+}
+
+function toggleWidgetWindow() {
+  if (widgetWindow && !widgetWindow.isDestroyed() && widgetWindow.isVisible()) {
+    widgetWindow.close();
+    widgetWindow = null;
+  } else {
+    createWidgetWindow();
+  }
+  updateTrayMenu();
 }
 
 function createWindow() {
@@ -150,6 +273,29 @@ ipcMain.on('window-maximize', (event) => {
 ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
   win?.hide();
+});
+
+// Tray & Widget IPC handlers
+ipcMain.on('update-tray', (_, data: TrayData) => {
+  updateTrayMenu(data);
+});
+
+ipcMain.on('toggle-widget', () => {
+  toggleWidgetWindow();
+});
+
+ipcMain.on('close-widget', () => {
+  if (widgetWindow && !widgetWindow.isDestroyed()) {
+    widgetWindow.close();
+    widgetWindow = null;
+  }
+});
+
+ipcMain.on('open-main', () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  }
 });
 
 // Native Notification IPC handler

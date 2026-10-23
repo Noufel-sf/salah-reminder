@@ -70,10 +70,10 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
   if (!currentPrayer || !timeLeft) return null;
 
   return (
-    <div className="bg-gradient-to-r from-emerald-950 via-[#0e3020] to-[#071f15] border-2 border-emerald-400/40 p-4 sm:p-5 text-white shadow-lg rounded-none relative overflow-hidden font-readex animate-fade-in">
+    <div className="bg-[#19392c] border-2 border-[#19392c]/40 p-4 sm:p-5 text-white shadow-lg rounded-none relative overflow-hidden font-readex animate-fade-in">
       {/* Decorative ambient background blur */}
-      <div className="absolute -top-12 -left-12 w-36 h-36 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
-      <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -top-12 -left-12 w-36 h-36 bg-[#19392c]/15 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#19392c]/10 rounded-full blur-2xl pointer-events-none" />
 
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Left / Main info */}
@@ -149,9 +149,9 @@ export const IqamahCountdownBanner: React.FC<IqamahCountdownBannerProps> = ({
 
       {/* Progress Bar */}
       {!timeLeft.isFinished && (
-        <div className="w-full bg-black/50 h-1.5 mt-3.5 border border-emerald-500/20 overflow-hidden">
+        <div className="w-full bg-[#19392c]/50 h-1.5 mt-3.5 border border-[#19392c]/20 overflow-hidden">
           <div
-            className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 h-full transition-all duration-1000 ease-linear"
+            className="bg-green-400 h-full transition-all duration-1000 ease-linear"
             style={{ width: `${timeLeft.progress}%` }}
           />
         </div>

@@ -17,7 +17,8 @@ import {
   Minus,
   Bell,
   Clock,
-  Hourglass
+  Hourglass,
+  AppWindow
 } from 'lucide-react';
 import { AppSettings, CalculationMethodKey, SoundOption, PrayerName } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
@@ -759,6 +760,50 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 </div>
                 <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
                   اضغط مفتاح المسافة في أي مكان داخل التطبيق للعد الفوري مع إشعار طافي وحفظ في الإحصائيات (يتوقف تلقائياً عند الكتابة في الخانات).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Mini-Widget & Tray Section */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <AppWindow size={16} className="text-emerald-700" />
+                <span>شريط الودجت العائم وقائمة شريط المهام (Desktop Mini-Widget & Tray)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.electronAPI?.toggleWidget) {
+                    window.electronAPI.toggleWidget();
+                  } else {
+                    alert('شريط الودجت العائم مخصص لتطبيق سطح المكتب (Always-on-top فوق جميع النوافذ)');
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+              >
+                <AppWindow size={12} />
+                <span>تشغيل / تبديل الودجت الآن</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+                <span className="block text-xs font-bold text-slate-800 mb-1 font-readex">
+                  الودجت العائم (Always-on-top Compact Widget)
+                </span>
+                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                  شريط صغير وأنيق وشفاف يبقى دائماً في الواجهة أثناء استخدامك لأي برنامج أو تصفحك، يعرض اسم الصلاة القادمة والوقت المتبقي بدقة، مع إمكانية تحريكه بالسحب لأي زاوية من الشاشة وزر تسبيح سريع.
+                </p>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border border-slate-200 text-right">
+                <span className="block text-xs font-bold text-slate-800 mb-1 font-readex">
+                  قائمة شريط المهام الذكية (Tray Menu Enhanced)
+                </span>
+                <p className="text-[11px] text-slate-500 font-readex leading-relaxed">
+                  بمجرد تمرير الفأرة فوق أيقونة التطبيق بجانب الساعة في ويندوز، يظهر نص مباشر بالصلاة القادمة والوقت المتبقي. وبالنقر بالزر الأيمن يمكنك كتم الصوت، التسبيح السريع (+1)، أو فتح الودجت.
                 </p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Minus, Square, Copy, X, Calendar, MapPin } from 'lucide-react';
+import { Minus, Square, Copy, X, Calendar, MapPin, AppWindow } from 'lucide-react';
 import { getHijriDate, getGregorianDateArabic } from '../utils/prayerTimes';
 
 interface AppHeaderProps {
@@ -8,6 +8,7 @@ interface AppHeaderProps {
   cityName: string;
   countryName: string;
   onOpenLocationSettings: () => void;
+  onToggleWidget?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -15,7 +16,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   subtitle,
   cityName,
   countryName,
-  onOpenLocationSettings
+  onOpenLocationSettings,
+  onToggleWidget
 }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -114,6 +116,20 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           <span className="text-slate-300">|</span>
           <span className="font-bold text-emerald-900 font-amiri text-sm">{hijri.arabic}</span>
         </div>
+
+        {/* Mini Widget button */}
+        {onToggleWidget && (
+          <button
+            type="button"
+            onClick={onToggleWidget}
+            style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+            className="titlebar-no-drag flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-emerald-300/80 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 text-xs font-bold transition-colors cursor-pointer"
+            title="تشغيل الودجت المصغر العائم لسطح المكتب (Always-on-top)"
+          >
+            <AppWindow size={13} strokeWidth={2} className="text-emerald-700" />
+            <span className="hidden sm:inline">الودجت العائم</span>
+          </button>
+        )}
 
         {/* Window controls */}
         <div 

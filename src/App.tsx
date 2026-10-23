@@ -7,6 +7,7 @@ import { TasbihView } from './components/views/TasbihView';
 import { DuasView } from './components/views/DuasView';
 import { CalendarView } from './components/views/CalendarView';
 import { SettingsView } from './components/views/SettingsView';
+import { MiniWidgetView } from './components/MiniWidgetView';
 
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES } from './utils/prayerTimes';
@@ -17,6 +18,11 @@ import { sendDhikrNotification, DhikrReminder } from './utils/dhikrNotifications
 const STORAGE_KEY = 'noor_prayer_settings';
 
 export const App: React.FC = () => {
+  const isWidgetWindow = typeof window !== 'undefined' && window.location.hash === '#widget';
+  if (isWidgetWindow) {
+    return <MiniWidgetView />;
+  }
+
   const [currentTab, setCurrentTab] = useState<NavTab>('prayers');
 
   const [settings, setSettings] = useState<AppSettings>(() => {
@@ -92,10 +98,19 @@ export const App: React.FC = () => {
   const [activeDhikrPop, setActiveDhikrPop] = useState<DhikrReminder | null>(null);
   const [activePreAdhanToast, setActivePreAdhanToast] = useState<{ prayerName: string; minutesBefore: number } | null>(null);
   const [activeIqamahToast, setActiveIqamahToast] = useState<{ prayerName: string } | null>(null);
+  const [showInPageWidget, setShowInPageWidget] = useState<boolean>(false);
   const toastTimeoutRef = useRef<any>(null);
   const dhikrPopTimeoutRef = useRef<any>(null);
   const preAdhanTimeoutRef = useRef<any>(null);
   const iqamahTimeoutRef = useRef<any>(null);
+
+  const handleToggleMiniWidget = () => {
+    if (window.electronAPI?.toggleWidget) {
+      window.electronAPI.toggleWidget();
+    } else {
+      setShowInPageWidget((prev) => !prev);
+    }
+  };
 
   useEffect(() => {
     const handleStarted = () => setIsAdhanPlaying(true);
@@ -236,6 +251,55 @@ export const App: React.FC = () => {
       window.removeEventListener('trigger-test-iqamah', handleTestIqamah);
     };
   }, [settings.remindMinutesBefore, settings.city]);
+
+  // Real-time System Tray synchronization with next prayer & tooltip
+  useEffect(() => {
+    if (!prayerData || !window.electronAPI?.updateTray) return;
+
+    const next = prayerData.nextPrayer;
+    if (!next) return;
+
+    const now = currentTime.getTime();
+    const target = new Date(next.time).getTime();
+    const diff = Math.max(0, target - now);
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    const remainingText = hours > 0 ? `${hours} س و ${minutes} د` : `${minutes} دقيقة`;
+    const tooltip = `رمضان برو | ${next.name} بعد ${remainingText} (${next.timeString})`;
+
+    window.electronAPI.updateTray({
+      tooltip,
+      nextPrayerName: next.name,
+      nextPrayerTime: next.timeString,
+      remainingText,
+      isMuted: settings.soundOption === 'silent'
+    });
+  }, [currentTime, prayerData, settings.soundOption]);
+
+  // Tray menu listeners for Quick Tasbih & Toggle Mute
+  useEffect(() => {
+    if (!window.electronAPI) return;
+
+    const unsubscribeTasbih = window.electronAPI.onQuickTasbih?.(() => {
+      const record = incrementDhikr('tasbih', 1);
+      audioService.playBeep(0.12);
+      setSpaceToast({ count: record.tasbih });
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = setTimeout(() => setSpaceToast(null), 1200);
+      window.dispatchEvent(new CustomEvent('space-tasbih-tap'));
+    });
+
+    const unsubscribeMute = window.electronAPI.onToggleMute?.(() => {
+      handleToggleMute();
+    });
+
+    return () => {
+      unsubscribeTasbih?.();
+      unsubscribeMute?.();
+    };
+  }, [settings.soundOption]);
 
   useEffect(() => {
     if (!prayerData || !prayerData.prayers) return;
@@ -394,6 +458,7 @@ export const App: React.FC = () => {
           cityName={settings.city}
           countryName={settings.country}
           onOpenLocationSettings={() => setCurrentTab('settings')}
+          onToggleWidget={handleToggleMiniWidget}
         />
 
         {/* Scrollable View Container */}
@@ -589,6 +654,13 @@ export const App: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Floating In-page Desktop Mini-Widget (Fallback or browser preview mode) */}
+      {showInPageWidget && (
+        <div className="fixed bottom-6 left-6 z-50 w-[330px] h-[76px] shadow-2xl animate-fade-in">
+          <MiniWidgetView />
         </div>
       )}
     </div>

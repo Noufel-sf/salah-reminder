@@ -55,7 +55,16 @@ export interface AppSettings {
   prayerAdjustments?: Partial<Record<PrayerName, number>>;
   randomDhikrEnabled?: boolean;
   randomDhikrInterval?: number; // 0 for random (20-45m), or 15, 30, 45, 60 mins
+  miniWidgetEnabled?: boolean;
   theme?: 'light' | 'dark' | 'system';
+}
+
+export interface TrayUpdatePayload {
+  tooltip: string;
+  nextPrayerName: string;
+  nextPrayerTime: string;
+  remainingText: string;
+  isMuted?: boolean;
 }
 
 declare global {
@@ -67,6 +76,12 @@ declare global {
       showNotification: (title: string, body: string) => void;
       setStartup: (enable: boolean) => Promise<boolean>;
       getStartup: () => Promise<boolean>;
+      updateTray: (data: TrayUpdatePayload) => void;
+      toggleWidget: () => void;
+      closeWidget: () => void;
+      openMain: () => void;
+      onQuickTasbih: (callback: () => void) => () => void;
+      onToggleMute: (callback: () => void) => () => void;
     };
   }
 }
