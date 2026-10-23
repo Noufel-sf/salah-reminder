@@ -119,7 +119,7 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-fade-in font-readex">
       {/* Modal Dialog Card */}
       <div 
-        className="bg-[#fcfdfc] w-full max-w-4xl h-[92vh] flex flex-col shadow-2xl border-2 border-emerald-800 rounded-none relative overflow-hidden"
+        className="bg-[#fcfdfc] dark:bg-[#0c1611] w-full max-w-4xl h-[92vh] flex flex-col shadow-2xl border-2 border-emerald-800 rounded-none relative overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
@@ -221,16 +221,16 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
         </div>
 
         {/* Reading Body (Scrollable Mushaf) */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-10 text-right select-text bg-[#fbfcfb]">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-10 text-right select-text bg-[#fbfcfb] dark:bg-[#0c1611]">
           {/* Ornate Surah Frame Header */}
-          <div className="max-w-3xl mx-auto mb-8 text-center border-y-2 border-emerald-800/40 py-4 bg-emerald-50/40">
-            <span className="text-xs font-bold text-emerald-900 block font-readex tracking-wide">
+          <div className="max-w-3xl mx-auto mb-8 text-center border-y-2 border-emerald-800/40 py-4 bg-emerald-50/40 dark:bg-emerald-950/30">
+            <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300 block font-readex tracking-wide">
               سُورَةُ الْكَهْفِ
             </span>
-            <p className="font-amiri text-2xl sm:text-3xl font-bold text-emerald-950 my-2">
+            <p className="font-amiri text-2xl sm:text-3xl font-bold text-emerald-950 dark:text-emerald-200 my-2">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </p>
-            <p className="text-[11px] text-slate-600 font-readex">
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-readex">
               الجزء الخامس عشر والسادس عشر • 110 آيات
             </p>
           </div>
@@ -239,7 +239,7 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
             {viewMode === 'flow' ? (
               /* Continuous Mushaf Paragraph Flow */
               <div 
-                className="font-amiri leading-[2.5] text-slate-900 text-justify text-justify-arabic"
+                className="font-amiri leading-[2.5] text-slate-900 dark:text-slate-100 text-justify text-justify-arabic"
                 style={{ fontSize: `${fontSize}px` }}
               >
                 {SURAH_AL_KAHF_AYAHS.map((ayah) => {
@@ -251,11 +251,11 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
 
                   return (
                     <React.Fragment key={ayah.number}>
-                      <span className="hover:bg-emerald-100/60 transition-colors px-1 rounded-xs inline">
+                      <span className="hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-colors px-1 rounded-xs inline">
                         {text}
                       </span>
                       <span 
-                        className="inline-flex items-center justify-center font-amiri font-bold text-emerald-800 mx-1 select-none text-[0.85em] cursor-pointer"
+                        className="inline-flex items-center justify-center font-amiri font-bold text-emerald-800 dark:text-emerald-400 mx-1 select-none text-[0.85em] cursor-pointer"
                         title={`آية ${ayah.number} (انقر لنسخ الآية)`}
                         onClick={() => handleCopyAyah(ayah.number, ayah.text)}
                       >
@@ -271,11 +271,11 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
                 {SURAH_AL_KAHF_AYAHS.map((ayah) => (
                   <div 
                     key={ayah.number} 
-                    className="p-4 bg-white border border-slate-200/80 hover:border-emerald-500 transition-all group flex items-start justify-between gap-4"
+                    className="p-4 bg-white dark:bg-[#14221b] border border-slate-200/80 dark:border-emerald-900/40 hover:border-emerald-500 transition-all group flex items-start justify-between gap-4"
                   >
                     <div className="flex-1">
                       <p 
-                        className="font-amiri font-bold leading-relaxed text-slate-900"
+                        className="font-amiri font-bold leading-relaxed text-slate-900 dark:text-slate-100"
                         style={{ fontSize: `${fontSize}px` }}
                       >
                         {ayah.text}
@@ -283,13 +283,13 @@ export const SurahAlKahfModal: React.FC<SurahAlKahfModalProps> = ({
                     </div>
 
                     <div className="flex flex-col items-center gap-2 shrink-0 pt-1">
-                      <span className="w-8 h-8 bg-emerald-50 border border-emerald-300 text-emerald-900 font-bold font-mono text-xs flex items-center justify-center">
+                      <span className="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/60 text-emerald-900 dark:text-emerald-300 font-bold font-mono text-xs flex items-center justify-center">
                         {ayah.number}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleCopyAyah(ayah.number, ayah.text)}
-                        className="text-slate-400 hover:text-emerald-800 p-1 cursor-pointer"
+                        className="text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1 cursor-pointer"
                         title="نسخ الآية"
                       >
                         {copiedAyah === ayah.number ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}

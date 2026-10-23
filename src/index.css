@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
 @layer base {
   *, ::before, ::after {
     margin: 0;
@@ -156,11 +158,55 @@
   color: #d7e4dd !important;
 }
 
+[data-theme="dark"] .bg-slate-200,
+.dark .bg-slate-200 {
+  background-color: #1a2c25 !important;
+  border-color: #243c31 !important;
+}
+
+[data-theme="dark"] .border-slate-300,
+.dark .border-slate-300 {
+  border-color: #243c31 !important;
+}
+
 [data-theme="dark"] .hover\:bg-slate-50:hover,
 .dark .hover\:bg-slate-50:hover,
 [data-theme="dark"] .hover\:bg-slate-100:hover,
 .dark .hover\:bg-slate-100:hover {
   background-color: #1d332a !important;
+}
+
+/* Dark Mode Gradients Handling */
+[data-theme="dark"] [class*="from-emerald-50"],
+.dark [class*="from-emerald-50"] {
+  --tw-gradient-from: rgba(6, 78, 59, 0.45) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(6, 78, 59, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+[data-theme="dark"] [class*="via-emerald-50"],
+.dark [class*="via-emerald-50"] {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(6, 78, 59, 0.25) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+[data-theme="dark"] [class*="from-amber-50"],
+.dark [class*="from-amber-50"] {
+  --tw-gradient-from: rgba(120, 53, 15, 0.4) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(120, 53, 15, 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* Explicit direct fallback for linear gradients in dark mode */
+[data-theme="dark"] [class*="bg-gradient-to"][class*="from-emerald-50"],
+.dark [class*="bg-gradient-to"][class*="from-emerald-50"] {
+  background-image: linear-gradient(to right, rgba(6, 78, 59, 0.35), rgba(6, 78, 59, 0.15), transparent) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+[data-theme="dark"] [class*="bg-gradient-to"][class*="from-amber-50"],
+.dark [class*="bg-gradient-to"][class*="from-amber-50"] {
+  background-image: linear-gradient(to bottom, rgba(120, 53, 15, 0.3), rgba(6, 78, 59, 0.15)) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
 }
 
 /* Emerald accents in Dark Mode */

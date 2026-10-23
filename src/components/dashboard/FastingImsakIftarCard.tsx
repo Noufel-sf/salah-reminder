@@ -118,22 +118,22 @@ export const FastingImsakIftarCard: React.FC<FastingImsakIftarCardProps> = ({
       {/* Main Countdown & Times */}
       {activeMode ? (
         <div className="space-y-4">
-          <div className="bg-gradient-to-b from-amber-50/70 to-emerald-50/40 border border-amber-200/70 p-4 text-center">
-            <span className="text-[11px] font-bold text-amber-900 block mb-1">
+          <div className="bg-gradient-to-b from-amber-50/70 to-emerald-50/40 dark:from-amber-950/30 dark:to-emerald-950/20 border border-amber-200/70 dark:border-amber-800/40 p-4 text-center">
+            <span className="text-[11px] font-bold text-amber-900 dark:text-amber-300 block mb-1">
               {countdown.isIftarPassed ? 'حان وقت الإفطار' : 'الوقت المتبقي على أذان المغرب والإفطار'}
             </span>
 
             {countdown.isIftarPassed ? (
               <div className="space-y-1 py-1">
-                <span className="text-xl font-bold text-emerald-800 font-amiri block">
+                <span className="text-xl font-bold text-emerald-800 dark:text-emerald-300 font-amiri block">
                   تقبل الله صيامكم وطاعتكم 🤲
                 </span>
-                <p className="text-xs text-slate-600 font-amiri">
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-amiri">
                   «ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ، وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّهُ»
                 </p>
               </div>
             ) : (
-              <div className="font-mono text-2xl sm:text-3xl font-extrabold text-amber-900 tracking-wider">
+              <div className="font-mono text-2xl sm:text-3xl font-extrabold text-amber-900 dark:text-amber-300 tracking-wider">
                 {countdown.hours.toString().padStart(2, '0')}:
                 {countdown.minutes.toString().padStart(2, '0')}:
                 {countdown.seconds.toString().padStart(2, '0')}
@@ -143,11 +143,11 @@ export const FastingImsakIftarCard: React.FC<FastingImsakIftarCardProps> = ({
             {/* Progress Bar of Fasting Day */}
             {!countdown.isIftarPassed && (
               <div className="mt-3">
-                <div className="flex justify-between text-[10px] font-semibold text-slate-600 mb-1">
+                <div className="flex justify-between text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
                   <span>انقضى {Math.round(countdown.progress)}% من ساعات الصيام</span>
                   <span>{fajrPrayer?.timeString} ← {maghribPrayer?.timeString}</span>
                 </div>
-                <div className="w-full bg-black/10 h-2 border border-amber-300/40 overflow-hidden">
+                <div className="w-full bg-black/10 dark:bg-black/40 h-2 border border-amber-300/40 dark:border-amber-700/40 overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-amber-500 via-orange-400 to-emerald-600 h-full transition-all duration-1000 ease-linear"
                     style={{ width: `${countdown.progress}%` }}

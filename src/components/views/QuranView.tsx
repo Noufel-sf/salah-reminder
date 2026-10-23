@@ -359,30 +359,30 @@ export const QuranView: React.FC = () => {
             </div>
 
             {/* Arabic Quranic Calligraphy */}
-            <div className="bg-gradient-to-b from-emerald-50/60 to-transparent p-6 border border-emerald-100 text-center my-2">
-              <p className="font-amiri text-2xl sm:text-3xl font-extrabold text-slate-900 leading-loose select-text">
+            <div className="bg-gradient-to-b from-emerald-50/60 to-transparent dark:from-emerald-950/40 dark:to-transparent p-6 border border-emerald-100 dark:border-emerald-900/40 text-center my-2">
+              <p className="font-amiri text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 leading-loose select-text">
                 ﴿ {verse.arabic} ﴾
               </p>
             </div>
 
             {/* Tafseer Muyassar */}
-            <div className="p-4 bg-slate-50 border border-slate-200 space-y-2">
-              <span className="font-bold text-xs text-emerald-900 flex items-center gap-1.5 font-readex">
-                <BookOpen size={14} className="text-emerald-700" />
+            <div className="p-4 bg-slate-50 dark:bg-[#15231e] border border-slate-200 dark:border-[#233b31] space-y-2">
+              <span className="font-bold text-xs text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5 font-readex">
+                <BookOpen size={14} className="text-emerald-700 dark:text-emerald-400" />
                 <span>التفسير الميسر:</span>
               </span>
-              <p className="text-xs text-slate-700 leading-relaxed font-readex">
+              <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-readex">
                 {verse.tafseer}
               </p>
             </div>
 
             {/* Reflection & Daily Action */}
-            <div className="p-4 bg-emerald-50/70 border border-emerald-200/90 space-y-2">
-              <span className="font-bold text-xs text-emerald-900 flex items-center gap-1.5 font-readex">
-                <Sparkles size={14} className="text-emerald-700" />
+            <div className="p-4 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/90 dark:border-emerald-800/40 space-y-2">
+              <span className="font-bold text-xs text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5 font-readex">
+                <Sparkles size={14} className="text-emerald-700 dark:text-emerald-400" />
                 <span>وقفة تدبرية وعمل بالآية:</span>
               </span>
-              <p className="text-xs text-emerald-950 leading-relaxed font-readex">
+              <p className="text-xs text-emerald-950 dark:text-emerald-200 leading-relaxed font-readex">
                 {verse.reflection}
               </p>
             </div>

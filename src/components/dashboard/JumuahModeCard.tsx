@@ -138,58 +138,58 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
   const salawatPercent = Math.min(100, Math.round((salawatCount / Math.max(1, salawatGoal)) * 100));
 
   return (
-    <div className="bg-white rounded-none border border-slate-200/90 shadow-sm p-6 text-right font-readex relative overflow-hidden transition-all space-y-6">
+    <div className="bg-white dark:bg-[#121f1a] rounded-none border border-slate-200/90 dark:border-emerald-900/40 shadow-sm p-6 text-right font-readex relative overflow-hidden transition-all space-y-6">
       {/* Top Emerald Header Bar */}
       <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-800" />
 
       {/* Main Title & Friday Greeting */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-100 dark:border-[#1e332a] gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <span className="font-amiri font-bold text-xl">🕌</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base text-slate-900 font-readex">
+              <h3 className="font-bold text-base text-slate-900 dark:text-slate-100 font-readex">
                 الجمعة المباركة
               </h3>
               <span className="text-[11px] font-bold px-2.5 py-0.5 bg-emerald-800 text-white">
                 خير يوم طلعت عليه الشمس
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-readex mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-readex mt-0.5">
               سنن وفضائل الجمعة: الغسل، التطيب، التبكير للمسجد، وقراءة سورة الكهف، والإكثار من الصلاة على النبي ﷺ
             </p>
           </div>
         </div>
 
         <div className="hidden md:block text-left font-readex">
-          <span className="text-xs font-bold text-emerald-800 block">سُنَّةُ النَّبِيِّ ﷺ</span>
-          <span className="text-[11px] text-slate-500">«أَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ»</span>
+          <span className="text-xs font-bold text-emerald-800 dark:text-emerald-400 block">سُنَّةُ النَّبِيِّ ﷺ</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">«أَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ»</span>
         </div>
       </div>
 
       {/* 2-Column Responsive Section: Surah Al-Kahf & Hour of Response */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Section 1: Surah Al-Kahf */}
-        <div className="p-4 bg-emerald-50/50 border-r-4 border-emerald-800 space-y-3">
+        <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/30 border-r-4 border-emerald-800 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BookOpen size={16} className="text-emerald-800" />
-              <span className="text-xs font-bold text-slate-900">سورة الكهف (نور ما بين الجمعتين)</span>
+              <BookOpen size={16} className="text-emerald-800 dark:text-emerald-400" />
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100">سورة الكهف (نور ما بين الجمعتين)</span>
             </div>
             <span 
               className={`text-[11px] font-bold px-2 py-0.5 ${
                 isKahfRead 
                   ? 'bg-emerald-700 text-white' 
-                  : 'bg-amber-100 text-amber-900'
+                  : 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300'
               }`}
             >
               {isKahfRead ? 'تمت القراءة ✅' : 'لم تقرأ بعد'}
             </span>
           </div>
 
-          <p className="text-xs text-slate-600 leading-relaxed font-readex">
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-readex">
             «مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»
           </p>
 
@@ -197,7 +197,7 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
             <button
               type="button"
               onClick={onOpenKahfReader}
-              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+              className="px-4 py-2 bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
             >
               <BookOpen size={14} />
               <span>قراءة سورة الكهف داخل التطبيق</span>
@@ -206,7 +206,7 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
             <button
               type="button"
               onClick={handleToggleKahfRead}
-              className="px-3 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold text-xs cursor-pointer transition-colors"
+              className="px-3 py-2 bg-white dark:bg-[#162520] hover:bg-slate-50 dark:hover:bg-[#1f352c] border border-slate-300 dark:border-[#233b31] text-slate-700 dark:text-slate-200 font-semibold text-xs cursor-pointer transition-colors"
               title="تعديل حالة القراءة"
             >
               {isKahfRead ? 'إلغاء التأكيد' : 'تأكيد القراءة'}
@@ -218,14 +218,14 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
         <div 
           className={`p-4 border-r-4 space-y-3 transition-colors ${
             ijabahInfo.status === 'active'
-              ? 'bg-amber-50/80 border-amber-500'
-              : 'bg-slate-50 border-emerald-700'
+              ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-500'
+              : 'bg-slate-50 dark:bg-[#15231e] border-emerald-700'
           }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Clock size={16} className={ijabahInfo.status === 'active' ? 'text-amber-700 animate-pulse' : 'text-emerald-800'} />
-              <span className="text-xs font-bold text-slate-900">ساعة الإجابة (آخر ساعة قبل المغرب)</span>
+              <Clock size={16} className={ijabahInfo.status === 'active' ? 'text-amber-700 dark:text-amber-400 animate-pulse' : 'text-emerald-800 dark:text-emerald-400'} />
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100">ساعة الإجابة (آخر ساعة قبل المغرب)</span>
             </div>
             {ijabahInfo.status === 'active' && (
               <span className="text-[11px] font-bold px-2 py-0.5 bg-amber-600 text-white animate-pulse">
@@ -234,43 +234,43 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
             )}
           </div>
 
-          <p className="text-xs font-bold text-slate-800 leading-relaxed font-readex">
+          <p className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-relaxed font-readex">
             {ijabahInfo.text}
           </p>
-          <p className="text-[11px] text-slate-500 font-readex">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
             {ijabahInfo.detail}
           </p>
 
-          <div className="pt-1 flex items-center justify-between text-xs text-slate-600">
+          <div className="pt-1 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
             <span className="text-[11px]">«رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ»</span>
           </div>
         </div>
       </div>
 
       {/* Section 3: Friday Salawat on the Prophet ﷺ Counter */}
-      <div className="p-5 bg-gradient-to-r from-emerald-50/70 via-emerald-50/40 to-transparent border border-emerald-200/80 space-y-4">
+      <div className="p-5 bg-gradient-to-r from-emerald-50/70 via-emerald-50/40 to-transparent dark:from-emerald-950/40 dark:via-emerald-950/20 dark:to-transparent border border-emerald-200/80 dark:border-emerald-800/40 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-emerald-800" />
+            <Sparkles size={16} className="text-emerald-800 dark:text-emerald-400" />
             <div>
-              <h4 className="text-xs font-bold text-slate-900 font-readex">
+              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-readex">
                 عداد الصلاة على النبي ﷺ الخاص بيوم الجمعة
               </h4>
-              <p className="text-[11px] text-slate-500 font-readex">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-readex">
                 الهدف اليومي المستحب: {salawatGoal} صلاة
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="font-mono text-sm font-bold text-emerald-900 bg-white px-3 py-1 border border-emerald-300">
+            <span className="font-mono text-sm font-bold text-emerald-900 dark:text-emerald-300 bg-white dark:bg-[#162520] px-3 py-1 border border-emerald-300 dark:border-emerald-700/60">
               {salawatCount} / {salawatGoal}
             </span>
             {salawatCount > 0 && (
               <button
                 type="button"
                 onClick={handleResetSalawat}
-                className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 bg-white border border-slate-200 cursor-pointer"
+                className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 bg-white dark:bg-[#162520] border border-slate-200 dark:border-[#233b31] cursor-pointer"
                 title="تصفير عداد الجمعة"
               >
                 <RotateCcw size={12} />
@@ -281,14 +281,14 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
 
         {/* Big Tap Area */}
         <div className="text-center py-2">
-          <p className="font-amiri text-2xl sm:text-3xl font-bold text-emerald-950 mb-3 leading-relaxed">
+          <p className="font-amiri text-2xl sm:text-3xl font-bold text-emerald-950 dark:text-emerald-300 mb-3 leading-relaxed">
             «اللَّهُمَّ صَلِّ وَسَلِّمْ وَبَارِكْ عَلَى نَبِيِّنَا مُحَمَّدٍ»
           </p>
 
           <button
             type="button"
             onClick={() => handleIncrementSalawat(1)}
-            className="w-full max-w-sm mx-auto py-3 bg-emerald-800 hover:bg-emerald-900 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer font-readex"
+            className="w-full max-w-sm mx-auto py-3 bg-emerald-800 hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer font-readex"
           >
             <Sparkles size={16} />
             <span>صَلِّ عَلَى النَّبِيِّ (+1)</span>
@@ -296,8 +296,8 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
         </div>
 
         {/* Progress Bar & Quick Add Buttons */}
-        <div className="space-y-2 pt-1 border-t border-emerald-200/60">
-          <div className="flex items-center justify-between text-xs text-slate-600 font-readex">
+        <div className="space-y-2 pt-1 border-t border-emerald-200/60 dark:border-emerald-800/40">
+          <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300 font-readex">
             <span>نسبة إنجاز هدف الجمعة: {salawatPercent}%</span>
             <div className="flex items-center gap-1.5">
               {[10, 50, 100].map((amt) => (
@@ -305,7 +305,7 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
                   key={amt}
                   type="button"
                   onClick={() => handleIncrementSalawat(amt)}
-                  className="px-2.5 py-1 bg-white border border-slate-300 text-slate-700 hover:bg-emerald-50 hover:border-emerald-400 hover:text-emerald-900 font-bold text-xs cursor-pointer transition-colors"
+                  className="px-2.5 py-1 bg-white dark:bg-[#162520] border border-slate-300 dark:border-[#233b31] text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 hover:border-emerald-400 dark:hover:border-emerald-600 hover:text-emerald-900 dark:hover:text-emerald-300 font-bold text-xs cursor-pointer transition-colors"
                 >
                   +{amt}
                 </button>
@@ -313,9 +313,9 @@ export const JumuahModeCard: React.FC<JumuahModeCardProps> = ({
             </div>
           </div>
 
-          <div className="w-full bg-slate-200 h-2 overflow-hidden">
+          <div className="w-full bg-slate-200 dark:bg-[#162520] h-2 overflow-hidden">
             <div 
-              className="bg-emerald-700 h-full transition-all duration-300"
+              className="bg-emerald-700 dark:bg-emerald-500 h-full transition-all duration-300"
               style={{ width: `${salawatPercent}%` }}
             />
           </div>
