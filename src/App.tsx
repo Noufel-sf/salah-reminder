@@ -11,6 +11,8 @@ import { QuranView } from './components/views/QuranView';
 import { MiniWidgetView } from './components/MiniWidgetView';
 import { SurahAlKahfModal } from './components/quran/SurahAlKahfModal';
 import { WelcomeOnboardingModal } from './components/onboarding/WelcomeOnboardingModal';
+import { DhikrMilestoneModal } from './components/tasbih/DhikrMilestoneModal';
+import { DHIKR_MILESTONES, DhikrMilestoneFeedback } from './utils/dhikrMilestones';
 
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES, getFastingDayInfo } from './utils/prayerTimes';
@@ -224,6 +226,12 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  const [globalMilestone, setGlobalMilestone] = useState<DhikrMilestoneFeedback | null>(null);
+  const currentTabRef = useRef<NavTab>(currentTab);
+  useEffect(() => {
+    currentTabRef.current = currentTab;
+  }, [currentTab]);
+
   // Global Hotkey: Space for Quick Tasbih across the app
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -250,6 +258,12 @@ export const App: React.FC = () => {
         }, 1200);
 
         window.dispatchEvent(new CustomEvent('space-tasbih-tap'));
+
+        // If outside tasbih view and reached a milestone, celebrate with Ayah modal
+        if (currentTabRef.current !== 'tasbih' && DHIKR_MILESTONES[record.tasbih]) {
+          audioService.playChime(0.5);
+          setGlobalMilestone(DHIKR_MILESTONES[record.tasbih]);
+        }
       }
     };
 
@@ -1034,6 +1048,18 @@ export const App: React.FC = () => {
         <WelcomeOnboardingModal
           currentSettings={settings}
           onComplete={handleCompleteOnboarding}
+        />
+      )}
+
+      {/* Global Dhikr Milestone Ayah & Hadith Modal */}
+      {globalMilestone && (
+        <DhikrMilestoneModal
+          milestone={globalMilestone}
+          onContinue={() => setGlobalMilestone(null)}
+          onNextPhrase={() => {
+            setGlobalMilestone(null);
+            setCurrentTab('tasbih');
+          }}
         />
       )}
     </div>
