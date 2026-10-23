@@ -52,30 +52,65 @@ class AudioService {
     }
   }
 
-  // Play peaceful melodic beep
-  playBeep(volume: number = 0.8) {
+  // Soft, calming prayer bead (Tasbih misbaha) tap for Dhikr
+  playTasbihClick(volume: number = 0.5) {
     try {
       const ctx = this.getAudioContext();
       const now = ctx.currentTime;
+      // Normalize effective volume so calls passing 0.12 - 0.5 sound balanced and comfortable
+      const normVol = Math.max(0.18, Math.min(1, volume * 2.2));
 
+      // 1. Warm resonant body (polished wooden/amber bead tone)
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 0.35);
+      osc.frequency.setValueAtTime(560, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.038);
 
-      gain.gain.setValueAtTime(volume * 0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      gain.gain.setValueAtTime(normVol * 0.45, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.042);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(now);
-      osc.stop(now + 0.45);
+      osc.stop(now + 0.045);
+
+      // 2. Subtle tactile bead contact impulse (soft wood tap)
+      const bufferSize = Math.floor(ctx.sampleRate * 0.015);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1500, now);
+      filter.Q.setValueAtTime(2.8, now);
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(normVol * 0.25, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.02);
     } catch (e) {
-      console.warn('Beep error:', e);
+      console.warn('Tasbih click error:', e);
     }
+  }
+
+  // Play soft sound for Dhikr buttons across all views
+  playBeep(volume: number = 0.5) {
+    this.playTasbihClick(volume);
   }
 
   // Play Adhan using bundled high quality local audio files
