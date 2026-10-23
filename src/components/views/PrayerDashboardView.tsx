@@ -86,9 +86,9 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
       />
 
       {/* 3. Responsive 2-Column Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Main Schedule Column (xl:col-span-8) */}
-        <div className="xl:col-span-8 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Main Schedule Column (7 cols) */}
+        <div className="lg:col-span-7 xl:col-span-7 space-y-6">
           <PrayerScheduleTable
             prayers={prayers}
             calculationMethod={settings.calculationMethod}
@@ -99,8 +99,8 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
           <DailyEncouragement />
         </div>
 
-        {/* Right Supporting Panel (xl:col-span-4) */}
-        <div className="xl:col-span-4 space-y-6">
+        {/* Right Supporting Panel (5 cols) */}
+        <div className="lg:col-span-5 xl:col-span-5 space-y-6">
           <DailyVerseCard onOpenQuranTab={onOpenQuranTab} />
           <TasbihCard />
           <QiblaShortcutCard
