@@ -11,7 +11,7 @@ import { QuranView } from './components/views/QuranView';
 import { MiniWidgetView } from './components/MiniWidgetView';
 
 import { AppSettings, PrayerName } from './types/prayer';
-import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES } from './utils/prayerTimes';
+import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES, getFastingDayInfo } from './utils/prayerTimes';
 import { audioService } from './utils/audio';
 import { incrementDhikr } from './utils/worshipStats';
 import { sendDhikrNotification, DhikrReminder } from './utils/dhikrNotifications';
@@ -86,6 +86,11 @@ export const App: React.FC = () => {
     handleSaveSettings({ ...settings, soundOption: nextSound });
   };
 
+  const handleToggleFastingToday = () => {
+    const nextVal = !settings.isFastingToday;
+    handleSaveSettings({ ...settings, isFastingToday: nextVal });
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -99,11 +104,14 @@ export const App: React.FC = () => {
   const [activeDhikrPop, setActiveDhikrPop] = useState<DhikrReminder | null>(null);
   const [activePreAdhanToast, setActivePreAdhanToast] = useState<{ prayerName: string; minutesBefore: number } | null>(null);
   const [activeIqamahToast, setActiveIqamahToast] = useState<{ prayerName: string } | null>(null);
+  const [activeFastingToast, setActiveFastingToast] = useState<{ title: string; message: string; virtue?: string } | null>(null);
   const [showInPageWidget, setShowInPageWidget] = useState<boolean>(false);
   const toastTimeoutRef = useRef<any>(null);
   const dhikrPopTimeoutRef = useRef<any>(null);
   const preAdhanTimeoutRef = useRef<any>(null);
   const iqamahTimeoutRef = useRef<any>(null);
+  const fastingToastTimeoutRef = useRef<any>(null);
+  const lastFastingAlertRef = useRef<string>('');
 
   const handleToggleMiniWidget = () => {
     if (window.electronAPI?.toggleWidget) {
@@ -252,6 +260,87 @@ export const App: React.FC = () => {
       window.removeEventListener('trigger-test-iqamah', handleTestIqamah);
     };
   }, [settings.remindMinutesBefore, settings.city]);
+
+  // Test event listener for Sunnah Fasting from Settings
+  useEffect(() => {
+    const handleTestFasting = (e: any) => {
+      const title = e.detail?.title || 'تذكير بصيام نافلة 🌙';
+      const message = e.detail?.message || 'غداً يوم مبارك يُسن صيامه وعقد النية الليلة.';
+      const virtue = e.detail?.virtue || '«مَنْ صَامَ يَوْماً فِي سَبِيلِ اللَّهِ بَعَّدَ اللَّهُ وَجْهَهُ عَنِ النَّارِ سَبْعِينَ خَرِيفاً»';
+      audioService.playChime(0.5);
+
+      if (window.electronAPI) {
+        window.electronAPI.showNotification(title, message);
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: message });
+      }
+
+      setActiveFastingToast({ title, message, virtue });
+      if (fastingToastTimeoutRef.current) clearTimeout(fastingToastTimeoutRef.current);
+      fastingToastTimeoutRef.current = setTimeout(() => setActiveFastingToast(null), 14000);
+    };
+
+    window.addEventListener('trigger-test-fasting', handleTestFasting);
+    return () => {
+      window.removeEventListener('trigger-test-fasting', handleTestFasting);
+      if (fastingToastTimeoutRef.current) clearTimeout(fastingToastTimeoutRef.current);
+    };
+  }, []);
+
+  // Sunnah Fasting Evening Check (evening reminder between 18:00 and 22:30 for Monday/Thursday or White Days)
+  useEffect(() => {
+    const now = new Date();
+    const hours = now.getHours();
+    // Remind in the evening
+    if (hours < 18 || hours > 22) return;
+
+    const todayStr = now.toDateString();
+    const fastingInfo = getFastingDayInfo(now);
+
+    // Monday / Thursday check
+    if (fastingInfo.isTomorrowMondayOrThursday && settings.fastingMondayThursdayReminder !== false) {
+      const alertKey = `${todayStr}_fasting_mon_thu`;
+      if (lastFastingAlertRef.current !== alertKey) {
+        lastFastingAlertRef.current = alertKey;
+        const title = fastingInfo.tomorrowTitle || 'تذكير بصيام الغد 🌙';
+        const message = fastingInfo.tomorrowDescription || 'غداً يوم مبارك يُسن صيامه وعقد النية الليلة.';
+        const virtue = fastingInfo.tomorrowVirtue || '«تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ»';
+
+        audioService.playChime(0.5);
+        if (window.electronAPI) {
+          window.electronAPI.showNotification(title, message);
+        } else if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification(title, { body: message });
+        }
+
+        setActiveFastingToast({ title, message, virtue });
+        if (fastingToastTimeoutRef.current) clearTimeout(fastingToastTimeoutRef.current);
+        fastingToastTimeoutRef.current = setTimeout(() => setActiveFastingToast(null), 15000);
+      }
+    }
+
+    // White Days (13, 14, 15 Hijri) check
+    if (fastingInfo.isTomorrowWhiteDay && settings.fastingWhiteDaysReminder !== false) {
+      const alertKey = `${todayStr}_fasting_white_day`;
+      if (lastFastingAlertRef.current !== alertKey) {
+        lastFastingAlertRef.current = alertKey;
+        const title = fastingInfo.tomorrowTitle || 'تذكير بصيام الأيام البيض 🌕';
+        const message = fastingInfo.tomorrowDescription || 'غداً من الأيام البيض المباركة (13، 14، 15 هجري).';
+        const virtue = fastingInfo.tomorrowVirtue || '«صِيَامُ ثَلاثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ الدَّهْرِ كُلِّهِ»';
+
+        audioService.playChime(0.5);
+        if (window.electronAPI) {
+          window.electronAPI.showNotification(title, message);
+        } else if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification(title, { body: message });
+        }
+
+        setActiveFastingToast({ title, message, virtue });
+        if (fastingToastTimeoutRef.current) clearTimeout(fastingToastTimeoutRef.current);
+        fastingToastTimeoutRef.current = setTimeout(() => setActiveFastingToast(null), 15000);
+      }
+    }
+  }, [currentTime, settings.fastingMondayThursdayReminder, settings.fastingWhiteDaysReminder]);
 
   // Real-time System Tray synchronization with next prayer & tooltip
   useEffect(() => {
@@ -481,6 +570,7 @@ export const App: React.FC = () => {
               onOpenTasbihTab={() => setCurrentTab('tasbih')}
               onOpenDuasTab={() => setCurrentTab('duas')}
               onOpenQuranTab={() => setCurrentTab('quran')}
+              onToggleFastingToday={handleToggleFastingToday}
             />
           )}
 
@@ -662,6 +752,52 @@ export const App: React.FC = () => {
                 className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold cursor-pointer transition-colors"
               >
                 أقم الصلاة (إغلاق)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Sunnah Fasting Reminder Toast */}
+      {activeFastingToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-lg w-full px-4 font-readex animate-fade-in">
+          <div className="bg-[#0b1f16]/95 border-2 border-emerald-400 text-white p-5 shadow-2xl backdrop-blur-md rounded-none relative">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-500/30">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-emerald-400 rounded-none animate-ping" />
+                <span className="text-xs font-bold text-emerald-300">{activeFastingToast.title}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveFastingToast(null)}
+                className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer"
+                title="إغلاق التنبيه"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-sm font-semibold text-slate-100 my-2.5 leading-relaxed text-right">
+              {activeFastingToast.message}
+            </p>
+
+            {activeFastingToast.virtue && (
+              <p className="font-amiri text-base font-bold text-center text-amber-200 bg-emerald-950/70 p-2.5 border border-emerald-500/20 leading-relaxed">
+                {activeFastingToast.virtue}
+              </p>
+            )}
+
+            <div className="mt-3.5 flex items-center justify-between text-xs">
+              <span className="text-slate-400 text-[11px]">قال ﷺ: «إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ»</span>
+              <button
+                type="button"
+                onClick={() => {
+                  handleToggleFastingToday();
+                  setActiveFastingToast(null);
+                }}
+                className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold cursor-pointer transition-colors border border-emerald-500/40 shadow-xs"
+              >
+                عقدت النية (أنا صائم) 🌙
               </button>
             </div>
           </div>

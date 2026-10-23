@@ -691,6 +691,69 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
           </div>
 
+          {/* Sunnah Fasting Reminders */}
+          <div className="pt-4 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                <Moon size={16} className="text-emerald-700" />
+                <span>تنبيهات صيام النوافل والأيام البيض (Sunnah Fasting)</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(
+                    new CustomEvent('trigger-test-fasting', {
+                      detail: {
+                        title: 'تذكير بصيام الاثنين المبارك 🌙',
+                        message: 'غداً يوم الاثنين، ترفع فيه الأعمال إلى الله تعالى. انوِ الصيام ونل الأجر العظيم.',
+                        virtue: '«تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ»'
+                      }
+                    })
+                  );
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                title="تجربة إشعار تذكير الصيام"
+              >
+                <Sparkles size={12} />
+                <span>تجربة تنبيه الصيام</span>
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 space-y-4">
+              {/* Monday & Thursday */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">تنبيه صيام الإثنين والخميس</h4>
+                  <p className="text-[11px] text-slate-500 font-readex">
+                    إشعار يظهر مساء الأحد ومساء الأربعاء للتذكير بفضل صيام الغد وعقد النية
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.fastingMondayThursdayReminder !== false}
+                  onChange={(e) => setFormData({ ...formData, fastingMondayThursdayReminder: e.target.checked })}
+                  className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                />
+              </div>
+
+              {/* White Days */}
+              <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-xs text-slate-900 font-readex">تنبيه الأيام البيض (13، 14، 15 هجري)</h4>
+                  <p className="text-[11px] text-slate-500 font-readex">
+                    إشعار تلقائي يعتمد على التقويم الهجري القمري يذكرك بصيام الأيام البيض الثلاثة من كل شهر
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={formData.fastingWhiteDaysReminder !== false}
+                  onChange={(e) => setFormData({ ...formData, fastingWhiteDaysReminder: e.target.checked })}
+                  className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Theme / Appearance */}
           <div className="pt-4 border-t border-slate-100">
             <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 mb-3 font-readex">

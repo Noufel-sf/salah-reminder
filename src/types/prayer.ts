@@ -56,6 +56,9 @@ export interface AppSettings {
   randomDhikrEnabled?: boolean;
   randomDhikrInterval?: number; // 0 for random (20-45m), or 15, 30, 45, 60 mins
   miniWidgetEnabled?: boolean;
+  fastingMondayThursdayReminder?: boolean;
+  fastingWhiteDaysReminder?: boolean;
+  isFastingToday?: boolean;
   theme?: 'light' | 'dark' | 'system';
 }
 

@@ -1,11 +1,12 @@
 import React from 'react';
 import { PrayerItem, PrayerName, AppSettings } from '../../types/prayer';
-import { calculateQibla, DEFAULT_IQAMAH_MINUTES } from '../../utils/prayerTimes';
+import { calculateQibla, DEFAULT_IQAMAH_MINUTES, getFastingDayInfo } from '../../utils/prayerTimes';
 import { NextPrayerHero } from '../dashboard/NextPrayerHero';
 import { IqamahCountdownBanner } from '../dashboard/IqamahCountdownBanner';
 import { DashboardStats } from '../dashboard/DashboardStats';
 import { PrayerScheduleTable } from '../dashboard/PrayerScheduleTable';
 import { DailyEncouragement } from '../dashboard/DailyEncouragement';
+import { FastingImsakIftarCard } from '../dashboard/FastingImsakIftarCard';
 import { DailyVerseCard } from '../dashboard/DailyVerseCard';
 import { TasbihCard } from '../dashboard/TasbihCard';
 import { QiblaShortcutCard } from '../dashboard/QiblaShortcutCard';
@@ -21,6 +22,7 @@ interface PrayerDashboardViewProps {
   onOpenTasbihTab?: () => void;
   onOpenDuasTab?: () => void;
   onOpenQuranTab?: () => void;
+  onToggleFastingToday?: () => void;
 }
 
 export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
@@ -33,10 +35,12 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onOpenSettingsTab,
   onOpenTasbihTab,
   onOpenDuasTab,
-  onOpenQuranTab
+  onOpenQuranTab,
+  onToggleFastingToday
 }) => {
   const [dismissedIqamahPrayer, setDismissedIqamahPrayer] = React.useState<string | null>(null);
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
+  const fastingInfo = React.useMemo(() => getFastingDayInfo(), []);
 
   const activeIqamahInfo = React.useMemo(() => {
     if (settings.iqamahEnabled === false || !currentPrayer || currentPrayer.id === 'Sunrise') {
@@ -101,6 +105,12 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
 
         {/* Right Supporting Panel (xl:col-span-4) */}
         <div className="xl:col-span-4 space-y-6">
+          <FastingImsakIftarCard
+            prayers={prayers}
+            fastingInfo={fastingInfo}
+            isFastingToday={settings.isFastingToday ?? false}
+            onToggleFastingToday={onToggleFastingToday || (() => {})}
+          />
           <DailyVerseCard onOpenQuranTab={onOpenQuranTab} />
           <TasbihCard />
           <QiblaShortcutCard

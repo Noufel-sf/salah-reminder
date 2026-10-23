@@ -41,6 +41,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   randomDhikrEnabled: true,
   randomDhikrInterval: 0,
+  fastingMondayThursdayReminder: true,
+  fastingWhiteDaysReminder: true,
+  isFastingToday: false,
   theme: 'light'
 };
 
@@ -202,21 +205,162 @@ export function formatTime(date: Date): string {
   return `${displayHours}:${minutes} ${period}`;
 }
 
-export function getHijriDate(date: Date = new Date()): { formatted: string; arabic: string } {
+export interface HijriDateParts {
+  day: number;
+  month: number;
+  monthName: string;
+  year: number;
+  formatted: string;
+  arabic: string;
+}
+
+export function getHijriDateParts(date: Date = new Date()): HijriDateParts {
   try {
+    const formatterEn = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric'
+    });
+    const parts = formatterEn.formatToParts(date);
+    const day = parseInt(parts.find((p) => p.type === 'day')?.value || '1', 10);
+    const month = parseInt(parts.find((p) => p.type === 'month')?.value || '1', 10);
+    const year = parseInt(parts.find((p) => p.type === 'year')?.value || '1446', 10);
+
     const formatterArabic = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
     const formatted = formatterArabic.format(date);
+
+    const monthNames = [
+      'محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة',
+      'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'
+    ];
+    const monthName = monthNames[month - 1] || 'شهر هجري';
+
     return {
+      day,
+      month,
+      monthName,
+      year,
       formatted,
       arabic: formatted
     };
   } catch {
-    return { formatted: '١٤٤٦ هـ', arabic: '١٤٤٦ هـ' };
+    return {
+      day: 15,
+      month: 8,
+      monthName: 'شعبان',
+      year: 1446,
+      formatted: '١٥ شعبان ١٤٤٦ هـ',
+      arabic: '١٥ شعبان ١٤٤٦ هـ'
+    };
   }
+}
+
+export function getHijriDate(date: Date = new Date()): { formatted: string; arabic: string } {
+  const parts = getHijriDateParts(date);
+  return {
+    formatted: parts.formatted,
+    arabic: parts.arabic
+  };
+}
+
+export interface FastingInfo {
+  isFastingDay: boolean;
+  type: 'monday' | 'thursday' | 'white_day' | 'ashura' | 'arafah' | 'ramadan' | 'none';
+  title: string;
+  virtue: string;
+  isTomorrowFastingDay: boolean;
+  tomorrowType: 'monday' | 'thursday' | 'white_day' | 'none';
+  tomorrowTitle: string;
+  tomorrowVirtue: string;
+  tomorrowDescription: string;
+  isTomorrowMondayOrThursday: boolean;
+  isTomorrowWhiteDay: boolean;
+}
+
+export function getFastingDayInfo(date: Date = new Date()): FastingInfo {
+  const dayOfWeek = date.getDay(); // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+  const hijri = getHijriDateParts(date);
+
+  const tomorrow = new Date(date);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowDayOfWeek = tomorrow.getDay();
+  const tomorrowHijri = getHijriDateParts(tomorrow);
+
+  // Check today
+  let isFastingDay = false;
+  let type: FastingInfo['type'] = 'none';
+  let title = '';
+  let virtue = '';
+
+  if (hijri.month === 9) {
+    isFastingDay = true;
+    type = 'ramadan';
+    title = 'صيام شهر رمضان المبارك';
+    virtue = 'صيام الفريضة، تغفر فيه الذنوب وتفتح فيه أبواب الجنان وتضاعف الحسنات.';
+  } else if (hijri.day === 13 || hijri.day === 14 || hijri.day === 15) {
+    isFastingDay = true;
+    type = 'white_day';
+    title = `صيام الأيام البيض (${hijri.day} ${hijri.monthName})`;
+    virtue = '«صِيَامُ ثَلاثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ الدَّهْرِ كُلِّهِ» (متفق عليه).';
+  } else if (dayOfWeek === 1) { // Monday
+    isFastingDay = true;
+    type = 'monday';
+    title = 'صيام يوم الإثنين (سنة نبوية)';
+    virtue = '«ذَلِكَ يَوْمٌ وُلِدْتُ فِيهِ، وَيَوْمٌ بُعِثْتُ أَوْ أُنْزِلَ عَلَيَّ فِيهِ» وتُعرض فيه الأعمال على الله.';
+  } else if (dayOfWeek === 4) { // Thursday
+    isFastingDay = true;
+    type = 'thursday';
+    title = 'صيام يوم الخميس (سنة نبوية)';
+    virtue = '«تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ».';
+  }
+
+  // Check tomorrow
+  let isTomorrowFastingDay = false;
+  let tomorrowType: FastingInfo['tomorrowType'] = 'none';
+  let tomorrowTitle = '';
+  let tomorrowVirtue = '';
+  let tomorrowDescription = '';
+
+  const isTomorrowWhiteDay = tomorrowHijri.day === 13 || tomorrowHijri.day === 14 || tomorrowHijri.day === 15;
+  const isTomorrowMondayOrThursday = tomorrowDayOfWeek === 1 || tomorrowDayOfWeek === 4;
+
+  if (isTomorrowWhiteDay) {
+    isTomorrowFastingDay = true;
+    tomorrowType = 'white_day';
+    tomorrowTitle = `تذكير بصيام الأيام البيض (${tomorrowHijri.day} ${tomorrowHijri.monthName}) 🌕`;
+    tomorrowDescription = `غداً يوافق اليوم ${tomorrowHijri.day} من شهر ${tomorrowHijri.monthName}، وهو من الأيام البيض المستحب صيامها.`;
+    tomorrowVirtue = '«صِيَامُ ثَلاثَةِ أَيَّامٍ مِنْ كُلِّ شَهْرٍ صِيَامُ الدَّهْرِ كُلِّهِ» (متفق عليه)';
+  } else if (tomorrowDayOfWeek === 1) {
+    isTomorrowFastingDay = true;
+    tomorrowType = 'monday';
+    tomorrowTitle = 'تذكير بصيام يوم الإثنين المبارك 🌙';
+    tomorrowDescription = 'غداً يوم الإثنين، ترفع فيه الأعمال إلى الله تعالى. انوِ الصيام ونل الأجر العظيم.';
+    tomorrowVirtue = '«تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ»';
+  } else if (tomorrowDayOfWeek === 4) {
+    isTomorrowFastingDay = true;
+    tomorrowType = 'thursday';
+    tomorrowTitle = 'تذكير بصيام يوم الخميس المبارك 🌙';
+    tomorrowDescription = 'غداً يوم الخميس، ترفع فيه الأعمال إلى الله تعالى. انوِ الصيام ونل الأجر العظيم.';
+    tomorrowVirtue = '«تُعْرَضُ الأَعْمَالُ يَوْمَ الاِثْنَيْنِ وَالْخَمِيسِ فَأُحِبُّ أَنْ يُعْرَضَ عَمَلِي وَأَنَا صَائِمٌ»';
+  }
+
+  return {
+    isFastingDay,
+    type,
+    title,
+    virtue,
+    isTomorrowFastingDay,
+    tomorrowType,
+    tomorrowTitle,
+    tomorrowVirtue,
+    tomorrowDescription,
+    isTomorrowMondayOrThursday,
+    isTomorrowWhiteDay
+  };
 }
 
 export function getGregorianDateArabic(date: Date = new Date()): string {
