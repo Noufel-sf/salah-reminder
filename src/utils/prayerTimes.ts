@@ -1,6 +1,15 @@
 import { Coordinates, CalculationMethod, CalculationParameters, PrayerTimes, Madhab } from 'adhan';
 import { AppSettings, CalculationMethodKey, PrayerItem, PrayerName } from '../types/prayer';
 
+export const DEFAULT_IQAMAH_MINUTES: Record<PrayerName, number> = {
+  Fajr: 20,
+  Sunrise: 0,
+  Dhuhr: 15,
+  Asr: 15,
+  Maghrib: 10,
+  Isha: 15
+};
+
 export const DEFAULT_SETTINGS: AppSettings = {
   city: 'قسنطينة',
   country: 'الجزائر',
@@ -11,7 +20,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   soundOption: 'full_adhan',
   adhanVolume: 0.8,
   autoStart: true,
-  remindMinutesBefore: 0,
+  remindMinutesBefore: 15, // 15 minutes before prayer adhan
+  iqamahEnabled: true,
+  iqamahDurations: DEFAULT_IQAMAH_MINUTES,
   enabledPrayers: {
     Fajr: true,
     Sunrise: false,

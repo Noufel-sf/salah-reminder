@@ -48,7 +48,9 @@ export interface AppSettings {
   soundOption: SoundOption;
   adhanVolume: number; // 0 to 1
   autoStart: boolean;
-  remindMinutesBefore: number; // e.g. 0 or 15 mins before
+  remindMinutesBefore: number; // e.g. 0, 5, 10, 15, or 20 mins before
+  iqamahEnabled?: boolean;
+  iqamahDurations?: Partial<Record<PrayerName, number>>;
   enabledPrayers: Record<PrayerName, boolean>;
   prayerAdjustments?: Partial<Record<PrayerName, number>>;
   randomDhikrEnabled?: boolean;

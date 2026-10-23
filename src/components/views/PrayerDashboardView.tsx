@@ -1,7 +1,8 @@
 import React from 'react';
 import { PrayerItem, PrayerName, AppSettings } from '../../types/prayer';
-import { calculateQibla } from '../../utils/prayerTimes';
+import { calculateQibla, DEFAULT_IQAMAH_MINUTES } from '../../utils/prayerTimes';
 import { NextPrayerHero } from '../dashboard/NextPrayerHero';
+import { IqamahCountdownBanner } from '../dashboard/IqamahCountdownBanner';
 import { DashboardStats } from '../dashboard/DashboardStats';
 import { PrayerScheduleTable } from '../dashboard/PrayerScheduleTable';
 import { DailyEncouragement } from '../dashboard/DailyEncouragement';
@@ -32,7 +33,31 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
   onOpenTasbihTab,
   onOpenDuasTab
 }) => {
+  const [dismissedIqamahPrayer, setDismissedIqamahPrayer] = React.useState<string | null>(null);
   const qiblaAngle = calculateQibla(settings.latitude, settings.longitude);
+
+  const activeIqamahInfo = React.useMemo(() => {
+    if (settings.iqamahEnabled === false || !currentPrayer || currentPrayer.id === 'Sunrise') {
+      return null;
+    }
+    if (dismissedIqamahPrayer === currentPrayer.id) {
+      return null;
+    }
+
+    const now = new Date().getTime();
+    const prayerTime = new Date(currentPrayer.time).getTime();
+    const diff = now - prayerTime;
+    const iqamahMins = settings.iqamahDurations?.[currentPrayer.id] ?? DEFAULT_IQAMAH_MINUTES[currentPrayer.id] ?? 15;
+
+    // Show banner from 0 to (iqamahMins + 5) minutes after adhan
+    if (diff >= 0 && diff <= (iqamahMins + 5) * 60 * 1000) {
+      return {
+        prayer: currentPrayer,
+        minutes: iqamahMins
+      };
+    }
+    return null;
+  }, [settings.iqamahEnabled, settings.iqamahDurations, currentPrayer, dismissedIqamahPrayer]);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -41,6 +66,16 @@ export const PrayerDashboardView: React.FC<PrayerDashboardViewProps> = ({
         nextPrayer={nextPrayer}
         currentPrayer={currentPrayer}
       />
+
+      {/* 1.5 Active Iqamah Countdown Banner */}
+      {activeIqamahInfo && (
+        <IqamahCountdownBanner
+          currentPrayer={activeIqamahInfo.prayer}
+          iqamahMinutes={activeIqamahInfo.minutes}
+          onDismiss={() => setDismissedIqamahPrayer(activeIqamahInfo.prayer.id)}
+          onOpenDuas={onOpenDuasTab}
+        />
+      )}
 
       {/* 2. Key Worship & Prayer Statistics (Real Adhkar stats) */}
       <DashboardStats

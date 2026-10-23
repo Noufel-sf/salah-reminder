@@ -9,7 +9,7 @@ import { CalendarView } from './components/views/CalendarView';
 import { SettingsView } from './components/views/SettingsView';
 
 import { AppSettings, PrayerName } from './types/prayer';
-import { DEFAULT_SETTINGS, calculatePrayerTimes } from './utils/prayerTimes';
+import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES } from './utils/prayerTimes';
 import { audioService } from './utils/audio';
 import { incrementDhikr } from './utils/worshipStats';
 import { sendDhikrNotification, DhikrReminder } from './utils/dhikrNotifications';
@@ -40,6 +40,8 @@ export const App: React.FC = () => {
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const lastAlertedPrayerRef = useRef<string>('');
+  const lastPreAlertedPrayerRef = useRef<string>('');
+  const lastIqamahAlertedRef = useRef<string>('');
 
   useEffect(() => {
     const theme = settings.theme || 'light';
@@ -88,8 +90,12 @@ export const App: React.FC = () => {
   const [isAdhanPlaying, setIsAdhanPlaying] = useState<boolean>(false);
   const [activeAdhanPrayer, setActiveAdhanPrayer] = useState<string>('');
   const [activeDhikrPop, setActiveDhikrPop] = useState<DhikrReminder | null>(null);
+  const [activePreAdhanToast, setActivePreAdhanToast] = useState<{ prayerName: string; minutesBefore: number } | null>(null);
+  const [activeIqamahToast, setActiveIqamahToast] = useState<{ prayerName: string } | null>(null);
   const toastTimeoutRef = useRef<any>(null);
   const dhikrPopTimeoutRef = useRef<any>(null);
+  const preAdhanTimeoutRef = useRef<any>(null);
+  const iqamahTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     const handleStarted = () => setIsAdhanPlaying(true);
@@ -190,19 +196,92 @@ export const App: React.FC = () => {
     return calculatePrayerTimes(settings, currentTime);
   }, [settings, currentTime.toDateString()]);
 
+  // Test event listeners for Pre-Adhan and Iqamah testing from Settings
+  useEffect(() => {
+    const handleTestPreAdhan = (e: any) => {
+      const prayerName = e.detail?.prayerName || 'الظهر';
+      const mins = e.detail?.minutes || settings.remindMinutesBefore || 15;
+      audioService.playChime(0.5);
+
+      if (window.electronAPI) {
+        window.electronAPI.showNotification(
+          `اقترب موعد صلاة ${prayerName} ⏳`,
+          `متبقي ${mins} دقيقة على الأذان في ${settings.city} - استعد للوضوء والصلاة.`
+        );
+      }
+      setActivePreAdhanToast({ prayerName, minutesBefore: mins });
+      if (preAdhanTimeoutRef.current) clearTimeout(preAdhanTimeoutRef.current);
+      preAdhanTimeoutRef.current = setTimeout(() => setActivePreAdhanToast(null), 12000);
+    };
+
+    const handleTestIqamah = (e: any) => {
+      const prayerName = e.detail?.prayerName || 'الظهر';
+      audioService.playBeep(0.4);
+
+      if (window.electronAPI) {
+        window.electronAPI.showNotification(
+          `حان موعد إقامة صلاة ${prayerName} 🕌`,
+          `استووا واعتدلوا، أقم الصلاة يرحمك الله.`
+        );
+      }
+      setActiveIqamahToast({ prayerName });
+      if (iqamahTimeoutRef.current) clearTimeout(iqamahTimeoutRef.current);
+      iqamahTimeoutRef.current = setTimeout(() => setActiveIqamahToast(null), 12000);
+    };
+
+    window.addEventListener('trigger-test-preadhan', handleTestPreAdhan);
+    window.addEventListener('trigger-test-iqamah', handleTestIqamah);
+    return () => {
+      window.removeEventListener('trigger-test-preadhan', handleTestPreAdhan);
+      window.removeEventListener('trigger-test-iqamah', handleTestIqamah);
+    };
+  }, [settings.remindMinutesBefore, settings.city]);
+
   useEffect(() => {
     if (!prayerData || !prayerData.prayers) return;
 
     const now = new Date();
     const todayStr = now.toDateString();
+    const nowMs = now.getTime();
 
     prayerData.prayers.forEach((prayer) => {
       if (prayer.id === 'Sunrise') return;
       if (!settings.enabledPrayers[prayer.id]) return;
 
       const prayerTime = new Date(prayer.time);
-      const diffMs = now.getTime() - prayerTime.getTime();
+      const prayerMs = prayerTime.getTime();
+      const diffMs = nowMs - prayerMs;
 
+      // 1. Pre-Adhan Preparation Alert (e.g. 10 or 15 minutes before)
+      const remindMins = settings.remindMinutesBefore || 0;
+      if (remindMins > 0) {
+        const preTimeMs = prayerMs - remindMins * 60 * 1000;
+        const preDiffMs = nowMs - preTimeMs;
+        if (preDiffMs >= 0 && preDiffMs < 45000) {
+          const preKey = `${todayStr}_preadhan_${prayer.id}_${remindMins}`;
+          if (lastPreAlertedPrayerRef.current !== preKey) {
+            lastPreAlertedPrayerRef.current = preKey;
+            audioService.playChime(0.5);
+
+            if (window.electronAPI) {
+              window.electronAPI.showNotification(
+                `اقترب موعد صلاة ${prayer.name} ⏳`,
+                `متبقي ${remindMins} دقيقة على الأذان في ${settings.city} - استعد للوضوء والصلاة.`
+              );
+            } else if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification(`اقترب موعد صلاة ${prayer.name} ⏳`, {
+                body: `متبقي ${remindMins} دقيقة على الأذان في ${settings.city} - استعد للوضوء.`
+              });
+            }
+
+            setActivePreAdhanToast({ prayerName: prayer.name, minutesBefore: remindMins });
+            if (preAdhanTimeoutRef.current) clearTimeout(preAdhanTimeoutRef.current);
+            preAdhanTimeoutRef.current = setTimeout(() => setActivePreAdhanToast(null), 14000);
+          }
+        }
+      }
+
+      // 2. Exact Adhan Time Alert
       if (diffMs >= 0 && diffMs < 45000) {
         const alertKey = `${todayStr}_${prayer.id}`;
         if (lastAlertedPrayerRef.current !== alertKey) {
@@ -220,6 +299,37 @@ export const App: React.FC = () => {
             new Notification(`حان الآن وقت ${prayer.name}`, {
               body: `حان موعد صلاة ${prayer.name} في مدينة ${settings.city}.`
             });
+          }
+        }
+      }
+
+      // 3. Iqamah Time Alert
+      if (settings.iqamahEnabled !== false) {
+        const iqamahMins = settings.iqamahDurations?.[prayer.id] ?? DEFAULT_IQAMAH_MINUTES[prayer.id] ?? 15;
+        if (iqamahMins > 0) {
+          const iqamahTimeMs = prayerMs + iqamahMins * 60 * 1000;
+          const iqamahDiffMs = nowMs - iqamahTimeMs;
+          if (iqamahDiffMs >= 0 && iqamahDiffMs < 45000) {
+            const iqamahKey = `${todayStr}_iqamah_${prayer.id}_${iqamahMins}`;
+            if (lastIqamahAlertedRef.current !== iqamahKey) {
+              lastIqamahAlertedRef.current = iqamahKey;
+              audioService.playBeep(0.4);
+
+              if (window.electronAPI) {
+                window.electronAPI.showNotification(
+                  `حان موعد إقامة صلاة ${prayer.name} 🕌`,
+                  `استووا واعتدلوا، أقم الصلاة يرحمك الله.`
+                );
+              } else if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(`حان موعد إقامة صلاة ${prayer.name} 🕌`, {
+                  body: `استووا واعتدلوا، أقم الصلاة يرحمك الله.`
+                });
+              }
+
+              setActiveIqamahToast({ prayerName: prayer.name });
+              if (iqamahTimeoutRef.current) clearTimeout(iqamahTimeoutRef.current);
+              iqamahTimeoutRef.current = setTimeout(() => setActiveIqamahToast(null), 14000);
+            }
           }
         }
       }
@@ -400,6 +510,82 @@ export const App: React.FC = () => {
                 className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold cursor-pointer transition-colors border border-emerald-500/40 shadow-xs"
               >
                 تسبيح (+1)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Pre-Adhan Preparation Toast */}
+      {activePreAdhanToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4 font-readex animate-fade-in">
+          <div className="bg-[#101c24]/95 border-2 border-amber-400 text-white p-4 shadow-2xl backdrop-blur-md rounded-none relative">
+            <div className="flex items-center justify-between pb-2 border-b border-amber-400/30">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-amber-400 rounded-none animate-ping" />
+                <span className="text-xs font-bold text-amber-300">
+                  اقترب موعد صلاة {activePreAdhanToast.prayerName} ⏳
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivePreAdhanToast(null)}
+                className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer"
+                title="إغلاق"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-sm font-semibold text-slate-100 my-2 leading-relaxed text-right">
+              متبقي {activePreAdhanToast.minutesBefore} دقيقة على رفع الأذان — استعد للوضوء والصلاة وأذكار المسجد.
+            </p>
+            <div className="flex items-center justify-between pt-2 border-t border-slate-700/60 text-[11px] text-slate-300">
+              <span className="text-amber-200">«إِسْبَاغُ الْوُضُوءِ عَلَى الْمَكَارِهِ»</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCurrentTab('duas');
+                  setActivePreAdhanToast(null);
+                }}
+                className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white font-bold cursor-pointer transition-colors"
+              >
+                أذكار الوضوء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Iqamah Time Arrived Toast */}
+      {activeIqamahToast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4 font-readex animate-fade-in">
+          <div className="bg-[#0b1f16]/95 border-2 border-emerald-400 text-white p-4 shadow-2xl backdrop-blur-md rounded-none relative">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-400/30">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-emerald-400 rounded-none animate-ping" />
+                <span className="text-xs font-bold text-emerald-300">
+                  حان الآن موعد إقامة صلاة {activeIqamahToast.prayerName} 🕌
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveIqamahToast(null)}
+                className="text-slate-400 hover:text-white text-xs p-1 cursor-pointer"
+                title="إغلاق"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="font-amiri text-lg font-bold text-emerald-100 text-center my-2 leading-relaxed">
+              «اسْتَوُوا وَاعْتَدِلُوا وَتَرَاصُّوا، أَقِمِ الصَّلَاةَ يَرْحَمُكَ اللَّهُ»
+            </p>
+            <div className="flex items-center justify-end pt-2 border-t border-emerald-500/20">
+              <button
+                type="button"
+                onClick={() => setActiveIqamahToast(null)}
+                className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold cursor-pointer transition-colors"
+              >
+                أقم الصلاة (إغلاق)
               </button>
             </div>
           </div>

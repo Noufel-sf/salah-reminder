@@ -15,10 +15,13 @@ import {
   Sliders,
   Plus,
   Minus,
-  Bell
+  Bell,
+  Clock,
+  Hourglass
 } from 'lucide-react';
 import { AppSettings, CalculationMethodKey, SoundOption, PrayerName } from '../../types/prayer';
 import { audioService } from '../../utils/audio';
+import { DEFAULT_IQAMAH_MINUTES } from '../../utils/prayerTimes';
 import { sendDhikrNotification } from '../../utils/dhikrNotifications';
 
 interface SettingsViewProps {
@@ -66,6 +69,14 @@ const PRAYERS_LIST: { id: PrayerName; label: string }[] = [
   { id: 'Isha', label: 'العشاء' }
 ];
 
+const OBLIGATORY_PRAYERS_LIST: { id: PrayerName; label: string }[] = [
+  { id: 'Fajr', label: 'الفجر' },
+  { id: 'Dhuhr', label: 'الظهر' },
+  { id: 'Asr', label: 'العصر' },
+  { id: 'Maghrib', label: 'المغرب' },
+  { id: 'Isha', label: 'العشاء' }
+];
+
 export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) => {
   const [formData, setFormData] = useState<AppSettings>(settings);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -92,6 +103,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
         ...prev,
         prayerAdjustments: {
           ...prev.prayerAdjustments,
+          [prayerId]: updated
+        }
+      };
+    });
+  };
+
+  const handleIqamahDurationChange = (prayerId: PrayerName, delta: number) => {
+    setFormData((prev) => {
+      const current = prev.iqamahDurations?.[prayerId] ?? DEFAULT_IQAMAH_MINUTES[prayerId] ?? 15;
+      const updated = Math.max(1, Math.min(60, current + delta));
+      return {
+        ...prev,
+        iqamahDurations: {
+          ...DEFAULT_IQAMAH_MINUTES,
+          ...prev.iqamahDurations,
           [prayerId]: updated
         }
       };
@@ -447,6 +473,154 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                 onChange={(e) => setFormData({ ...formData, adhanVolume: parseFloat(e.target.value) })}
                 className="w-full accent-emerald-700 cursor-pointer"
               />
+            </div>
+          </div>
+
+          {/* Pre-Adhan Preparation & Iqamah Countdown Timers */}
+          <div className="pt-4 border-t border-slate-100 space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2 font-readex">
+                  <Clock size={16} className="text-emerald-700" />
+                  <span>تنبيه الاستعداد للصلاة (قبل الأذان)</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(
+                      new CustomEvent('trigger-test-preadhan', {
+                        detail: { prayerName: 'الظهر', minutes: formData.remindMinutesBefore || 15 }
+                      })
+                    );
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-amber-50 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors cursor-pointer font-readex border border-amber-300"
+                  title="تجربة إشعار الاستعداد قبل الأذان"
+                >
+                  <Sparkles size={12} />
+                  <span>تجربة تنبيه الاستعداد</span>
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-500 mb-3 font-readex leading-relaxed">
+                إشعار لطيف بصوت خافت «اقترب موعد صلاة الظهر - استعد للوضوء»، ليمنحك وقتاً كافياً للوضوء وأذكار المسجد قبل رفع الأذان:
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                {[
+                  { value: 0, label: 'إيقاف التنبيه' },
+                  { value: 5, label: 'قبل 5 دقائق' },
+                  { value: 10, label: 'قبل 10 دقائق' },
+                  { value: 15, label: 'قبل 15 دقيقة (موصى به)' },
+                  { value: 20, label: 'قبل 20 دقيقة' }
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, remindMinutesBefore: opt.value })}
+                    className={`py-2 px-3 rounded-none border text-center text-xs font-semibold transition-all cursor-pointer font-readex ${
+                      formData.remindMinutesBefore === opt.value
+                        ? 'bg-emerald-800 border-emerald-800 text-white font-bold shadow-xs'
+                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Iqamah Countdown Section */}
+            <div className="pt-3 border-t border-slate-200/70">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Hourglass size={16} className="text-emerald-700" />
+                  <div>
+                    <h4 className="font-bold text-xs text-slate-900 font-readex">مؤقت إقامة الصلاة في المسجد (Iqamah Countdown)</h4>
+                    <p className="text-[11px] text-slate-500 font-readex">
+                      يبدأ مؤقت تنازلي بالدقائق والثواني بعد رفع الأذان مع شريط تقدم وتنبيه عند حلول الإقامة
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.dispatchEvent(
+                        new CustomEvent('trigger-test-iqamah', {
+                          detail: { prayerName: 'الظهر' }
+                        })
+                      );
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer font-readex border border-emerald-300"
+                    title="تجربة إشعار حلول وقت الإقامة"
+                  >
+                    <Sparkles size={12} />
+                    <span>تجربة تنبيه الإقامة</span>
+                  </button>
+
+                  <input
+                    type="checkbox"
+                    checked={formData.iqamahEnabled !== false}
+                    onChange={(e) => setFormData({ ...formData, iqamahEnabled: e.target.checked })}
+                    className="w-5 h-5 accent-emerald-700 rounded-none cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {formData.iqamahEnabled !== false && (
+                <div className="mt-3 p-3 bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-700 font-readex">
+                      تحديد وقت الإقامة لكل صلاة (بالدقائق):
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          iqamahDurations: { ...DEFAULT_IQAMAH_MINUTES }
+                        }));
+                      }}
+                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer font-readex"
+                    >
+                      استعادة الأوقات الرسمية
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    {OBLIGATORY_PRAYERS_LIST.map((pr) => {
+                      const mins = formData.iqamahDurations?.[pr.id] ?? DEFAULT_IQAMAH_MINUTES[pr.id] ?? 15;
+                      return (
+                        <div key={pr.id} className="p-2 bg-white border border-slate-200 text-center font-readex">
+                          <span className="block text-xs font-bold text-slate-800 mb-1">{pr.label}</span>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleIqamahDurationChange(pr.id, -1)}
+                              className="w-6 h-6 bg-slate-100 border border-slate-300 text-slate-700 hover:bg-slate-200 flex items-center justify-center font-bold text-xs cursor-pointer"
+                              title="إنقاص دقيقة"
+                            >
+                              <Minus size={11} />
+                            </button>
+                            <span className="font-mono text-xs font-bold text-emerald-800 min-w-[2.2rem]">
+                              {mins} د
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleIqamahDurationChange(pr.id, 1)}
+                              className="w-6 h-6 bg-slate-100 border border-slate-300 text-slate-700 hover:bg-slate-200 flex items-center justify-center font-bold text-xs cursor-pointer"
+                              title="زيادة دقيقة"
+                            >
+                              <Plus size={11} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
