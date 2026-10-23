@@ -76,7 +76,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           </div>
           <div className="leading-tight text-right">
             <h1 className="font-extrabold text-sm tracking-tight text-slate-900">
-              رمضان برو
+              نور
             </h1>
             <p className="text-[11px] font-medium text-slate-500">
               الصلاة والعبادة اليومية

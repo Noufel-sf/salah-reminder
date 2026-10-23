@@ -138,32 +138,47 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Periodic & Random Dhikr Reminders Scheduler
+  // Periodic & Random Dhikr Reminders Scheduler (Persistent & Resilient)
   useEffect(() => {
     if (settings.randomDhikrEnabled === false) return;
 
-    let timeoutId: any;
+    const DHIKR_NEXT_KEY = 'noor_next_dhikr_target_time';
 
-    const scheduleNext = () => {
-      // If interval is 0, choose random time between 20 and 45 minutes
-      // If > 0, use exact minutes
-      const intervalMinutes =
-        settings.randomDhikrInterval && settings.randomDhikrInterval > 0
-          ? settings.randomDhikrInterval
-          : 20 + Math.random() * 25;
-
-      const delayMs = intervalMinutes * 60 * 1000;
-
-      timeoutId = setTimeout(() => {
-        sendDhikrNotification();
-        scheduleNext();
-      }, delayMs);
+    const getIntervalMinutes = () => {
+      if (settings.randomDhikrInterval && settings.randomDhikrInterval > 0) {
+        return settings.randomDhikrInterval;
+      }
+      return 15 + Math.random() * 20; // 15 to 35 mins
     };
 
-    scheduleNext();
+    const checkAndTrigger = () => {
+      const now = Date.now();
+      const rawTarget = localStorage.getItem(DHIKR_NEXT_KEY);
+      const target = rawTarget ? parseInt(rawTarget, 10) : 0;
+
+      // Initialize if no target exists
+      if (!target || isNaN(target)) {
+        const nextTarget = now + getIntervalMinutes() * 60 * 1000;
+        localStorage.setItem(DHIKR_NEXT_KEY, nextTarget.toString());
+        return;
+      }
+
+      // If scheduled time has arrived
+      if (now >= target) {
+        sendDhikrNotification();
+        const nextTarget = now + getIntervalMinutes() * 60 * 1000;
+        localStorage.setItem(DHIKR_NEXT_KEY, nextTarget.toString());
+      }
+    };
+
+    // Run check on mount
+    checkAndTrigger();
+
+    // Regular ticker every 5 seconds so notifications are prompt and never throttled
+    const intervalId = setInterval(checkAndTrigger, 5000);
 
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      clearInterval(intervalId);
     };
   }, [settings.randomDhikrEnabled, settings.randomDhikrInterval]);
 

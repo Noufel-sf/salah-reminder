@@ -20,7 +20,7 @@ interface TrayData {
 }
 
 let lastTrayData: TrayData = {
-  tooltip: 'رمضان برو - منبّه الصلاة والأذكار',
+  tooltip: 'نور - منبّه الصلاة والأذكار',
   nextPrayerName: '',
   nextPrayerTime: '',
   remainingText: '',
@@ -56,8 +56,8 @@ function updateTrayMenu(data?: TrayData) {
   if (data) lastTrayData = data;
 
   const tooltip = lastTrayData.nextPrayerName
-    ? `رمضان برو | ${lastTrayData.nextPrayerName} بعد ${lastTrayData.remainingText} (${lastTrayData.nextPrayerTime})`
-    : (lastTrayData.tooltip || 'رمضان برو - منبّه الصلاة والأذكار');
+    ? `نور | ${lastTrayData.nextPrayerName} بعد ${lastTrayData.remainingText} (${lastTrayData.nextPrayerTime})`
+    : (lastTrayData.tooltip || 'نور - منبّه الصلاة والأذكار');
 
   tray.setToolTip(tooltip);
 
@@ -331,6 +331,11 @@ ipcMain.handle('get-startup', async () => {
 });
 
 app.whenReady().then(() => {
+  // Register AppUserModelId for Windows Action Center notifications
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('com.noor.app');
+  }
+
   createWindow();
   createTray();
 

@@ -664,13 +664,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
                   <label className="text-xs font-semibold text-slate-600 block mb-2 font-readex">
                     الفترة الزمنية بين الإشعارات
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                     {[
-                      { value: 0, label: 'أوقات عشوائية (20-45 دقيقة)' },
+                      { value: 0, label: 'عشوائي (15-35 د)' },
+                      { value: 5, label: 'كل 5 دقائق (تجربة)' },
                       { value: 15, label: 'كل 15 دقيقة' },
                       { value: 30, label: 'كل 30 دقيقة' },
                       { value: 45, label: 'كل 45 دقيقة' },
-                      { value: 60, label: 'كل ساعة (60 دقيقة)' }
+                      { value: 60, label: 'كل ساعة' }
                     ].map((opt) => (
                       <button
                         key={opt.value}
