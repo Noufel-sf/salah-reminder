@@ -10,6 +10,7 @@ import { SettingsView } from './components/views/SettingsView';
 import { QuranView } from './components/views/QuranView';
 import { MiniWidgetView } from './components/MiniWidgetView';
 import { SurahAlKahfModal } from './components/quran/SurahAlKahfModal';
+import { WelcomeOnboardingModal } from './components/onboarding/WelcomeOnboardingModal';
 
 import { AppSettings, PrayerName } from './types/prayer';
 import { DEFAULT_SETTINGS, calculatePrayerTimes, DEFAULT_IQAMAH_MINUTES, getFastingDayInfo } from './utils/prayerTimes';
@@ -119,11 +120,33 @@ export const App: React.FC = () => {
   const lastJumuahKahfAlertRef = useRef<string>('');
   const lastJumuahIjabahAlertRef = useRef<string>('');
 
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('noor_onboarding_completed') !== 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const handleToggleMiniWidget = () => {
     if (window.electronAPI?.toggleWidget) {
       window.electronAPI.toggleWidget();
     } else {
       setShowInPageWidget((prev) => !prev);
+    }
+  };
+
+  useEffect(() => {
+    const handleOpenOnboarding = () => setIsOnboardingOpen(true);
+    window.addEventListener('open-onboarding', handleOpenOnboarding);
+    return () => window.removeEventListener('open-onboarding', handleOpenOnboarding);
+  }, []);
+
+  const handleCompleteOnboarding = (updatedSettings: AppSettings) => {
+    setIsOnboardingOpen(false);
+    handleSaveSettings(updatedSettings);
+    if (window.electronAPI?.setStartup) {
+      window.electronAPI.setStartup(updatedSettings.autoStart);
     }
   };
 
@@ -1004,6 +1027,14 @@ export const App: React.FC = () => {
         <div className="fixed bottom-6 left-6 z-50 w-[330px] h-[76px] shadow-2xl animate-fade-in">
           <MiniWidgetView />
         </div>
+      )}
+
+      {/* First-Time Welcome & Onboarding Tour Modal */}
+      {isOnboardingOpen && (
+        <WelcomeOnboardingModal
+          currentSettings={settings}
+          onComplete={handleCompleteOnboarding}
+        />
       )}
     </div>
   );

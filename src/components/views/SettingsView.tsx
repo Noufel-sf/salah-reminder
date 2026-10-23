@@ -183,13 +183,25 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ settings, onSave }) 
             </div>
           </div>
 
-          <button
-            onClick={handleSaveAll}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-none bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-sm transition-all cursor-pointer font-readex"
-          >
-            {isSaved ? <Check size={14} className="text-emerald-300" /> : <Sparkles size={14} />}
-            <span>{isSaved ? 'تم الحفظ بنجاح!' : 'حفظ التغييرات'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('open-onboarding'))}
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-none bg-slate-100 dark:bg-[#162520] hover:bg-slate-200 dark:hover:bg-[#20362c] text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-[#233b31] font-semibold text-xs transition-colors cursor-pointer font-readex"
+              title="إعادة فتح شاشة الترحيب والتهيئة الأولى"
+            >
+              <Sparkles size={13} className="text-emerald-700 dark:text-emerald-400" />
+              <span>جولة الترحيب 🌿</span>
+            </button>
+
+            <button
+              onClick={handleSaveAll}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-none bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer font-readex"
+            >
+              {isSaved ? <Check size={14} className="text-emerald-300" /> : <Sparkles size={14} />}
+              <span>{isSaved ? 'تم الحفظ بنجاح!' : 'حفظ التغييرات'}</span>
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6">
