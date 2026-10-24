@@ -6,10 +6,8 @@ import {
   Plus, 
   Minus, 
   Bookmark, 
-  Radio, 
   Volume2, 
   Square, 
-  Play, 
   Copy, 
   RotateCw,
   Award
@@ -153,22 +151,11 @@ const SURAHS_LIST = [
   { name: 'الناس', number: 114, totalAyahs: 6 }
 ];
 
-const RADIO_STATIONS = [
-  { id: 'algeria', name: 'إذاعة القرآن الكريم (الجزائر)', url: 'https://webradio.tda.dz/Coran_64K.mp3' },
-  { id: 'makkah', name: 'إذاعة القرآن الكريم (مكة المكرمة)', url: 'https://stream.radiojar.com/0tpy1h0kxtzuv' },
-  { id: 'cairo', name: 'إذاعة القرآن الكريم (القاهرة)', url: 'https://stream.zeno.fm/06283y6sm98uv' }
-];
-
 export const QuranView: React.FC = () => {
   const [verse, setVerse] = useState<DailyVerse>(getTodayVerse());
   const [copied, setCopied] = useState<boolean>(false);
   const [isPlayingRecitation, setIsPlayingRecitation] = useState<boolean>(false);
   const [recitationAudio, setRecitationAudio] = useState<HTMLAudioElement | null>(null);
-
-  // Live Radio State
-  const [activeRadio, setActiveRadio] = useState<string | null>(null);
-  const [radioAudio, setRadioAudio] = useState<HTMLAudioElement | null>(null);
-  const [isRadioBuffering, setIsRadioBuffering] = useState<boolean>(false);
 
   // Daily Wird Tracker State
   const [tracker, setTracker] = useState<QuranTrackerState>(() => {
@@ -202,9 +189,8 @@ export const QuranView: React.FC = () => {
   useEffect(() => {
     return () => {
       if (recitationAudio) recitationAudio.pause();
-      if (radioAudio) radioAudio.pause();
     };
-  }, [recitationAudio, radioAudio]);
+  }, [recitationAudio]);
 
   const handleNextVerse = () => {
     if (recitationAudio) {
@@ -238,36 +224,6 @@ export const QuranView: React.FC = () => {
       a.onerror = () => setIsPlayingRecitation(false);
       a.play().catch(() => setIsPlayingRecitation(false));
     }
-  };
-
-  const handleToggleRadio = (station: typeof RADIO_STATIONS[0]) => {
-    if (activeRadio === station.id && radioAudio) {
-      radioAudio.pause();
-      setActiveRadio(null);
-      setIsRadioBuffering(false);
-      return;
-    }
-
-    if (radioAudio) {
-      radioAudio.pause();
-    }
-
-    setIsRadioBuffering(true);
-    const a = new Audio(station.url);
-    setRadioAudio(a);
-    setActiveRadio(station.id);
-
-    a.onplaying = () => setIsRadioBuffering(false);
-    a.onerror = () => {
-      setIsRadioBuffering(false);
-      setActiveRadio(null);
-      alert('تعذر تشغيل البث المباشر للإذاعة حالياً، يرجى المحاولة لاحقاً.');
-    };
-
-    a.play().catch(() => {
-      setIsRadioBuffering(false);
-      setActiveRadio(null);
-    });
   };
 
   const handleAddPages = (delta: number) => {
@@ -304,33 +260,6 @@ export const QuranView: React.FC = () => {
               «اقْرَؤُوا القُرْآنَ فإنَّه يَأْتي يَومَ القِيامَةِ شَفِيعًا لأَصْحابِهِ» — رتّل آيات الله وتدبّر معانيها
             </p>
           </div>
-        </div>
-
-        {/* Live Quran Radios Quick Bar */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5 ml-2">
-            <Radio size={14} className={activeRadio ? 'animate-pulse text-amber-400' : ''} />
-            <span>إذاعات القرآن:</span>
-          </span>
-          {RADIO_STATIONS.map((st) => (
-            <button
-              key={st.id}
-              type="button"
-              onClick={() => handleToggleRadio(st)}
-              className={`px-3 py-1.5 rounded-none text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
-                activeRadio === st.id
-                  ? 'bg-amber-600 border-amber-400 text-white font-bold animate-pulse'
-                  : 'bg-emerald-950/80 border-emerald-500/30 text-emerald-100 hover:bg-emerald-900'
-              }`}
-            >
-              {activeRadio === st.id ? <Square size={11} /> : <Play size={11} />}
-              <span>
-                {activeRadio === st.id && isRadioBuffering
-                  ? 'جاري الاتصال...'
-                  : st.name.replace('إذاعة القرآن الكريم ', '')}
-              </span>
-            </button>
-          ))}
         </div>
       </div>
 
