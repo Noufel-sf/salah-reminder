@@ -86,11 +86,11 @@ export function sendDhikrNotification(customDhikr?: DhikrReminder): DhikrReminde
     window.electronAPI.showNotification(title, `${item.arabic} - ${item.virtue}`);
   } else if (typeof window !== 'undefined' && 'Notification' in window) {
     if (Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/icon.png' });
+      new Notification(title, { body, icon: './icon.png' });
     } else if (Notification.permission !== 'denied') {
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-          new Notification(title, { body, icon: '/icon.png' });
+          new Notification(title, { body, icon: './icon.png' });
         }
       });
     }

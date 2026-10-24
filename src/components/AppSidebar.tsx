@@ -14,6 +14,7 @@ import {
   Sun
 } from 'lucide-react';
 import { AppSettings } from '../types/prayer';
+import appLogo from '../assets/logo.png';
 
 export type NavTab = 'prayers' | 'quran' | 'duas' | 'calendar' | 'qibla' | 'tasbih' | 'settings';
 
@@ -72,7 +73,15 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         {/* Brand Header */}
         <div className="titlebar-drag px-2 mb-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-none flex items-center justify-center shrink-0 bg-[#004217] border border-emerald-900/30 overflow-hidden shadow-xs">
-            <img src="/logo.png" alt="شعار التطبيق" className="w-full h-full object-cover" />
+            <img 
+              src={appLogo} 
+              alt="شعار التطبيق" 
+              className="w-full h-full object-cover" 
+              onError={(e) => {
+                // Fallback to relative path in root if bundled asset fails
+                (e.currentTarget as HTMLImageElement).src = './logo.png';
+              }}
+            />
           </div>
           <div className="leading-tight text-right">
             <h1 className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-slate-100">

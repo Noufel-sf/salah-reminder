@@ -11,6 +11,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { AppSettings } from '../types/prayer';
+import appLogo from '../assets/logo.png';
 
 export type NavTab = 'prayers' | 'qibla' | 'tasbih' | 'duas' | 'calendar' | 'settings';
 
@@ -81,7 +82,14 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       <div className="p-4 overflow-y-auto">
         <div className="titlebar-drag px-2 py-3 mb-4 flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-none bg-[#004217] flex items-center justify-center border border-emerald-900/30 overflow-hidden shadow-xs">
-            <img src="/logo.png" alt="شعار التطبيق" className="w-full h-full object-cover" />
+            <img 
+              src={appLogo} 
+              alt="شعار التطبيق" 
+              className="w-full h-full object-cover" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = './logo.png';
+              }}
+            />
           </div>
           <div className="leading-tight text-right">
             <h1 className="font-extrabold text-sm text-[#123d2e] tracking-tight font-readex">رمضان برو</h1>
