@@ -162,8 +162,8 @@ function createWidgetWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
 
-  const widgetWidth = 330;
-  const widgetHeight = 76;
+  const widgetWidth = 350;
+  const widgetHeight = 82;
   const x = screenWidth - widgetWidth - 24;
   const y = screenHeight - widgetHeight - 24;
 

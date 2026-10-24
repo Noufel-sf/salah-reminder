@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Maximize2, X, Plus } from 'lucide-react';
 import { AppSettings, PrayerItem } from '../types/prayer';
 import { calculatePrayerTimes, DEFAULT_SETTINGS } from '../utils/prayerTimes';
@@ -7,8 +7,21 @@ import { incrementDhikr } from '../utils/worshipStats';
 
 const STORAGE_KEY = 'noor_prayer_settings';
 
-export const MiniWidgetView: React.FC = () => {
-  const [settings] = useState<AppSettings>(() => {
+interface MiniWidgetViewProps {
+  isStandalone?: boolean;
+  settings?: AppSettings;
+  onClose?: () => void;
+  onOpenMain?: () => void;
+}
+
+export const MiniWidgetView: React.FC<MiniWidgetViewProps> = ({
+  isStandalone = false,
+  settings: propSettings,
+  onClose,
+  onOpenMain
+}) => {
+  const [internalSettings, setInternalSettings] = useState<AppSettings>(() => {
+    if (propSettings) return propSettings;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
@@ -17,6 +30,32 @@ export const MiniWidgetView: React.FC = () => {
     }
     return DEFAULT_SETTINGS;
   });
+
+  const effectiveSettings = propSettings || internalSettings;
+
+  useEffect(() => {
+    if (isStandalone) {
+      document.documentElement.style.backgroundColor = 'transparent';
+      document.body.style.backgroundColor = 'transparent';
+      document.body.style.overflow = 'hidden';
+    }
+  }, [isStandalone]);
+
+  useEffect(() => {
+    if (propSettings) {
+      setInternalSettings(propSettings);
+    }
+  }, [propSettings]);
+
+  useEffect(() => {
+    const handleSettingsUpdate = (e: any) => {
+      if (e.detail) {
+        setInternalSettings(e.detail);
+      }
+    };
+    window.addEventListener('prayer-settings-updated', handleSettingsUpdate);
+    return () => window.removeEventListener('prayer-settings-updated', handleSettingsUpdate);
+  }, []);
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [tasbihCount, setTasbihCount] = useState<number>(0);
@@ -27,11 +66,14 @@ export const MiniWidgetView: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const prayerData = calculatePrayerTimes(settings, currentTime);
+  const prayerData = useMemo(() => {
+    return calculatePrayerTimes(effectiveSettings, currentTime);
+  }, [effectiveSettings, currentTime]);
+
   const nextPrayer: PrayerItem | null = prayerData.nextPrayer;
 
   // Calculate remaining time
-  const remaining = React.useMemo(() => {
+  const remaining = useMemo(() => {
     if (!nextPrayer) return { text: '--:--', isImminent: false };
     const now = currentTime.getTime();
     const target = new Date(nextPrayer.time).getTime();
@@ -73,33 +115,43 @@ export const MiniWidgetView: React.FC = () => {
   }, []);
 
   const handleOpenMain = () => {
-    if (window.electronAPI) {
+    if (onOpenMain) {
+      onOpenMain();
+    }
+    if (window.electronAPI?.openMain) {
       window.electronAPI.openMain();
     }
   };
 
   const handleCloseWidget = () => {
-    if (window.electronAPI) {
+    if (onClose) {
+      onClose();
+    }
+    if (isStandalone && window.electronAPI?.closeWidget) {
       window.electronAPI.closeWidget();
     }
   };
 
   return (
     <div
-      className="w-screen h-screen flex items-center justify-center p-1.5 select-none font-readex bg-transparent overflow-hidden"
-      style={{ WebkitAppRegion: 'drag' } as any}
+      className={
+        isStandalone
+          ? 'w-screen h-screen flex items-center justify-center p-1 select-none font-readex bg-transparent overflow-hidden'
+          : 'w-full h-full select-none font-readex overflow-hidden'
+      }
+      style={isStandalone ? ({ WebkitAppRegion: 'drag' } as any) : undefined}
     >
-      <div className="w-full h-full bg-[#0a1813]/95 border-2 border-emerald-500/50 shadow-2xl backdrop-blur-md px-3.5 py-2 flex items-center justify-between text-white relative rounded-none">
+      <div className="w-full h-full bg-[#0b1f16]/95 border-2 border-emerald-500/80 shadow-2xl backdrop-blur-md px-3.5 py-2 flex items-center justify-between text-white relative rounded-none">
         {/* Decorative corner indicator */}
         <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-emerald-400 pointer-events-none" />
 
-        {/* Right Info Section (Prayer info & Countdown) */}
+        {/* Right Info Section (Prayer info & Countdown in RTL) */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex flex-col items-start leading-tight">
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-none ${remaining.isImminent ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
               <span className="text-xs font-bold text-emerald-200 truncate">
-                {nextPrayer ? nextPrayer.name : 'الصلاة'}
+                {nextPrayer ? (nextPrayer.arabicName || nextPrayer.name) : 'الصلاة'}
               </span>
               <span className="text-[11px] font-mono text-slate-400">
                 ({nextPrayer ? nextPrayer.timeString : '--:--'})

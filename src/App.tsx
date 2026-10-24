@@ -25,7 +25,7 @@ const STORAGE_KEY = 'noor_prayer_settings';
 export const App: React.FC = () => {
   const isWidgetWindow = typeof window !== 'undefined' && window.location.hash === '#widget';
   if (isWidgetWindow) {
-    return <MiniWidgetView />;
+    return <MiniWidgetView isStandalone={true} />;
   }
 
   const [currentTab, setCurrentTab] = useState<NavTab>('prayers');
@@ -67,6 +67,7 @@ export const App: React.FC = () => {
   const handleSaveSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
+    window.dispatchEvent(new CustomEvent('prayer-settings-updated', { detail: newSettings }));
   };
 
   const handleToggleTheme = () => {
@@ -1038,8 +1039,16 @@ export const App: React.FC = () => {
 
       {/* Floating In-page Desktop Mini-Widget (Fallback or browser preview mode) */}
       {showInPageWidget && (
-        <div className="fixed bottom-6 left-6 z-50 w-[330px] h-[76px] shadow-2xl animate-fade-in">
-          <MiniWidgetView />
+        <div className="fixed bottom-6 left-6 z-50 w-[350px] h-[76px] shadow-2xl animate-fade-in">
+          <MiniWidgetView
+            isStandalone={false}
+            settings={settings}
+            onClose={() => setShowInPageWidget(false)}
+            onOpenMain={() => {
+              setCurrentTab('prayers');
+              setShowInPageWidget(false);
+            }}
+          />
         </div>
       )}
 
