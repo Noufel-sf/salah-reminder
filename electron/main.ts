@@ -6,10 +6,23 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// In development, isolate userData directory to prevent lock conflicts with installed production app
+if (!app.isPackaged) {
+  app.setPath('userData', path.join(app.getPath('appData'), 'pray-reminder-dev'));
+}
+
 // Single Instance Lock: Prevent multiple app instances running simultaneously
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
   app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
 }
 
 let mainWindow: BrowserWindow | null = null;
