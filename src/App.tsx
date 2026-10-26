@@ -8,6 +8,7 @@ import { DuasView } from './components/views/DuasView';
 import { CalendarView } from './components/views/CalendarView';
 import { SettingsView } from './components/views/SettingsView';
 import { QuranView } from './components/views/QuranView';
+import { NawawiView } from './components/views/NawawiView';
 import { MiniWidgetView } from './components/MiniWidgetView';
 import { SurahAlKahfModal } from './components/quran/SurahAlKahfModal';
 import { WelcomeOnboardingModal } from './components/onboarding/WelcomeOnboardingModal';
@@ -690,6 +691,11 @@ export const App: React.FC = () => {
           title: 'المصحف الشريف والورد اليومي',
           subtitle: 'آية اليوم وتفسيرها الميسر ومتابعة الورد والختمة'
         };
+      case 'nawawi':
+        return {
+          title: 'الأربعون النووية',
+          subtitle: 'متن الأحاديث الأربعين النووية للإمام النووي مع الشرح والفوائد الفقهية'
+        };
       case 'qibla':
         return {
           title: 'اتجاه القبلة',
@@ -764,6 +770,10 @@ export const App: React.FC = () => {
 
           {currentTab === 'quran' && (
             <QuranView />
+          )}
+
+          {currentTab === 'nawawi' && (
+            <NawawiView />
           )}
 
           {currentTab === 'qibla' && (

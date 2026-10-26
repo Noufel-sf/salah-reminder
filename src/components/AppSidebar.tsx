@@ -11,12 +11,13 @@ import {
   VolumeX, 
   MapPin, 
   Moon,
-  Sun
+  Sun,
+  BookMarked
 } from 'lucide-react';
 import { AppSettings } from '../types/prayer';
 import appLogo from '../assets/logo.png';
 
-export type NavTab = 'prayers' | 'quran' | 'duas' | 'calendar' | 'qibla' | 'tasbih' | 'settings';
+export type NavTab = 'prayers' | 'quran' | 'nawawi' | 'duas' | 'calendar' | 'qibla' | 'tasbih' | 'settings';
 
 interface AppSidebarProps {
   currentTab: NavTab;
@@ -47,6 +48,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       items: [
         { id: 'prayers', label: 'مواقيت الصلاة', icon: <Clock size={17} strokeWidth={2} /> },
         { id: 'quran', label: 'المصحف والورد', icon: <BookOpen size={17} strokeWidth={2} /> },
+        { id: 'nawawi', label: 'الأربعون النووية', icon: <BookMarked size={17} strokeWidth={2} /> },
         { id: 'duas', label: 'الأذكار والحديث', icon: <ScrollText size={17} strokeWidth={2} /> },
         { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={17} strokeWidth={2} /> }
       ]
